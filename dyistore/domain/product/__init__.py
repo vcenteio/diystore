@@ -1,0 +1,1 @@
+from pydantic.dataclasses import dataclass as pydantic_dataclass
