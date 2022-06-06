@@ -28,3 +28,9 @@ class Discount(BaseModel):
         if "creation_date" in values and date <= values["creation_date"]:
             raise ValueError("expiry_date must be greater than creation_date")
         return date
+
+    def __mul__(self, other):
+        return self.rate * other
+    
+    def __rmul__(self, other):
+        return self.__mul__(other)
