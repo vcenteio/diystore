@@ -4,6 +4,7 @@ from uuid import uuid4
 import pytest
 from pydantic.error_wrappers import ValidationError
 
+from dyistore.domain.product.vat import VAT
 from .conftest import VATFactory
 
 
@@ -91,3 +92,19 @@ def test_vat_id_correct_conversion_from_str(faker):
     str_uuid = faker.uuid4()
     v = VATFactory(id=str_uuid)
     assert v.id == UUID(str_uuid) and isinstance(v.id, UUID)
+
+
+def test_vat_name_is_required():
+    with pytest.raises(ValidationError) as e:
+        VAT(rate=0.25)
+    err_repr = repr(e.getrepr())
+    assert "name" in err_repr
+    assert "field required" in err_repr
+
+
+def test_vat_rate_is_required():
+    with pytest.raises(ValidationError) as e:
+        VAT(name="abc")
+    err_repr = repr(e.getrepr())
+    assert "rate" in err_repr
+    assert "field required" in err_repr
