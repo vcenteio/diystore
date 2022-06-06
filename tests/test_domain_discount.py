@@ -16,8 +16,8 @@ def test_discount_rate_wrong_type(rate):
         DiscountFactory(rate=rate)
 
 
-@pytest.mark.parametrize("rate", (1, 0.5))
-def test_discount_rate_float_and_int_are_converted_to_decimal(rate):
+@pytest.mark.parametrize("rate", (1, 0.5, "1"))
+def test_discount_rate_float_int_str_are_converted_to_decimal(rate):
     d = DiscountFactory(rate=rate)
     assert isinstance(d.rate, Decimal)
 
@@ -118,10 +118,10 @@ def test_discount_id_correct_type():
 def test_discount_id_correct_value():
     _id = uuid4()
     d = DiscountFactory(id=_id)
-    assert d.id == _id and isinstance(d.id, UUID)
+    assert d.id == _id
 
 
 def test_discount_id_correct_conversion_from_str(faker):
     str_uuid = faker.uuid4()
     d = DiscountFactory(id=str_uuid)
-    assert d.id == UUID(str_uuid) and isinstance(d.id, UUID)
+    assert d.id == UUID(str_uuid)
