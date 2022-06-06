@@ -12,6 +12,7 @@ from factory import Faker
 
 from dyistore.domain.product.discount import Discount
 from dyistore.domain.product.vat import VAT
+from dyistore.domain.product.price import ProductPrice
 
 
 tz = timezone("UTC")
@@ -41,6 +42,23 @@ class VATFactory(Factory):
     rate: Decimal = Faker("pyfloat", right_digits=2, min_value=0, max_value=1)
     name: str = Faker("pystr", min_chars=2, max_chars=20)
 
+
+class ProductPriceFactory(Factory):
+    class Meta:
+        model = ProductPrice
+
+    value: Decimal = Faker("pyfloat", right_digits=2, min_value=0.01, max_value=999.99)
+    vat: VAT = SubFactory(VATFactory)
+    discount: Discount = SubFactory(DiscountFactory)
+
+
+@pytest.fixture
+def valid_product_price_float(faker):
+    return faker.pyfloat(right_digits=2, min_value=0.01, max_value=999_999.99)
+
+@pytest.fixture
+def valid_product_price_decimal(faker):
+    return faker.pydecimal(right_digits=2, min_value=0, max_value=999_999)
 
 @pytest.fixture
 def future_date():
