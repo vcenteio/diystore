@@ -3,6 +3,7 @@ from datetime import datetime
 from uuid import UUID
 
 import pytest
+import pendulum
 from pendulum import now
 from pendulum import duration
 from pendulum.tz import timezone
@@ -10,7 +11,10 @@ from factory import Factory
 from factory import SubFactory
 from factory import Faker
 
+
+from dyistore.domain.helpers import round_decimal
 from dyistore.domain.product.discount import Discount
+from dyistore.domain.product.review import ProductReview
 from dyistore.domain.product.vat import VAT
 from dyistore.domain.product.price import ProductPrice
 from dyistore.domain.product.dimensions import ProductDimensions
@@ -97,6 +101,19 @@ class TerminalLevelProductCategoryFactory(Factory):
     parent = SubFactory(MidLevelProductCategoryFactory)
 
 
+class ProductReviewFactory(Factory):
+    class Meta:
+        model = ProductReview
+
+    id: UUID = Faker("uuid4")
+    product_id: UUID = Faker("uuid4")
+    client_id: UUID = Faker("uuid4")
+    rating: Decimal = Faker(
+        "pydecimal", right_digits=1, min_value=Decimal("0"), max_value=Decimal("5")
+    )
+    creation_date: datetime = Faker("date_time", end_datetime=now(tz), tzinfo=tz)
+
+
 @pytest.fixture
 def non_str_type(faker):
     types = (
@@ -175,3 +192,15 @@ def str_lenght_gt_max_lenght_error_msg():
 @pytest.fixture
 def str_lenght_lt_min_lenght_error_msg():
     return r"ensure this value has at least \d+ characters"
+
+
+@pytest.fixture
+def non_utc_past_datetime(faker):
+    date = faker.date_time(end_datetime=now().subtract(hours=1))
+    return pendulum.instance(date, tz="Europe/Lisbon")
+
+
+@pytest.fixture
+def naive_past_datetime(faker):
+    date = faker.date_time(end_datetime=now().subtract(hours=1))
+    return pendulum.instance(date).naive()
