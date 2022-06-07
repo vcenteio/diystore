@@ -14,6 +14,7 @@ from factory import Faker
 
 from dyistore.domain.helpers import round_decimal
 from dyistore.domain.product.discount import Discount
+from dyistore.domain.product.rating import ProductRating
 from dyistore.domain.product.review import ProductReview
 from dyistore.domain.product.vat import VAT
 from dyistore.domain.product.price import ProductPrice
@@ -112,6 +113,13 @@ class ProductReviewFactory(Factory):
         "pydecimal", right_digits=1, min_value=Decimal("0"), max_value=Decimal("5")
     )
     creation_date: datetime = Faker("date_time", end_datetime=now(tz), tzinfo=tz)
+
+
+class ProductRatingFactory(Factory):
+    class Meta:
+        model = ProductRating
+
+    reviews: list[ProductReview] = [ProductReviewFactory() for _ in range(3)]
 
 
 @pytest.fixture
