@@ -4,7 +4,7 @@ import pytest
 from pydantic.error_wrappers import ValidationError
 from faker import Faker
 
-from dyistore.domain.product.price import ProductPrice
+from diystore.domain.product.price import ProductPrice
 
 from .conftest import DiscountFactory, ProductPriceFactory
 from .conftest import VATFactory

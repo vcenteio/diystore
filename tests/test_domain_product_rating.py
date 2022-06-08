@@ -3,8 +3,8 @@ from functools import reduce
 import pytest
 from pydantic.error_wrappers import ValidationError
 
-from dyistore.domain.product.rating import ProductRating
-from dyistore.domain.product.review import ProductReview
+from diystore.domain.product.rating import ProductRating
+from diystore.domain.product.review import ProductReview
 from .conftest import round_decimal
 from .conftest import ProductRatingFactory
 from .conftest import ProductReviewFactory

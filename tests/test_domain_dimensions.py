@@ -3,7 +3,7 @@ from decimal import Decimal
 import pytest
 from pydantic.error_wrappers import ValidationError
 
-from dyistore.domain.product.dimensions import ProductDimensions
+from diystore.domain.product.dimensions import ProductDimensions
 from .conftest import ProductDimensionsFactory
 
 

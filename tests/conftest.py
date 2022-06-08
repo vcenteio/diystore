@@ -13,18 +13,18 @@ from factory import Faker
 from factory import LazyAttribute
 
 
-from dyistore.domain.helpers import round_decimal
-from dyistore.domain.product.discount import Discount
-from dyistore.domain.product.rating import ProductRating
-from dyistore.domain.product.review import ProductReview
-from dyistore.domain.product.vat import VAT
-from dyistore.domain.product.price import ProductPrice
-from dyistore.domain.product.dimensions import ProductDimensions
-from dyistore.domain.product.categories import ProductCategory
-from dyistore.domain.product.categories import TopLevelProductCategory
-from dyistore.domain.product.categories import MidLevelProductCategory
-from dyistore.domain.product.categories import TerminalLevelProductCategory
-from dyistore.domain.product.photo import ProductPhotoUrl
+from diystore.domain.helpers import round_decimal
+from diystore.domain.product.discount import Discount
+from diystore.domain.product.rating import ProductRating
+from diystore.domain.product.review import ProductReview
+from diystore.domain.product.vat import VAT
+from diystore.domain.product.price import ProductPrice
+from diystore.domain.product.dimensions import ProductDimensions
+from diystore.domain.product.categories import ProductCategory
+from diystore.domain.product.categories import TopLevelProductCategory
+from diystore.domain.product.categories import MidLevelProductCategory
+from diystore.domain.product.categories import TerminalLevelProductCategory
+from diystore.domain.product.photo import ProductPhotoUrl
 
 
 tz = timezone("UTC")

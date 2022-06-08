@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "dyistore"
+name = "diystore"
 version = "0.1.0"
 description = "DIY Store e-Commerce Project"
 authors = ["Vitor Centeio <vitor.centeio@gmail.com>"]
