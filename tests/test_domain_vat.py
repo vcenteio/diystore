@@ -50,7 +50,7 @@ def test_vat_name_length_lt_min_length(faker):
 
 def test_vat_name_correct_length_range():
     d = VATFactory()
-    assert len(d.name) in range(2, 20)
+    assert len(d.name) in range(2, 21)
 
 
 def test_vat_name_correct_type():
