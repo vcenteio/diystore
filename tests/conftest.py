@@ -10,6 +10,7 @@ from pendulum.tz import timezone
 from factory import Factory
 from factory import SubFactory
 from factory import Faker
+from factory import LazyAttribute
 
 
 from dyistore.domain.helpers import round_decimal
@@ -23,6 +24,7 @@ from dyistore.domain.product.categories import ProductCategory
 from dyistore.domain.product.categories import TopLevelProductCategory
 from dyistore.domain.product.categories import MidLevelProductCategory
 from dyistore.domain.product.categories import TerminalLevelProductCategory
+from dyistore.domain.product.photo import ProductPhotoUrl
 
 
 tz = timezone("UTC")
@@ -120,6 +122,20 @@ class ProductRatingFactory(Factory):
         model = ProductRating
 
     reviews: list[ProductReview] = [ProductReviewFactory() for _ in range(3)]
+
+
+def generate_dummy_image_url(name: str, width: int, height: int):
+    return f"https://cdn.diystore.com/{name}.jpg?size={width}x{height}"
+
+
+class ProductPhotoUrlFactory(Factory):
+    class Meta:
+        model = ProductPhotoUrl
+
+    _name = Faker("word")
+    thumbnail = LazyAttribute(lambda o: generate_dummy_image_url(o._name, 200, 200))
+    medium = LazyAttribute(lambda o: generate_dummy_image_url(o._name, 640, 640))
+    large = LazyAttribute(lambda o: generate_dummy_image_url(o._name, 1000, 1000))
 
 
 @pytest.fixture
