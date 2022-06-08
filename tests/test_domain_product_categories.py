@@ -158,10 +158,3 @@ def test_domain_product_categories_terminal_category_get_top_level_category():
     )
     assert tmc.get_top_level_category() == top_cat
 
-
-def test_domain_product_categories_terminal_category_get_mid_level_category():
-    mid_cat = MidLevelProductCategoryFactory()
-    tmc: TerminalLevelProductCategory = TerminalLevelProductCategoryFactory(
-        parent=mid_cat
-    )
-    assert tmc.get_mid_level_category() == mid_cat

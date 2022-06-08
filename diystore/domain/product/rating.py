@@ -15,7 +15,7 @@ class ProductRating(BaseModel):
     class Config:
         validate_assignment = True
 
-    def get_reviews(self):
+    def get_reviews(self) -> list[ProductReview]:
         return self.reviews
 
     def calculate(self) -> Optional[Decimal]:

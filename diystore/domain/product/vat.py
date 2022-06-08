@@ -12,6 +12,9 @@ class VAT(BaseModel):
     name: constr(min_length=2, max_length=20, strict=True) = Field(...)
     id: UUID = Field(default_factory=uuid4)
 
+    class Config:
+        validate_assignment = True
+
     def __mul__(self, other):
         return self.rate * other
 

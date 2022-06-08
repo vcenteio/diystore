@@ -14,6 +14,7 @@ from factory import LazyAttribute
 
 
 from diystore.domain.helpers import round_decimal
+from diystore.domain.product import Product
 from diystore.domain.product.discount import Discount
 from diystore.domain.product.rating import ProductRating
 from diystore.domain.product.review import ProductReview
@@ -71,9 +72,9 @@ class ProductDimensionsFactory(Factory):
     class Meta:
         model = ProductDimensions
 
-    height: Decimal = Faker("pyfloat", right_digits=1, min_value=0.1, max_value=99.9)
-    width: Decimal = Faker("pyfloat", right_digits=1, min_value=0.1, max_value=99.9)
-    length: Decimal = Faker("pyfloat", right_digits=1, min_value=0.1, max_value=99.9)
+    height: Decimal = Faker("pyfloat", right_digits=1, min_value=1, max_value=99.9)
+    width: Decimal = Faker("pyfloat", right_digits=1, min_value=1, max_value=99.9)
+    length: Decimal = Faker("pyfloat", right_digits=1, min_value=1, max_value=99.9)
 
 
 class TopLevelProductCategoryFactory(Factory):
@@ -159,6 +160,27 @@ class ProductVendorFactory(Factory):
     logo_url = LazyAttribute(generate_dummy_logo_url)
 
 
+class ProductFactory(Factory):
+    class Meta:
+        model = Product
+
+    id = Faker("uuid4")
+    ean = Faker("bothify", text="#############")
+    name = Faker("word")
+    description = Faker("pystr", min_chars=1, max_chars=300)
+    price = SubFactory(ProductPriceFactory)
+    quantity = Faker("pyint", min_value=0, max_value=1_000_000)
+    creation_date = Faker("date_time_between", tzinfo=tz)
+    dimensions = SubFactory(ProductDimensionsFactory)
+    color = Faker("color_name")
+    country_of_origin = Faker("country")
+    warranty = Faker("pyint", min_value=0, max_value=5)
+    category = SubFactory(TerminalLevelProductCategoryFactory)
+    rating = SubFactory(ProductRatingFactory)
+    photo_url = SubFactory(ProductPhotoUrlFactory)
+    vendor = SubFactory(ProductVendorFactory)
+
+
 @pytest.fixture
 def non_str_type(faker):
     types = (
@@ -230,6 +252,19 @@ def invalid_uuid_str(faker):
 
 
 @pytest.fixture
+def none_not_allowed_error_msg():
+    return "is not an allowed value"
+
+
+@pytest.fixture
+def not_a_valid_dict_error_msg():
+    return "a valid dict"
+
+@pytest.fixture
+def field_required_error_msg():
+    return "{field}\n  field required"
+
+@pytest.fixture
 def str_lenght_gt_max_lenght_error_msg():
     return r"ensure this value has at most \d+ characters"
 
@@ -237,6 +272,25 @@ def str_lenght_gt_max_lenght_error_msg():
 @pytest.fixture
 def str_lenght_lt_min_lenght_error_msg():
     return r"ensure this value has at least \d+ characters"
+
+
+@pytest.fixture
+def not_a_valid_integer_error_msg():
+    return "value is not a valid integer"
+
+
+@pytest.fixture
+def int_ge_error_msg():
+    return "ensure this value is greater than or equal to"
+
+
+@pytest.fixture
+def int_le_error_msg():
+    return "ensure this value is less than or equal to"
+
+@pytest.fixture
+def invalid_value_for_decimal_error_msg():
+    return "value should be of type Decimal, int, float or str"
 
 
 @pytest.fixture

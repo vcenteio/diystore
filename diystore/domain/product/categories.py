@@ -36,9 +36,16 @@ class MidLevelProductCategory(ProductCategory):
             raise ValueError(
                 "parent must be a TopLevelProductCategory object or a valid dict"
             )
-        if isinstance(parent, dict):
-            return TopLevelProductCategory(**parent)
         return parent
+    
+    def get_parent_id(self) -> UUID:
+        return self.parent.id
+    
+    def get_parent_name(self) -> str:
+        return self.parent.name
+
+    def get_parent_description(self) -> str:
+        return self.parent.description
 
 
 class TerminalLevelProductCategory(ProductCategory):
@@ -54,12 +61,28 @@ class TerminalLevelProductCategory(ProductCategory):
             raise ValueError(
                 "parent must be a MidLevelProductCategory object or a valid dict"
             )
-        if isinstance(parent, dict):
-            return MidLevelProductCategory(**parent)
         return parent
+    
+    def get_parent_id(self) -> UUID:
+        return self.parent.id
 
-    def get_mid_level_category(self):
-        return self.parent
+    def get_parent_name(self) -> str:
+        return self.parent.name
+    
+    def get_parent_description(self) -> str:
+        return self.parent.description
 
-    def get_top_level_category(self):
+    def get_top_level_category(self) -> TopLevelProductCategory:
         return self.parent.parent
+
+    def set_top_level_category(self, category: TopLevelProductCategory):
+        self.parent.parent = category
+    
+    def get_top_level_category_id(self) -> UUID:
+        return self.parent.get_parent_id()
+
+    def get_top_level_category_name(self) -> str:
+        return self.parent.get_parent_name()
+    
+    def get_top_level_category_description(self) -> str:
+        return self.parent.get_parent_description()

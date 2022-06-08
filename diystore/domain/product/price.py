@@ -17,6 +17,9 @@ class ProductPrice(BaseModel):
     discount: Discount = Field(default=None)
     _rounding_template: Decimal = PrivateAttr(default=Decimal("1.00"))
 
+    class Config:
+        validate_assignment = True
+
     @validator("value", pre=True)
     def _ensure_correct_type(cls, value):
         if not isinstance(value, (Decimal, int, float, str)):
@@ -39,3 +42,9 @@ class ProductPrice(BaseModel):
     def calculate(self):
         v = self.value if self.discount is None else self._apply_discount()
         return self._round(self._add_vat(v))
+    
+    def get_discount_rate(self) -> Decimal:
+        return self.discount.rate
+    
+    def get_vat_rate(self) -> Decimal:
+        return self.vat.rate
