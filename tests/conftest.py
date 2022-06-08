@@ -25,6 +25,7 @@ from diystore.domain.product.categories import TopLevelProductCategory
 from diystore.domain.product.categories import MidLevelProductCategory
 from diystore.domain.product.categories import TerminalLevelProductCategory
 from diystore.domain.product.photo import ProductPhotoUrl
+from diystore.domain.product.vendor import ProductVendor
 
 
 tz = timezone("UTC")
@@ -136,6 +137,26 @@ class ProductPhotoUrlFactory(Factory):
     thumbnail = LazyAttribute(lambda o: generate_dummy_image_url(o._name, 200, 200))
     medium = LazyAttribute(lambda o: generate_dummy_image_url(o._name, 640, 640))
     large = LazyAttribute(lambda o: generate_dummy_image_url(o._name, 1000, 1000))
+
+
+def generate_dummy_logo_url(o):
+    if o.name is None:
+        return None
+    parse_table = {" ": "-", ",": ""}
+    name = o.name.lower()
+    for old, new in parse_table.items():
+        name = name.replace(old, new)
+    return f"https://www.{name}.com/logo.png"
+
+
+class ProductVendorFactory(Factory):
+    class Meta:
+        model = ProductVendor
+
+    id: UUID = Faker("uuid4")
+    name: str = Faker("company")
+    description: str = Faker("catch_phrase")
+    logo_url = LazyAttribute(generate_dummy_logo_url)
 
 
 @pytest.fixture
