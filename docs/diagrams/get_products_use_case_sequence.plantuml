@@ -1,0 +1,24 @@
+@startuml "Get Products Use Case Sequence Diagram"
+!theme materia
+
+boundary ":Infrastructure Object" as infra
+participant ":InputDTO" as input_dto
+control ":GetProductsUseCase" as use_case
+database ":Repository" as repo
+entity ":Product" as product
+participant ":OutputDTO" as output_dto
+control ":Presenter" as presenter
+
+
+infra -> input_dto **: creates
+infra -> use_case ++: calls / execute(InputDTO)
+use_case -> repo ++: get_products()
+repo -> repo: fetches products
+repo -> product **: creates list of
+return products
+use_case -> output_dto **: creates list of
+use_case -> presenter ++: present(OutputDTO[])
+return representation
+return representation
+
+@enduml
