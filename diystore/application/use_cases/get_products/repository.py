@@ -4,7 +4,7 @@ from decimal import Decimal
 from uuid import UUID
 
 
-class Repository(ABC):
+class GetProductsRepository(ABC):
     @abstractmethod
     def get_products_ordering_by_rating(
         self,
