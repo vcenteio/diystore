@@ -5,13 +5,13 @@ import pendulum
 from pendulum.datetime import DateTime
 from pydantic.error_wrappers import ValidationError
 
-from diystore.domain.product.price import ProductPrice
-from diystore.domain.product.rating import ProductRating
-from diystore.domain.product.dimensions import ProductDimensions
-from diystore.domain.product.categories import TerminalLevelProductCategory
-from diystore.domain.product.photo import ProductPhotoUrl
-from diystore.domain.product.vendor import ProductVendor
-from diystore.domain.product import Product
+from diystore.domain.entities.product import ProductPrice
+from diystore.domain.entities.product import ProductRating
+from diystore.domain.entities.product import ProductDimensions
+from diystore.domain.entities.product import TerminalLevelProductCategory
+from diystore.domain.entities.product import ProductPhotoUrl
+from diystore.domain.entities.product import ProductVendor
+from diystore.domain.entities.product import Product
 from .conftest import DiscountFactory, tz
 from .conftest import round_decimal
 from .conftest import ProductPhotoUrlFactory

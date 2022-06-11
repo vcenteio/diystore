@@ -11,22 +11,26 @@ from factory import Factory
 from factory import SubFactory
 from factory import Faker
 from factory import LazyAttribute
+from devtools import debug
 
 
 from diystore.domain.helpers import round_decimal
-from diystore.domain.product import Product
-from diystore.domain.product.discount import Discount
-from diystore.domain.product.rating import ProductRating
-from diystore.domain.product.review import ProductReview
-from diystore.domain.product.vat import VAT
-from diystore.domain.product.price import ProductPrice
-from diystore.domain.product.dimensions import ProductDimensions
-from diystore.domain.product.categories import ProductCategory
-from diystore.domain.product.categories import TopLevelProductCategory
-from diystore.domain.product.categories import MidLevelProductCategory
-from diystore.domain.product.categories import TerminalLevelProductCategory
-from diystore.domain.product.photo import ProductPhotoUrl
-from diystore.domain.product.vendor import ProductVendor
+from diystore.domain.entities.product import Product
+from diystore.domain.entities.product.discount import Discount
+from diystore.domain.entities.product.rating import ProductRating
+from diystore.domain.entities.product.review import ProductReview
+from diystore.domain.entities.product.vat import VAT
+from diystore.domain.entities.product.price import ProductPrice
+from diystore.domain.entities.product.dimensions import ProductDimensions
+from diystore.domain.entities.product.categories import ProductCategory
+from diystore.domain.entities.product.categories import TopLevelProductCategory
+from diystore.domain.entities.product.categories import MidLevelProductCategory
+from diystore.domain.entities.product.categories import TerminalLevelProductCategory
+from diystore.domain.entities.product.photo import ProductPhotoUrl
+from diystore.domain.entities.product.vendor import ProductVendor
+from diystore.application.use_cases.get_products import GetProductsInputDTO
+from diystore.application.use_cases.get_products import ProductOrderingCriteria
+from diystore.application.use_cases.get_products import ProductOutputDTO
 
 
 tz = timezone("UTC")
@@ -173,6 +177,7 @@ class ProductFactory(Factory):
     creation_date = Faker("date_time_between", tzinfo=tz)
     dimensions = SubFactory(ProductDimensionsFactory)
     color = Faker("color_name")
+    material = Faker("word")
     country_of_origin = Faker("country")
     warranty = Faker("pyint", min_value=0, max_value=5)
     category = SubFactory(TerminalLevelProductCategoryFactory)
@@ -260,9 +265,11 @@ def none_not_allowed_error_msg():
 def not_a_valid_dict_error_msg():
     return "a valid dict"
 
+
 @pytest.fixture
 def field_required_error_msg():
     return "{field}\n  field required"
+
 
 @pytest.fixture
 def str_lenght_gt_max_lenght_error_msg():
@@ -287,6 +294,7 @@ def int_ge_error_msg():
 @pytest.fixture
 def int_le_error_msg():
     return "ensure this value is less than or equal to"
+
 
 @pytest.fixture
 def invalid_value_for_decimal_error_msg():

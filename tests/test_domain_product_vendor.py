@@ -1,7 +1,7 @@
 import pytest
 from pydantic.error_wrappers import ValidationError
 
-from diystore.domain.product.vendor import ProductVendor
+from diystore.domain.entities.product import ProductVendor
 from .conftest import ProductVendorFactory
 
 

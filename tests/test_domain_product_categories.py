@@ -3,7 +3,7 @@ from uuid import UUID
 import pytest
 from pydantic.error_wrappers import ValidationError
 
-from diystore.domain.product.categories import TerminalLevelProductCategory
+from diystore.domain.entities.product import TerminalLevelProductCategory
 
 from .conftest import TopLevelProductCategoryFactory
 from .conftest import MidLevelProductCategoryFactory

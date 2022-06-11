@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from pydantic import Field
 from pydantic import validator
 
-from ..helpers import round_decimal
+from ...helpers import round_decimal
 
 
 class ProductDimensions(BaseModel):

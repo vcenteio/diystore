@@ -10,7 +10,7 @@ from pydantic import Extra
 import pendulum
 from pendulum.datetime import DateTime
 
-from ..helpers import round_decimal
+from ...helpers import round_decimal
 
 
 class ProductReview(BaseModel):

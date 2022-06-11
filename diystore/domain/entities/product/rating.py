@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from pydantic import Field
 from pydantic import conlist
 
-from ..helpers import round_decimal
+from ...helpers import round_decimal
 from .review import ProductReview
 
 

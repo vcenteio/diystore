@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 from pydantic.error_wrappers import ValidationError
 
-from diystore.domain.product.vat import VAT
+from diystore.domain.entities.product import VAT
 from .conftest import VATFactory
 
 

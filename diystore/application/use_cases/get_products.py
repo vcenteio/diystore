@@ -8,8 +8,8 @@ from pydantic import validator
 from pydantic import constr
 from pydantic import conint
 
-from .repository import Repository
-from ..domain.helpers import round_decimal
+from ..repository import Repository
+from ...domain.helpers import round_decimal
 
 
 class OrderingProperty(IntEnum):
