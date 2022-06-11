@@ -13,7 +13,6 @@ from factory import Faker
 from factory import LazyAttribute
 from devtools import debug
 
-
 from diystore.domain.helpers import round_decimal
 from diystore.domain.entities.product import Product
 from diystore.domain.entities.product.discount import Discount
@@ -186,6 +185,26 @@ class ProductFactory(Factory):
     vendor = SubFactory(ProductVendorFactory)
 
 
+class ProductOrderingCriteriaFactory(Factory):
+    class Meta:
+        model = ProductOrderingCriteria
+
+    property = Faker("random_element", elements=(1, 2))
+    type = Faker("random_element", elements=(1, 2))
+
+
+class GetProductsInputDTOFactory(Factory):
+    class Meta:
+        model = GetProductsInputDTO
+
+    category_id = Faker("uuid4")
+    price_min = Faker("pydecimal", min_value=0, max_value=99, right_digits=2)
+    price_max = Faker("pydecimal", min_value=100, max_value=999, right_digits=2)
+    rating_min = Faker("pydecimal", min_value=0, max_value=2, right_digits=1)
+    rating_max = Faker("pydecimal", min_value=3, max_value=5, right_digits=1)
+    ordering_criteria = SubFactory(ProductOrderingCriteriaFactory)
+    with_discounts = Faker("pybool")
+
 
 class ProductOutputDTOFactory(Factory):
     class Meta:
@@ -199,7 +218,9 @@ class ProductOutputDTOFactory(Factory):
     discount: Decimal = Faker(
         "pyfloat", right_digits=2, min_value=0.1, max_value=1, positive=True
     )
-    price_without_discount: Decimal = Faker("pyfloat", right_digits=2, min_value=0.01, max_value=999.99)
+    price_without_discount: Decimal = Faker(
+        "pyfloat", right_digits=2, min_value=0.01, max_value=999.99
+    )
     vat: Decimal = Faker("pyfloat", right_digits=2, min_value=0, max_value=1)
     in_stock: bool = Faker("pybool")
     height: Decimal = Faker("pyfloat", right_digits=1, min_value=1, max_value=99.9)
