@@ -1,5 +1,6 @@
 from decimal import Decimal
 from datetime import datetime
+from unittest.mock import Mock
 from uuid import UUID
 
 import pytest
@@ -30,6 +31,7 @@ from diystore.domain.entities.product.vendor import ProductVendor
 from diystore.application.usecases.product import GetProductsInputDTO
 from diystore.application.usecases.product import ProductOrderingCriteria
 from diystore.application.usecases.product import GetProductOutputDTO
+from diystore.application.usecases.product import ProductsRepository
 
 
 tz = timezone("UTC")
@@ -203,7 +205,7 @@ class GetProductsInputDTOFactory(Factory):
     rating_min = Faker("pydecimal", min_value=0, max_value=2, right_digits=1)
     rating_max = Faker("pydecimal", min_value=3, max_value=5, right_digits=1)
     ordering_criteria = SubFactory(ProductOrderingCriteriaFactory)
-    with_discounts = Faker("pybool")
+    with_discounts_only = Faker("pybool")
 
 
 class ProductOutputDTOFactory(Factory):
@@ -367,3 +369,13 @@ def non_utc_past_datetime(faker):
 def naive_past_datetime(faker):
     date = faker.date_time(end_datetime=now().subtract(hours=1))
     return pendulum.instance(date).naive()
+
+
+@pytest.fixture
+def mock_products_repository():
+    return Mock(ProductsRepository)
+
+
+@pytest.fixture(scope="session")
+def product_stub_list():
+    return [ProductFactory() for _ in range(30)]

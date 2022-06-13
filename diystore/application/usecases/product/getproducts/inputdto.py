@@ -16,7 +16,7 @@ class GetProductsInputDTO(BaseModel):
     rating_min: Decimal = Field(default=0, ge=0, le=5)
     rating_max: Decimal = Field(default=5, ge=0, le=5)
     ordering_criteria: ProductOrderingCriteria = Field(default=None)
-    with_discounts: bool = Field(default=False)
+    with_discounts_only: bool = Field(default=False)
 
     @validator("price_min", "price_max")
     def _validate_price_min_max(cls, price):
