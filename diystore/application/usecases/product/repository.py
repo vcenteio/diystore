@@ -11,8 +11,10 @@ class ProductsRepository(ABC):
     def get_products_ordering_by_rating(
         self,
         category_id: UUID,
-        price_range: tuple[Decimal, Decimal],
-        rating_range: tuple[Decimal, Decimal],
+        price_min: Decimal = Decimal("0.01"),
+        price_max: Decimal = Decimal("1_000_000"),
+        rating_min: Decimal = Decimal("0"),
+        rating_max: Decimal = Decimal("5"),
         with_discounts_only: bool = False,
         descending: bool = True
     ) -> list[Product]:
@@ -22,9 +24,11 @@ class ProductsRepository(ABC):
     def get_products_ordering_by_price(
         self,
         category_id: UUID,
-        price_range: tuple[Decimal, Decimal],
-        rating_range: tuple[Decimal, Decimal],
+        price_min: Decimal = Decimal("0.01"),
+        price_max: Decimal = Decimal("1_000_000"),
+        rating_min: Decimal = Decimal("0"),
+        rating_max: Decimal = Decimal("5"),
         with_discounts_only: bool = False,
-        descending: bool = True
+        descending: bool = False
     ) -> list[Product]:
         ...
