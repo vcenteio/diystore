@@ -1,10 +1,8 @@
 import pytest
 from pydantic import ValidationError
 
-from diystore.application.use_cases.get_products.ordering_criteria import (
-    OrderingProperty,
-)
-from diystore.application.use_cases.get_products.ordering_criteria import OrderingType
+from diystore.application.usecases.product import OrderingProperty
+from diystore.application.usecases.product import OrderingType
 from .conftest import GetProductsInputDTOFactory
 
 

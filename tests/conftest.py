@@ -27,9 +27,9 @@ from diystore.domain.entities.product.categories import MidLevelProductCategory
 from diystore.domain.entities.product.categories import TerminalLevelProductCategory
 from diystore.domain.entities.product.photo import ProductPhotoUrl
 from diystore.domain.entities.product.vendor import ProductVendor
-from diystore.application.use_cases.get_products import GetProductsInputDTO
-from diystore.application.use_cases.get_products import ProductOrderingCriteria
-from diystore.application.use_cases.get_products import ProductOutputDTO
+from diystore.application.usecases.product import GetProductsInputDTO
+from diystore.application.usecases.product import ProductOrderingCriteria
+from diystore.application.usecases.product import GetProductOutputDTO
 
 
 tz = timezone("UTC")
@@ -208,7 +208,7 @@ class GetProductsInputDTOFactory(Factory):
 
 class ProductOutputDTOFactory(Factory):
     class Meta:
-        model = ProductOutputDTO
+        model = GetProductOutputDTO
 
     id = Faker("uuid4")
     ean = Faker("bothify", text="#############")

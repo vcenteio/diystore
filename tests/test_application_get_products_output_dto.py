@@ -1,7 +1,7 @@
 from uuid import uuid4
 
-from diystore.application.use_cases.get_products import ProductOutputDTO
-from diystore.application.use_cases.get_products import GetProductsOutputDTO
+from diystore.application.usecases.product import GetProductOutputDTO
+from diystore.application.usecases.product import GetProductsOutputDTO
 from .conftest import Product
 from .conftest import ProductFactory
 from .conftest import ProductOutputDTOFactory
@@ -28,7 +28,7 @@ def test_application_get_products_product_output_dto_warranty_is_int(faker):
 
 def test_application_get_products_product_output_dto_from_product():
     product: Product = ProductFactory()
-    odto = ProductOutputDTO.from_product(product)
+    odto = GetProductOutputDTO.from_product(product)
     dimensions = product.get_dimensions_dict()
 
     assert odto.id == product.id.hex

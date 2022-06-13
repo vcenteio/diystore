@@ -5,10 +5,10 @@ from pydantic import constr
 from pydantic import conint
 from pydantic import validator
 
-from ....domain.entities.product import Product
+from .....domain.entities.product import Product
 
 
-class ProductOutputDTO(BaseModel):
+class GetProductOutputDTO(BaseModel):
     id: str
     ean: str
     name: str
@@ -72,7 +72,3 @@ class ProductOutputDTO(BaseModel):
             vendor_id=product.get_vendor_id().hex,
             vendor_name=product.get_vendor_name(),
         )
-
-
-class GetProductsOutputDTO(BaseModel):
-    products: list[ProductOutputDTO]

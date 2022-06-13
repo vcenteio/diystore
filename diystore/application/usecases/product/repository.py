@@ -3,8 +3,10 @@ from abc import abstractmethod
 from decimal import Decimal
 from uuid import UUID
 
+from ....domain.entities.product import Product
 
-class GetProductsRepository(ABC):
+
+class ProductsRepository(ABC):
     @abstractmethod
     def get_products_ordering_by_rating(
         self,
@@ -13,7 +15,7 @@ class GetProductsRepository(ABC):
         rating_range: tuple[Decimal, Decimal],
         with_discounts_only: bool = False,
         descending: bool = True
-    ):
+    ) -> list[Product]:
         ...
 
     @abstractmethod
@@ -24,5 +26,5 @@ class GetProductsRepository(ABC):
         rating_range: tuple[Decimal, Decimal],
         with_discounts_only: bool = False,
         descending: bool = True
-    ):
+    ) -> list[Product]:
         ...

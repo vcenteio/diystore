@@ -5,8 +5,8 @@ from pydantic import Field
 from pydantic import BaseModel
 from pydantic import validator
 
-from .ordering_criteria import ProductOrderingCriteria
-from ....domain.helpers import round_decimal
+from ..orderingcriteria import ProductOrderingCriteria
+from .....domain.helpers import round_decimal
 
 
 class GetProductsInputDTO(BaseModel):
