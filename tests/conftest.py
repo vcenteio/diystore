@@ -1,5 +1,6 @@
 from decimal import Decimal
 from datetime import datetime
+from typing import Union
 from unittest.mock import Mock
 from uuid import UUID
 

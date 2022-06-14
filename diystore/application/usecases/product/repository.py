@@ -8,6 +8,10 @@ from ....domain.entities.product import Product
 
 class ProductsRepository(ABC):
     @abstractmethod
+    def get_product(self, product_id: UUID):
+        ...
+
+    @abstractmethod
     def get_products(
         self,
         category_id: UUID,
