@@ -32,6 +32,7 @@ from diystore.application.usecases.product import GetProductsInputDTO
 from diystore.application.usecases.product import ProductOrderingCriteria
 from diystore.application.usecases.product import GetProductOutputDTO
 from diystore.application.usecases.product import ProductsRepository
+from diystore.application.usecases.product import GetProductInputDTO
 
 
 tz = timezone("UTC")
@@ -242,6 +243,13 @@ class ProductOutputDTOFactory(Factory):
     large_size_photo_url = Faker("image_url")
     vendor_id = Faker("uuid4")
     vendor_name = Faker("word")
+
+
+class GetProductInputDTOFactory(Factory):
+    class Meta:
+        model = GetProductInputDTO
+
+    product_id = Faker("uuid4")
 
 
 @pytest.fixture
