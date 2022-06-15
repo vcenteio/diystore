@@ -7,7 +7,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
 
-from ..base import Base
+from . import Base
 from ..exceptions import OrmEntityNotFullyLoaded
 from .....domain.entities.product import TopLevelProductCategory
 from .....domain.entities.product import MidLevelProductCategory

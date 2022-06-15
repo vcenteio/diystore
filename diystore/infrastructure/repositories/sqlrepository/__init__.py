@@ -3,4 +3,4 @@ from .models.discount import DiscountOrmModel
 from .models.categories import TopLevelCategoryOrmModel
 from .models.categories import MidLevelCategoryOrmModel
 from .models.categories import TerminalCategoryOrmModel
-from .base import Base
+from .models import Base
