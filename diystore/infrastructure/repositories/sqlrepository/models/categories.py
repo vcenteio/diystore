@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
 
 from . import Base
+from ..helpers import validate_id
 from ..exceptions import OrmEntityNotFullyLoaded
 from .....domain.entities.product import TopLevelProductCategory
 from .....domain.entities.product import MidLevelProductCategory
@@ -17,17 +18,7 @@ from .....domain.entities.product import TerminalLevelProductCategory
 class CategoryOrmModel:
     @validates("id", "parent_id")
     def _validate_id(self, key, _id):
-        if _id is None:
-            raise TypeError(f"{key} is a non-nullable field")
-        if not isinstance(_id, (UUID, bytes, int, str)):
-            raise TypeError("id must be an UUID, bytes, int or str object")
-        if isinstance(_id, UUID):
-            return _id.bytes
-        if isinstance(_id, bytes):
-            return UUID(bytes=_id).bytes
-        if isinstance(_id, int):
-            return UUID(int=_id).bytes
-        return UUID(_id).bytes
+        return validate_id(_id, key)
 
     @validates("parent")
     def _validate_parent(self, key, parent):
