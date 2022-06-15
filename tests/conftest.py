@@ -40,7 +40,6 @@ from diystore.application.usecases.product import ProductsRepository
 from diystore.application.usecases.product import GetProductInputDTO
 from diystore.infrastructure.repositories.sqlrepository import VatOrmModel
 from diystore.infrastructure.repositories.sqlrepository import Base
-from diystore.infrastructure.repositories.sqlrepository import DiscountOrmModel
 from diystore.infrastructure.repositories.sqlrepository import TopLevelCategoryOrmModel
 from diystore.infrastructure.repositories.sqlrepository import MidLevelCategoryOrmModel
 from diystore.infrastructure.repositories.sqlrepository import TerminalCategoryOrmModel
@@ -65,24 +64,6 @@ class DiscountFactory(Factory):
         tzinfo=tz,
     )
     id: UUID = Faker("uuid4")
-
-
-class DiscountOrmModelFactory(Factory):
-    class Meta:
-        model = DiscountOrmModel
-
-    rate: float = Faker(
-        "pyfloat", right_digits=2, min_value=0.1, max_value=1, positive=True
-    )
-    name: str = Faker("pystr", max_chars=50)
-    creation_date: datetime = now(tz)
-    expiry_date: datetime = Faker(
-        "date_time_between_dates",
-        datetime_start=now(tz) + duration(hours=1),
-        datetime_end=now(tz) + duration(months=3),
-        tzinfo=tz,
-    )
-    id: UUID = uuid4().bytes
 
 
 class VATFactory(Factory):
