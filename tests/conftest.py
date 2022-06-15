@@ -138,7 +138,7 @@ class MidLevelCategoryOrmModelFactory(Factory):
 
     id: UUID = Faker("uuid4")
     name: str = Faker("pystr", min_chars=2, max_chars=50)
-    description: str = Faker("pystr", min_chars=1, max_chars=3000)
+    description: str = Faker("pystr", min_chars=1, max_chars=300)
     parent_id: UUID = Faker("uuid4")
 
 
@@ -148,7 +148,7 @@ class TerminalCategoryOrmModelFactory(Factory):
 
     id: UUID = Faker("uuid4")
     name: str = Faker("pystr", min_chars=2, max_chars=50)
-    description: str = Faker("pystr", min_chars=1, max_chars=3000)
+    description: str = Faker("pystr", min_chars=1, max_chars=300)
     parent_id: UUID = Faker("uuid4")
 
 

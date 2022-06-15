@@ -8,6 +8,10 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
 
 from ..base import Base
+from ..exceptions import OrmEntityNotFullyLoaded
+from .....domain.entities.product import TopLevelProductCategory
+from .....domain.entities.product import MidLevelProductCategory
+from .....domain.entities.product import TerminalLevelProductCategory
 
 
 class CategoryOrmModel:
@@ -51,6 +55,19 @@ class TopLevelCategoryOrmModel(CategoryOrmModel, Base):
     def _children_type(self):
         return MidLevelCategoryOrmModel
 
+    def to_domain_entity(self) -> TopLevelProductCategory:
+        return TopLevelProductCategory(
+            id=UUID(bytes=self.id), name=self.name, description=self.description
+        )
+
+    @classmethod
+    def from_domain_entity(
+        cls, entity: TopLevelProductCategory
+    ) -> "TopLevelCategoryOrmModel":
+        if not isinstance(entity, TopLevelProductCategory):
+            raise TypeError(f"entity must be {cls.__name__} type")
+        return cls(id=entity.id, name=entity.name, description=entity.description)
+
     def __repr__(self):
         return (
             f"TopLevelCategoryOrmModel(id={UUID(bytes=self.id)}, name={self.name!r}, "
@@ -77,6 +94,29 @@ class MidLevelCategoryOrmModel(CategoryOrmModel, Base):
     def _children_type(self):
         return TerminalCategoryOrmModel
 
+    def to_domain_entity(self) -> MidLevelProductCategory:
+        if self.parent is None:
+            raise OrmEntityNotFullyLoaded
+        return MidLevelProductCategory(
+            id=UUID(bytes=self.id),
+            name=self.name,
+            description=self.description,
+            parent=self.parent.to_domain_entity(),
+        )
+
+    @classmethod
+    def from_domain_entity(
+        cls, entity: MidLevelProductCategory
+    ) -> "MidLevelCategoryOrmModel":
+        if not isinstance(entity, MidLevelProductCategory):
+            raise TypeError(f"entity must be {cls.__name__} type")
+        return cls(
+            id=entity.id,
+            name=entity.name,
+            description=entity.description,
+            parent_id=entity.get_parent_id(),
+        )
+
     def __repr__(self):
         return (
             f"MidLevelCategoryOrmModel(id={UUID(bytes=self.id)}, name={self.name!r}, "
@@ -97,6 +137,29 @@ class TerminalCategoryOrmModel(CategoryOrmModel, Base):
     @property
     def _parent_type(self):
         return MidLevelCategoryOrmModel
+
+    def to_domain_entity(self) -> TerminalLevelProductCategory:
+        if self.parent is None:
+            raise OrmEntityNotFullyLoaded
+        return TerminalLevelProductCategory(
+            id=UUID(bytes=self.id),
+            name=self.name,
+            description=self.description,
+            parent=self.parent.to_domain_entity(),
+        )
+
+    @classmethod
+    def from_domain_entity(
+        cls, entity: TerminalLevelProductCategory
+    ) -> "TerminalCategoryOrmModel":
+        if not isinstance(entity, TerminalLevelProductCategory):
+            raise TypeError(f"entity must be TerminalLevelProductCategory type")
+        return cls(
+            id=entity.id,
+            name=entity.name,
+            description=entity.description,
+            parent_id=entity.get_parent_id(),
+        )
 
     def __repr__(self):
         return (
