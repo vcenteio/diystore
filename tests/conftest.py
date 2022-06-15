@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Union
 from unittest.mock import Mock
 from uuid import UUID
+from uuid import uuid4
 
 import pytest
 import pendulum
@@ -14,6 +15,9 @@ from factory import SubFactory
 from factory import Faker
 from factory import LazyAttribute
 from devtools import debug
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 
 from diystore.domain.helpers import round_decimal
 from diystore.domain.entities.product import Product
@@ -34,6 +38,12 @@ from diystore.application.usecases.product import ProductOrderingCriteria
 from diystore.application.usecases.product import GetProductOutputDTO
 from diystore.application.usecases.product import ProductsRepository
 from diystore.application.usecases.product import GetProductInputDTO
+from diystore.infrastructure.repositories.sqlrepository import VatOrmModel
+from diystore.infrastructure.repositories.sqlrepository import Base
+from diystore.infrastructure.repositories.sqlrepository import DiscountOrmModel
+from diystore.infrastructure.repositories.sqlrepository import TopLevelCategoryOrmModel
+from diystore.infrastructure.repositories.sqlrepository import MidLevelCategoryOrmModel
+from diystore.infrastructure.repositories.sqlrepository import TerminalCategoryOrmModel
 
 
 tz = timezone("UTC")
@@ -111,6 +121,35 @@ class TerminalLevelProductCategoryFactory(Factory):
     name: str = Faker("pystr", min_chars=2, max_chars=50)
     description: str = Faker("pystr", min_chars=1, max_chars=300)
     parent = SubFactory(MidLevelProductCategoryFactory)
+
+
+class TopLevelCategoryOrmModelFactory(Factory):
+    class Meta:
+        model = TopLevelCategoryOrmModel
+
+    id: UUID = Faker("uuid4")
+    name: str = Faker("pystr", min_chars=2, max_chars=50)
+    description: str = Faker("pystr", min_chars=1, max_chars=3000)
+
+
+class MidLevelCategoryOrmModelFactory(Factory):
+    class Meta:
+        model = MidLevelCategoryOrmModel
+
+    id: UUID = Faker("uuid4")
+    name: str = Faker("pystr", min_chars=2, max_chars=50)
+    description: str = Faker("pystr", min_chars=1, max_chars=3000)
+    parent_id: UUID = Faker("uuid4")
+
+
+class TerminalCategoryOrmModelFactory(Factory):
+    class Meta:
+        model = TerminalCategoryOrmModel
+
+    id: UUID = Faker("uuid4")
+    name: str = Faker("pystr", min_chars=2, max_chars=50)
+    description: str = Faker("pystr", min_chars=1, max_chars=3000)
+    parent_id: UUID = Faker("uuid4")
 
 
 class ProductReviewFactory(Factory):
@@ -388,3 +427,18 @@ def mock_products_repository():
 @pytest.fixture(scope="session")
 def product_stub_list():
     return [ProductFactory() for _ in range(30)]
+
+
+@pytest.fixture(scope="session")
+def session_factory():
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(engine)
+    return Session
+
+
+@pytest.fixture()
+def orm_session(session_factory):
+    session: Session = session_factory()
+    yield session
+    session.close()
