@@ -2,6 +2,7 @@ from sqlalchemy import Column
 from sqlalchemy import BINARY
 from sqlalchemy import String
 from sqlalchemy.orm import validates
+from sqlalchemy.orm import relationship
 
 from . import Base
 from ..helpers import validate_id
@@ -14,6 +15,8 @@ class ProductVendorOrmModel(Base):
     name = Column(String(50))
     description = Column(String(3000))
     logo_url = Column(String(2000))
+
+    products = relationship("ProductOrmModel", back_populates="vendor")
 
     @validates("id")
     def _validate_id(self, key, _id):

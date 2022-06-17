@@ -40,8 +40,8 @@ class ProductOrmModel(Base):
 
     vat = relationship("VatOrmModel")
     discount = relationship("DiscountOrmModel")
-    category = relationship("TerminalCategoryOrmModel")
-    vendor = relationship("ProductVendorOrmModel")
+    category = relationship("TerminalCategoryOrmModel", back_populates="products")
+    vendor = relationship("ProductVendorOrmModel", back_populates="products")
     reviews = relationship("ProductReviewOrmModel", back_populates="product")
 
     @validates("id", "vat_id", "discount_id", "category_id", "vendor_id")

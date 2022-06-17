@@ -124,6 +124,7 @@ class TerminalCategoryOrmModel(CategoryOrmModel, Base):
     parent_id = Column(BINARY(16), ForeignKey("midlevel_category.id"))
 
     parent = relationship("MidLevelCategoryOrmModel", back_populates="children")
+    products = relationship("ProductOrmModel", back_populates="category")
 
     @property
     def _parent_type(self):

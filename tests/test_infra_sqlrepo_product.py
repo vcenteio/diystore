@@ -23,6 +23,7 @@ from diystore.domain.entities.product import ProductDimensions
 from diystore.domain.entities.product import ProductRating
 from diystore.domain.entities.product import ProductPhotoUrl
 from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel
+from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
 
 
 def test_infra_sqlrepo_product_vat_relationship_non_existing_vat(orm_session: Session):
@@ -72,15 +73,18 @@ def test_infra_sqlrepo_product_category_relationship(orm_session: Session):
     assert product_orm.category == category_orm
     assert product_orm.category.parent == category_orm.parent
     assert product_orm.category.parent.parent == category_orm.parent.parent
+    assert product_orm in product_orm.category.products
 
 
 def test_infra_sqlrepo_product_vendor_relationship(orm_session: Session):
     vendor_orm = ProductVendorOrmModelFactory()
-    product_orm = ProductOrmModelFactory(vendor_id=vendor_orm.id)
-    orm_session.add_all((vendor_orm, product_orm))
+    products = ProductOrmModelFactory.build_batch(10, vendor_id=vendor_orm.id)
+    orm_session.add_all((vendor_orm, *products))
     orm_session.commit()
-    product_orm = orm_session.get(ProductOrmModel, product_orm.id)
-    assert product_orm.vendor == vendor_orm
+    vendor_orm = orm_session.get(ProductVendorOrmModel, vendor_orm.id)
+    assert vendor_orm.products == products
+    product = orm_session.get(ProductOrmModel, products[0].id)
+    assert product.vendor_id == vendor_orm.id
 
 
 def test_infra_sqlrepo_product_review_relationship(orm_session: Session):
