@@ -195,12 +195,6 @@ def test_infra_sqlrepo_top_level_category_from_domain_entity_correct_type():
     assert tlc_orm.description == tlc_entity.description
 
 
-def test_infra_sqlrepo_mid_level_category_to_domain_entity_not_fully_loaded():
-    mlc_orm: MidLevelCategoryOrmModel = MidLevelCategoryOrmModelFactory()
-    with pytest.raises(OrmEntityNotFullyLoaded):
-        mlc_orm.to_domain_entity()
-
-
 def test_infra_sqlrepo_mid_level_category_to_domain_entity_fully_loaded():
     parent = TopLevelCategoryOrmModelFactory()
     mlc_orm: MidLevelCategoryOrmModel = MidLevelCategoryOrmModelFactory()
@@ -233,24 +227,19 @@ def test_infra_sqlrepo_mid_level_category_from_domain_entity_correct_type():
     assert mlc_orm.parent_id == mlc_entity.get_parent_id().bytes
 
 
-def test_infra_sqlrepo_terminal_level_category_to_domain_entity_not_fully_loaded():
-    tmc_orm: TerminalCategoryOrmModel = TerminalCategoryOrmModelFactory()
-    with pytest.raises(OrmEntityNotFullyLoaded):
-        tmc_orm.to_domain_entity()
-
-
 def test_infra_sqlrepo_terminal_level_category_to_domain_entity_fully_loaded():
     parent = MidLevelCategoryOrmModelFactory()
     parent.parent = TopLevelCategoryOrmModelFactory()
-    mlc_orm: TerminalCategoryOrmModel = TerminalCategoryOrmModelFactory()
-    mlc_orm.parent = parent
-    mlc_entity = mlc_orm.to_domain_entity()
-    assert isinstance(mlc_entity, TerminalLevelProductCategory)
-    assert isinstance(mlc_entity.parent, MidLevelProductCategory)
-    assert mlc_entity.id.bytes == mlc_orm.id
-    assert mlc_entity.name == mlc_orm.name
-    assert mlc_entity.description == mlc_orm.description
-    assert mlc_entity.get_parent_id().bytes == mlc_orm.parent.id
+    tmc_orm: TerminalCategoryOrmModel = TerminalCategoryOrmModelFactory()
+    tmc_orm.parent = parent
+    tmc_entity = tmc_orm.to_domain_entity()
+    assert isinstance(tmc_entity, TerminalLevelProductCategory)
+    assert isinstance(tmc_entity.parent, MidLevelProductCategory)
+    assert isinstance(tmc_entity.get_top_level_category(), TopLevelProductCategory)
+    assert tmc_entity.id.bytes == tmc_orm.id
+    assert tmc_entity.name == tmc_orm.name
+    assert tmc_entity.description == tmc_orm.description
+    assert tmc_entity.get_parent_id().bytes == tmc_orm.parent.id
 
 
 @pytest.mark.parametrize(

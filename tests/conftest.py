@@ -170,6 +170,7 @@ class MidLevelCategoryOrmModelFactory(Factory):
     name: str = Faker("pystr", min_chars=2, max_chars=50)
     description: str = Faker("pystr", min_chars=1, max_chars=300)
     parent_id: UUID = Faker("uuid4")
+    parent = SubFactory(TopLevelCategoryOrmModelFactory)
 
 
 class TerminalCategoryOrmModelFactory(Factory):
@@ -180,6 +181,7 @@ class TerminalCategoryOrmModelFactory(Factory):
     name: str = Faker("pystr", min_chars=2, max_chars=50)
     description: str = Faker("pystr", min_chars=1, max_chars=300)
     parent_id: UUID = Faker("uuid4")
+    parent = SubFactory(MidLevelCategoryOrmModelFactory)
 
 
 class ProductReviewFactory(Factory):
