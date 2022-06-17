@@ -45,6 +45,7 @@ from diystore.infrastructure.repositories.sqlrepository import TopLevelCategoryO
 from diystore.infrastructure.repositories.sqlrepository import MidLevelCategoryOrmModel
 from diystore.infrastructure.repositories.sqlrepository import TerminalCategoryOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
+from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
 
 
 tz = timezone("UTC")
@@ -242,6 +243,16 @@ def generate_dummy_logo_url(o):
 class ProductVendorFactory(Factory):
     class Meta:
         model = ProductVendor
+
+    id: UUID = Faker("uuid4")
+    name: str = Faker("company")
+    description: str = Faker("catch_phrase")
+    logo_url = LazyAttribute(generate_dummy_logo_url)
+
+
+class ProductVendorOrmModelFactory(Factory):
+    class Meta:
+        model = ProductVendorOrmModel
 
     id: UUID = Faker("uuid4")
     name: str = Faker("company")

@@ -4,4 +4,5 @@ from .models.review import ProductReviewOrmModel
 from .models.categories import TopLevelCategoryOrmModel
 from .models.categories import MidLevelCategoryOrmModel
 from .models.categories import TerminalCategoryOrmModel
+from .models.vendor import ProductVendorOrmModel
 from .models import Base
