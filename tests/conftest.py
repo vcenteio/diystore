@@ -46,6 +46,7 @@ from diystore.infrastructure.repositories.sqlrepository import MidLevelCategoryO
 from diystore.infrastructure.repositories.sqlrepository import TerminalCategoryOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
+from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel
 
 
 tz = timezone("UTC")
@@ -84,7 +85,7 @@ class DiscountOrmModelFactory(Factory):
         datetime_end=now(tz) + duration(months=3),
         tzinfo=tz,
     )
-    id: UUID = uuid4().bytes
+    id: UUID = Faker("uuid4")
 
 
 class VATFactory(Factory):
@@ -280,6 +281,38 @@ class ProductFactory(Factory):
     rating = SubFactory(ProductRatingFactory)
     photo_url = SubFactory(ProductPhotoUrlFactory)
     vendor = SubFactory(ProductVendorFactory)
+
+
+class ProductOrmModelFactory(Factory):
+    class Meta:
+        model = ProductOrmModel
+
+    id = Faker("uuid4")
+    ean = Faker("bothify", text="#############")
+    name = Faker("word")
+    description = Faker("pystr", min_chars=1, max_chars=300)
+    base_price: Decimal = Faker(
+        "pyfloat", right_digits=2, min_value=0.01, max_value=999.99
+    )
+    vat_id = Faker("uuid4")
+    discount_id = Faker("uuid4")
+    quantity = Faker("pyint", min_value=0, max_value=1_000_000)
+    creation_date = Faker("date_time_between", tzinfo=tz)
+    height: Decimal = Faker("pyfloat", right_digits=1, min_value=1, max_value=99.9)
+    width: Decimal = Faker("pyfloat", right_digits=1, min_value=1, max_value=99.9)
+    length: Decimal = Faker("pyfloat", right_digits=1, min_value=1, max_value=99.9)
+    color = Faker("color_name")
+    material = Faker("word")
+    country_of_origin = Faker("country")
+    warranty = Faker("pyint", min_value=0, max_value=5)
+    category_id = Faker("uuid4")
+    rating: Decimal = Faker(
+        "pydecimal", right_digits=1, min_value=Decimal("0"), max_value=Decimal("5")
+    )
+    thumbnail_photo_url = Faker("image_url")
+    medium_size_photo_url = Faker("image_url")
+    large_size_photo_url = Faker("image_url")
+    vendor_id = Faker("uuid4")
 
 
 class ProductOrderingCriteriaFactory(Factory):
