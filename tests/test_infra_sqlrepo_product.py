@@ -4,6 +4,7 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.orm import Session
 
+from .conftest import ProductReviewOrmModelFactory
 from .conftest import ProductVendorOrmModelFactory
 from .conftest import VatOrmModelFactory
 from .conftest import ProductFactory
@@ -80,3 +81,14 @@ def test_infra_sqlrepo_product_vendor_relationship(orm_session: Session):
     orm_session.commit()
     product_orm = orm_session.get(ProductOrmModel, product_orm.id)
     assert product_orm.vendor == vendor_orm
+
+
+def test_infra_sqlrepo_product_review_relationship(orm_session: Session):
+    product_orm = ProductOrmModelFactory()
+    reviews = ProductReviewOrmModelFactory.build_batch(10, product_id=product_orm.id)
+    orm_session.add_all((product_orm, *reviews))
+    orm_session.commit()
+    product_orm = orm_session.get(ProductOrmModel, product_orm.id)
+    assert product_orm.reviews == reviews
+    for review in product_orm.reviews:
+        assert review.product == product_orm

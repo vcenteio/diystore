@@ -42,6 +42,7 @@ class ProductOrmModel(Base):
     discount = relationship("DiscountOrmModel")
     category = relationship("TerminalCategoryOrmModel")
     vendor = relationship("ProductVendorOrmModel")
+    reviews = relationship("ProductReviewOrmModel", back_populates="product")
 
     @validates("id", "vat_id", "discount_id", "category_id", "vendor_id")
     def _validate_id(self, key, _id):

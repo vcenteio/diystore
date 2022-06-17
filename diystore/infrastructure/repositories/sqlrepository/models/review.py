@@ -5,6 +5,7 @@ from sqlalchemy import BINARY
 from sqlalchemy import ForeignKey
 from sqlalchemy import DateTime
 from sqlalchemy.orm import validates
+from sqlalchemy.orm import relationship
 
 from . import Base
 from . import tz
@@ -15,11 +16,13 @@ from .....domain.entities.product import ProductReview
 class ProductReviewOrmModel(Base):
     __tablename__ = "product_review"
     id = Column(BINARY(16), primary_key=True)
-    product_id = Column(BINARY(16), nullable=False)
+    product_id = Column(BINARY(16), ForeignKey("product.id"), nullable=False)
     client_id = Column(BINARY(16), nullable=False)
     rating = Column(Numeric(precision=2, scale=1), nullable=False)
     creation_date = Column(DateTime(timezone=True), nullable=False)
     feedback = Column(String(3000))
+
+    product = relationship("ProductOrmModel", back_populates="reviews")
 
     @validates("id", "product_id", "client_id")
     def _validate_id(self, key, _id):
