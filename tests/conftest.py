@@ -44,6 +44,7 @@ from diystore.infrastructure.repositories.sqlrepository import DiscountOrmModel
 from diystore.infrastructure.repositories.sqlrepository import TopLevelCategoryOrmModel
 from diystore.infrastructure.repositories.sqlrepository import MidLevelCategoryOrmModel
 from diystore.infrastructure.repositories.sqlrepository import TerminalCategoryOrmModel
+from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
 
 
 tz = timezone("UTC")
@@ -190,6 +191,21 @@ class ProductReviewFactory(Factory):
         "pydecimal", right_digits=1, min_value=Decimal("0"), max_value=Decimal("5")
     )
     creation_date: datetime = Faker("date_time", end_datetime=now(tz), tzinfo=tz)
+    feedback: str = Faker("pystr", min_chars=1, max_chars=3000)
+
+
+class ProductReviewOrmModelFactory(Factory):
+    class Meta:
+        model = ProductReviewOrmModel
+
+    id: UUID = Faker("uuid4")
+    product_id: UUID = Faker("uuid4")
+    client_id: UUID = Faker("uuid4")
+    rating: Decimal = Faker(
+        "pydecimal", right_digits=1, min_value=Decimal("0"), max_value=Decimal("5")
+    )
+    creation_date: datetime = Faker("date_time", end_datetime=now(tz), tzinfo=tz)
+    feedback: str = Faker("pystr", min_chars=1, max_chars=3000)
 
 
 class ProductRatingFactory(Factory):
