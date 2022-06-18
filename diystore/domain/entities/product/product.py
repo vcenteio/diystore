@@ -196,7 +196,7 @@ class Product(BaseModel):
         return self.category.get_top_level_category_description()
 
     def get_client_rating(self) -> Optional[Decimal]:
-        return self.rating.calculate()
+        return self.rating.get_rating()
 
     def get_client_reviews(self) -> list[ProductReview]:
         return self.rating.get_reviews()

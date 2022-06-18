@@ -515,13 +515,6 @@ def test_domain_product_rating_correct_type():
     assert isinstance(p.rating, ProductRating)
 
 
-def test_domain_product_rating_correct_dict():
-    rating_dict = ProductRatingFactory().dict()
-    p = ProductFactory(rating=rating_dict)
-    assert p.rating == ProductRating(**rating_dict)
-    assert isinstance(p.rating, ProductRating)
-
-
 def test_domain_product_photo_url_is_optional():
     p = ProductFactory(photo_url=None)
     assert p.photo_url is None
