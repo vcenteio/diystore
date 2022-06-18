@@ -5,7 +5,7 @@ import pytest
 
 from .conftest import GetProductInputDTOFactory
 from .conftest import ProductFactory
-from diystore.application.usecases.product import ProductsRepository
+from diystore.application.usecases.product import ProductRepository
 from diystore.application.usecases.product import get_product_use_case
 from diystore.application.usecases.product import GetProductOutputDTO
 
@@ -26,7 +26,7 @@ def test_application_get_product_use_case_wrong_repository_type():
 
 
 def test_application_get_product_use_case_no_result(
-    mock_products_repository: Union[Mock, ProductsRepository]
+    mock_products_repository: Union[Mock, ProductRepository]
 ):
     input_dto = GetProductInputDTOFactory()
     mock_products_repository.get_product = Mock(return_value=None)
@@ -36,7 +36,7 @@ def test_application_get_product_use_case_no_result(
 
 
 def test_application_get_product_use_case_with_result(
-    mock_products_repository: Union[Mock, ProductsRepository]
+    mock_products_repository: Union[Mock, ProductRepository]
 ):
     input_dto = GetProductInputDTOFactory()
     expected_product = ProductFactory()

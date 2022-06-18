@@ -2,7 +2,7 @@ from typing import Optional
 
 from .inputdto import GetProductInputDTO
 from .outputdto import GetProductOutputDTO
-from ..repository import ProductsRepository
+from ..repository import ProductRepository
 
 
 def _ensure_input_dto_correct_type(input_dto):
@@ -11,7 +11,7 @@ def _ensure_input_dto_correct_type(input_dto):
 
 
 def _ensure_repository_correct_type(repository):
-    if not isinstance(repository, ProductsRepository):
+    if not isinstance(repository, ProductRepository):
         raise TypeError(f"wrong type for repository: {type(repository).__name__}")
 
 
@@ -21,7 +21,7 @@ def _validate_arguments(input_dto, repository):
 
 
 def get_product_use_case(
-    input_dto: GetProductInputDTO, repository: ProductsRepository
+    input_dto: GetProductInputDTO, repository: ProductRepository
 ) -> Optional[GetProductOutputDTO]:
     _validate_arguments(input_dto, repository)
     product = repository.get_product(input_dto.product_id)

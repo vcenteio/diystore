@@ -36,7 +36,7 @@ from diystore.domain.entities.product.vendor import ProductVendor
 from diystore.application.usecases.product import GetProductsInputDTO
 from diystore.application.usecases.product import ProductOrderingCriteria
 from diystore.application.usecases.product import GetProductOutputDTO
-from diystore.application.usecases.product import ProductsRepository
+from diystore.application.usecases.product import ProductRepository
 from diystore.application.usecases.product import GetProductInputDTO
 from diystore.infrastructure.repositories.sqlrepository import Base
 from diystore.infrastructure.repositories.sqlrepository import VatOrmModel
@@ -510,7 +510,7 @@ def naive_past_datetime(faker):
 
 @pytest.fixture
 def mock_products_repository():
-    return Mock(ProductsRepository)
+    return Mock(ProductRepository)
 
 
 @pytest.fixture(scope="session")

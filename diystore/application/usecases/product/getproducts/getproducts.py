@@ -3,7 +3,7 @@ from functools import partial
 
 from .inputdto import GetProductsInputDTO
 from .outputdto import GetProductsOutputDTO
-from ..repository import ProductsRepository
+from ..repository import ProductRepository
 from ..getproduct.outputdto import GetProductOutputDTO
 from ..orderingcriteria import OrderingProperty
 from ..orderingcriteria import OrderingType
@@ -24,7 +24,7 @@ def _is_ordering_type_rating(input_dto: GetProductsInputDTO):
 
 
 def _select_correct_repository_method(
-    input_dto: GetProductsInputDTO, repository: ProductsRepository
+    input_dto: GetProductsInputDTO, repository: ProductRepository
 ):
     if not _has_ordering_criteria(input_dto):
         return repository.get_products
@@ -58,7 +58,7 @@ def _call_method_with_correct_arguments(
 
 
 def get_products_use_case(
-    input_dto: GetProductsInputDTO, repository: ProductsRepository
+    input_dto: GetProductsInputDTO, repository: ProductRepository
 ):
     _validate_input_dto_type(input_dto)
     repo_method = _select_correct_repository_method(input_dto, repository)

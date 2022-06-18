@@ -6,7 +6,7 @@ from uuid import UUID
 from ....domain.entities.product import Product
 
 
-class ProductsRepository(ABC):
+class ProductRepository(ABC):
     @abstractmethod
     def get_product(self, product_id: UUID):
         ...
