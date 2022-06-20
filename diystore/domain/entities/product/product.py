@@ -24,9 +24,10 @@ from .categories import (
     TopLevelProductCategory,
 )
 from .review import ProductReview
-from .rating import ProductRating
+from .types import ProductRating
 from .photo import ProductPhotoUrl
 from .vendor import ProductVendor
+from ...helpers import round_decimal
 
 
 class Product(BaseModel):
@@ -44,6 +45,7 @@ class Product(BaseModel):
     warranty: conint(strict=True, ge=0, le=10) = Field(...)
     category: TerminalLevelProductCategory = Field(...)
     rating: ProductRating = Field(default=None)
+    reviews: list[ProductReview] = Field(default=[])
     photo_url: ProductPhotoUrl = Field(default=None)
     vendor: ProductVendor = Field(...)
 
@@ -195,14 +197,42 @@ class Product(BaseModel):
     def get_top_category_description(self) -> str:
         return self.category.get_top_level_category_description()
 
-    def get_client_rating(self) -> Optional[Decimal]:
-        return self.rating.get_rating()
+    def get_client_rating(self) -> Optional[ProductRating]:
+        return self.rating
+    
+    def update_client_rating(self):
+        self.rating = self.calculate_rating(self.reviews)
 
     def get_client_reviews(self) -> list[ProductReview]:
-        return self.rating.get_reviews()
+        return self.reviews
+
+    def _append_review(self, review: ProductReview):
+        if not isinstance(review, ProductReview):
+            raise TypeError(f"invalid review object type")
+        self.reviews.append(review)
+
+    @staticmethod
+    def calculate_rating(reviews: list[ProductReview]):
+        n = len(reviews)
+        if n < 2:
+            return reviews[0].rating if n else None
+        else:
+            rating_avg = sum([review.rating for review in reviews]) / n
+            return round_decimal(rating_avg, "1.0")
 
     def add_client_review(self, review: ProductReview):
-        return self.rating.add_review(review)
+        self._append_review(review)
+        self.rating = self.calculate_rating(self.reviews)
+
+    def delete_client_review(self, review_id: UUID):
+        if not isinstance(review_id, UUID):
+            raise TypeError("review_id must be a UUID object")
+        old_reviews = self.reviews
+        new_reviews = [rev for rev in self.reviews if rev.id != review_id]
+        if len(old_reviews) == len(new_reviews):
+            raise ValueError(f"no review with id {review_id!r}")
+        self.reviews = new_reviews
+        self.rating = self.calculate_rating(self.reviews)
 
     def get_thumbnail_photo_url(self) -> str:
         return str(self.photo_url.thumbnail)

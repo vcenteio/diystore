@@ -5,7 +5,7 @@ from .dimensions import ProductDimensions
 from .discount import Discount
 from .photo import ProductPhotoUrl
 from .price import ProductPrice
-from .rating import ProductRating
+from .types import ProductRating
 from .review import ProductReview
 from .vat import VAT
 from .vendor import ProductVendor

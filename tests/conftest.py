@@ -21,18 +21,16 @@ from sqlalchemy.orm import Session
 
 from diystore.domain.helpers import round_decimal
 from diystore.domain.entities.product import Product
-from diystore.domain.entities.product.discount import Discount
-from diystore.domain.entities.product.rating import ProductRating
-from diystore.domain.entities.product.review import ProductReview
-from diystore.domain.entities.product.vat import VAT
-from diystore.domain.entities.product.price import ProductPrice
-from diystore.domain.entities.product.dimensions import ProductDimensions
-from diystore.domain.entities.product.categories import ProductCategory
-from diystore.domain.entities.product.categories import TopLevelProductCategory
-from diystore.domain.entities.product.categories import MidLevelProductCategory
-from diystore.domain.entities.product.categories import TerminalLevelProductCategory
-from diystore.domain.entities.product.photo import ProductPhotoUrl
-from diystore.domain.entities.product.vendor import ProductVendor
+from diystore.domain.entities.product import Discount
+from diystore.domain.entities.product import ProductReview
+from diystore.domain.entities.product import VAT
+from diystore.domain.entities.product import ProductPrice
+from diystore.domain.entities.product import ProductDimensions
+from diystore.domain.entities.product import TopLevelProductCategory
+from diystore.domain.entities.product import MidLevelProductCategory
+from diystore.domain.entities.product import TerminalLevelProductCategory
+from diystore.domain.entities.product import ProductPhotoUrl
+from diystore.domain.entities.product import ProductVendor
 from diystore.application.usecases.product import GetProductsInputDTO
 from diystore.application.usecases.product import ProductOrderingCriteria
 from diystore.application.usecases.product import GetProductOutputDTO
@@ -212,13 +210,6 @@ class ProductReviewOrmModelFactory(Factory):
     feedback: str = Faker("pystr", min_chars=1, max_chars=3000)
 
 
-class ProductRatingFactory(Factory):
-    class Meta:
-        model = ProductRating
-
-    reviews: list[ProductReview] = [ProductReviewFactory() for _ in range(3)]
-
-
 def generate_dummy_image_url(name: str, width: int, height: int):
     return f"https://cdn.diystore.com/{name}.jpg?size={width}x{height}"
 
@@ -280,7 +271,9 @@ class ProductFactory(Factory):
     country_of_origin = Faker("country")
     warranty = Faker("pyint", min_value=0, max_value=5)
     category = SubFactory(TerminalLevelProductCategoryFactory)
-    rating = SubFactory(ProductRatingFactory)
+    rating: Decimal = Faker(
+        "pydecimal", right_digits=1, min_value=Decimal("0"), max_value=Decimal("5")
+    )
     photo_url = SubFactory(ProductPhotoUrlFactory)
     vendor = SubFactory(ProductVendorFactory)
 

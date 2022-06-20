@@ -1,4 +1,5 @@
 from decimal import Decimal
+from uuid import uuid1
 
 import pytest
 import pendulum
@@ -6,13 +7,13 @@ from pendulum.datetime import DateTime
 from pydantic.error_wrappers import ValidationError
 
 from diystore.domain.entities.product import ProductPrice
-from diystore.domain.entities.product import ProductRating
 from diystore.domain.entities.product import ProductDimensions
 from diystore.domain.entities.product import TerminalLevelProductCategory
 from diystore.domain.entities.product import ProductPhotoUrl
 from diystore.domain.entities.product import ProductVendor
 from diystore.domain.entities.product import Product
-from .conftest import DiscountFactory, tz
+from diystore.domain.entities.product import ProductRating
+from .conftest import DiscountFactory, ProductReviewFactory, tz
 from .conftest import round_decimal
 from .conftest import ProductPhotoUrlFactory
 from .conftest import ProductFactory
@@ -21,7 +22,6 @@ from .conftest import ProductPriceFactory
 from .conftest import TopLevelProductCategoryFactory
 from .conftest import MidLevelProductCategoryFactory
 from .conftest import TerminalLevelProductCategoryFactory
-from .conftest import ProductRatingFactory
 from .conftest import ProductVendorFactory
 
 
@@ -501,18 +501,65 @@ def test_domain_product_rating_is_optional():
     assert p.rating is None
 
 
-@pytest.mark.parametrize("wrong_rating", (1, "2", b"3", Decimal(3.5), (4,), [1, 2]))
-def test_domain_product_rating_wrong_type(wrong_rating, not_a_valid_dict_error_msg):
+@pytest.mark.parametrize("wrong_rating", ((4,), [1, 2]))
+def test_domain_product_rating_wrong_type(wrong_rating):
     with pytest.raises(ValidationError) as e:
         ProductFactory(rating=wrong_rating)
-    assert e.match(not_a_valid_dict_error_msg)
+    assert e.match("rating")
 
 
-def test_domain_product_rating_correct_type():
-    rating = ProductRatingFactory()
+@pytest.mark.parametrize("rating", (1, "2", 2.5, Decimal(3.5)))
+def test_domain_product_rating_correct_type(rating):
     p = ProductFactory(rating=rating)
-    assert p.rating == rating
-    assert isinstance(p.rating, ProductRating)
+    assert p.get_client_rating() == ProductRating(rating)
+    assert isinstance(p.get_client_rating(), ProductRating)
+
+
+@pytest.mark.parametrize(
+    ("rating", "reviews"),
+    [
+        (None, []),
+        (ProductRating(4.5), []),
+        (None, ProductReviewFactory.build_batch(3)),
+        (ProductRating(4.5), ProductReviewFactory.build_batch(3)),
+    ],
+)
+def test_domain_product_add_client_review_successfully_added(rating, reviews):
+    new_review = ProductReviewFactory()
+    product: Product = ProductFactory(rating=rating, reviews=reviews)
+    product.add_client_review(new_review)
+    assert new_review in product.reviews
+
+
+def test_domain_product_add_client_review_rating_is_updated():
+    product: Product = ProductFactory(
+        rating=1, reviews=[ProductReviewFactory(rating=1)]
+    )
+    previous_rating = product.get_client_rating()
+    product.add_client_review(ProductReviewFactory(rating=5))
+    assert product.rating == Product.calculate_rating(product.get_client_reviews())
+    assert product.rating != previous_rating
+
+
+def test_domain_product_delete_client_review_not_found():
+    product: Product = ProductFactory(reviews=ProductReviewFactory.build_batch(5))
+    product.update_client_rating()
+    previous_rating = product.get_client_rating()
+    inexistent_id = uuid1()
+    with pytest.raises(ValueError):
+        product.delete_client_review(inexistent_id)
+    assert product.get_client_rating() == previous_rating
+
+
+def test_domain_product_delete_client_review_found():
+    reviews = [ProductReviewFactory(rating=1), ProductReviewFactory(rating=5)]
+    product: Product = ProductFactory(reviews=reviews)
+    product.update_client_rating()
+    previous_rating = product.get_client_rating()
+    existant_review = reviews[0]
+    product.delete_client_review(existant_review.id)
+    assert existant_review not in product.get_client_reviews()
+    assert product.get_client_rating() != previous_rating
 
 
 def test_domain_product_photo_url_is_optional():
