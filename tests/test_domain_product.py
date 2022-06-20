@@ -37,18 +37,18 @@ def test_domain_product_ean_correct_lenght(faker):
     assert p.ean == ean
 
 
-def test_domain_product_ean_lenght_lt_min(faker, str_lenght_lt_min_lenght_error_msg):
+def test_domain_product_ean_lenght_lt_min(faker):
     ean = faker.bothify(text="############")
     with pytest.raises(ValidationError) as e:
         ProductFactory(ean=ean)
-    assert e.match(str_lenght_lt_min_lenght_error_msg)
+    assert e.match("EAN")
 
 
-def test_domain_product_ean_lenght_lt_min(faker, str_lenght_gt_max_lenght_error_msg):
+def test_domain_product_ean_lenght_lt_max(faker):
     ean = faker.bothify(text="##############")
     with pytest.raises(ValidationError) as e:
         ProductFactory(ean=ean)
-    assert e.match(str_lenght_gt_max_lenght_error_msg)
+    assert e.match("EAN")
 
 
 def test_domain_product_ean_wrong_value(faker):

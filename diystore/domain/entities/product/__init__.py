@@ -1,3 +1,5 @@
+from .types import ProductRating
+from .types import EAN13
 from .categories import TopLevelProductCategory
 from .categories import MidLevelProductCategory
 from .categories import TerminalLevelProductCategory
@@ -5,7 +7,6 @@ from .dimensions import ProductDimensions
 from .discount import Discount
 from .photo import ProductPhotoUrl
 from .price import ProductPrice
-from .types import ProductRating
 from .review import ProductReview
 from .vat import VAT
 from .vendor import ProductVendor

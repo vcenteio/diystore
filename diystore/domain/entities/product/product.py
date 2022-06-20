@@ -24,6 +24,7 @@ from .categories import (
     TopLevelProductCategory,
 )
 from .review import ProductReview
+from .types import EAN13
 from .types import ProductRating
 from .photo import ProductPhotoUrl
 from .vendor import ProductVendor
@@ -32,7 +33,7 @@ from ...helpers import round_decimal
 
 class Product(BaseModel):
     id: UUID = Field(default_factory=uuid4)
-    ean: str = Field(min_length=13, max_length=13, regex=r"^\d{13}$")
+    ean: EAN13 = Field(...)
     name: constr(strict=True, min_length=1, max_length=50) = Field(...)
     description: str = Field(min_length=1, max_length=3000, default=None, repr=False)
     price: ProductPrice = Field(...)
@@ -199,7 +200,7 @@ class Product(BaseModel):
 
     def get_client_rating(self) -> Optional[ProductRating]:
         return self.rating
-    
+
     def update_client_rating(self):
         self.rating = self.calculate_rating(self.reviews)
 
