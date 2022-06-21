@@ -7,3 +7,4 @@ from .models.categories import TerminalCategoryOrmModel
 from .models.vendor import ProductVendorOrmModel
 from .models.product import ProductOrmModel
 from .models import Base
+from .repository import SQLProductRepository

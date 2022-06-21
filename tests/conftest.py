@@ -46,6 +46,7 @@ from diystore.infrastructure.repositories.sqlrepository import TerminalCategoryO
 from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel
+from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
 
 
 tz = timezone("UTC")
@@ -537,3 +538,8 @@ def orm_session(session_factory):
     session: Session = session_factory()
     yield session
     session.close()
+
+
+@pytest.fixture()
+def sqlrepo():
+    return SQLProductRepository(db_url="sqlite:///:memory:")

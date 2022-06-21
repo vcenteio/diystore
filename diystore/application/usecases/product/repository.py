@@ -8,7 +8,7 @@ from ....domain.entities.product import Product
 
 class ProductRepository(ABC):
     @abstractmethod
-    def get_product(self, product_id: UUID):
+    def get_product(self, product_id: UUID, with_reviews: bool = False):
         ...
 
     @abstractmethod
@@ -20,7 +20,7 @@ class ProductRepository(ABC):
         rating_min: Decimal = Decimal("0"),
         rating_max: Decimal = Decimal("5"),
         with_discounts_only: bool = False,
-    ):
+    ) -> Product:
         ...
 
     @abstractmethod

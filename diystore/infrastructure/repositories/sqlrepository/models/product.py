@@ -54,11 +54,11 @@ class ProductOrmModel(Base):
     large_size_photo_url = Column(String(2000))
     vendor_id = Column(BINARY(16), ForeignKey("vendor.id"), nullable=False)
 
-    vat = relationship("VatOrmModel")
-    discount = relationship("DiscountOrmModel")
-    category = relationship("TerminalCategoryOrmModel", back_populates="products")
-    vendor = relationship("ProductVendorOrmModel", back_populates="products")
-    reviews = relationship("ProductReviewOrmModel", back_populates="product")
+    vat = relationship(VatOrmModel, lazy="joined")
+    discount = relationship(DiscountOrmModel, lazy="joined")
+    category = relationship(TerminalCategoryOrmModel, back_populates="products", lazy="joined")
+    vendor = relationship(ProductVendorOrmModel, back_populates="products", lazy="joined")
+    reviews = relationship(ProductReviewOrmModel, back_populates="product")
 
     @validates("id", "vat_id", "discount_id", "category_id", "vendor_id")
     def _validate_id(self, key, _id):
@@ -92,7 +92,7 @@ class ProductOrmModel(Base):
                 reviews=(
                     [rev.to_domain_entity() for rev in self.reviews]
                     if with_reviews and self.reviews
-                    else None
+                    else []
                 ),
                 photo_url=ProductPhotoUrl(
                     thumbnail=self.thumbnail_photo_url,
