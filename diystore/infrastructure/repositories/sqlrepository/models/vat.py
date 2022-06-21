@@ -1,3 +1,4 @@
+from typing import Type
 from uuid import UUID
 from decimal import Decimal
 
@@ -22,6 +23,8 @@ class VatOrmModel(Base):
 
     @validates("id")
     def _validate_id(self, key, _id):
+        if _id is None:
+            raise TypeError
         return validate_id(_id, key)
 
     def to_domain_entity(self) -> VAT:

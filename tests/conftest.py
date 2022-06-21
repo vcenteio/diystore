@@ -314,7 +314,11 @@ class ProductOrmModelFactory(Factory):
 
 class LoadedProductOrmModelFactory(ProductOrmModelFactory):
     vat = LazyAttribute(lambda o: VatOrmModelFactory(id=o.vat_id))
-    discount = LazyAttribute(lambda o: DiscountOrmModelFactory(id=o.discount_id))
+    discount = LazyAttribute(
+        lambda o: DiscountOrmModelFactory(id=o.discount_id)
+        if o.discount_id is not None
+        else None
+    )
     category = LazyAttribute(
         lambda o: TerminalCategoryOrmModelFactory(id=o.category_id)
     )

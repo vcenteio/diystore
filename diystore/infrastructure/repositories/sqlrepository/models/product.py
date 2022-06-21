@@ -56,12 +56,24 @@ class ProductOrmModel(Base):
 
     vat = relationship(VatOrmModel, lazy="joined")
     discount = relationship(DiscountOrmModel, lazy="joined")
-    category = relationship(TerminalCategoryOrmModel, back_populates="products", lazy="joined")
-    vendor = relationship(ProductVendorOrmModel, back_populates="products", lazy="joined")
+    category = relationship(
+        TerminalCategoryOrmModel, back_populates="products", lazy="joined"
+    )
+    vendor = relationship(
+        ProductVendorOrmModel, back_populates="products", lazy="joined"
+    )
     reviews = relationship(ProductReviewOrmModel, back_populates="product")
 
-    @validates("id", "vat_id", "discount_id", "category_id", "vendor_id")
-    def _validate_id(self, key, _id):
+    @validates("id", "vat_id", "category_id", "vendor_id")
+    def _validate_non_nullable_ids(self, key, _id):
+        if _id is None:
+            raise TypeError(f"{key} is a non-nullable field")
+        if not isinstance(_id, (UUID, bytes, int, str)):
+            raise TypeError("id must be an UUID, bytes, int or str object")
+        return validate_id(_id, key)
+
+    @validates("discount_id")
+    def _validate_discount_id(self, key, _id):
         return validate_id(_id, key)
 
     def __repr__(self):
@@ -76,7 +88,9 @@ class ProductOrmModel(Base):
                 price=ProductPrice(
                     value=self.base_price,
                     vat=self.vat.to_domain_entity(),
-                    discount=self.discount.to_domain_entity(),
+                    discount=(
+                        self.discount.to_domain_entity() if self.discount else None
+                    ),
                 ),
                 quantity=self.quantity,
                 creation_date=tz.convert(self.creation_date),

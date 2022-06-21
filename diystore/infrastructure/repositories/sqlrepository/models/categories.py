@@ -18,6 +18,8 @@ from .....domain.entities.product import TerminalLevelProductCategory
 class CategoryOrmModel:
     @validates("id", "parent_id")
     def _validate_id(self, key, _id):
+        if _id is None:
+            raise TypeError
         return validate_id(_id, key)
 
     @validates("parent")
