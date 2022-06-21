@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.orm import Session
 
-from .conftest import ProductReviewOrmModelFactory
+from .conftest import ProductReviewFactory, ProductReviewOrmModelFactory
 from .conftest import ProductVendorOrmModelFactory
 from .conftest import VatOrmModelFactory
 from .conftest import ProductFactory
@@ -148,3 +148,47 @@ def test_infra_sqlrepo_product_to_domain_entity(orm_session: Session):
     assert product_entity.reviews == validated_entity.reviews is None
     assert product_entity.photo_url == validated_entity.photo_url
     assert product_entity.vendor == validated_entity.vendor
+
+
+def test_infra_sqlrepo_product_from_domain_entity_wrong_type():
+    with pytest.raises(TypeError):
+        ProductOrmModel.from_domain_entity(1)
+
+
+def test_infra_sqlrepo_product_from_domain_entity_correct_type(orm_session: Session):
+    product: Product = ProductFactory(reviews=ProductReviewFactory.build_batch(3))
+    product_orm = ProductOrmModel.from_domain_entity(product)
+
+    orm_session.add(product_orm)
+    orm_session.commit()
+
+    product_orm: ProductOrmModel = orm_session.get(ProductOrmModel, product_orm.id)
+
+    assert product_orm.id == product.get_id_in_bytes_format()
+    assert product_orm.ean == product.ean
+    assert product_orm.name == product.name
+    assert product_orm.description == product.description
+    assert product_orm.base_price == product.get_base_price()
+    assert product_orm.vat_id == product.get_vat_id_in_bytes_format()
+    assert product_orm.discount_id == product.get_discount_id_in_bytes_format()
+    assert product_orm.quantity == product.quantity
+    assert product_orm.creation_date == product.creation_date.naive()
+    assert product_orm.height == product.get_height()
+    assert product_orm.width == product.get_width()
+    assert product_orm.length == product.get_length()
+    assert product_orm.color == product.color
+    assert product_orm.material == product.material
+    assert product_orm.country_of_origin == product.country_of_origin
+    assert product_orm.warranty == product.warranty
+    assert product_orm.category_id == product.get_category_id_in_bytes_format()
+    assert product_orm.rating == product.rating
+    assert product_orm.thumbnail_photo_url == product.get_thumbnail_photo_url()
+    assert product_orm.medium_size_photo_url == product.get_medium_size_photo_url()
+    assert product_orm.large_size_photo_url == product.get_large_size_photo_url()
+    assert product_orm.vendor_id == product.get_vendor_id_in_bytes_format()
+    assert isinstance(product_orm.vat, VatOrmModel)
+    assert isinstance(product_orm.discount, DiscountOrmModel)
+    assert isinstance(product_orm.category, TerminalCategoryOrmModel)
+    assert isinstance(product_orm.vendor, ProductVendorOrmModel)
+    for rev in product_orm.reviews:
+        assert isinstance(rev, ProductReviewOrmModel)

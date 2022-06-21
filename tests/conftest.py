@@ -314,9 +314,13 @@ class ProductOrmModelFactory(Factory):
 class LoadedProductOrmModelFactory(ProductOrmModelFactory):
     vat = LazyAttribute(lambda o: VatOrmModelFactory(id=o.vat_id))
     discount = LazyAttribute(lambda o: DiscountOrmModelFactory(id=o.discount_id))
-    category = LazyAttribute(lambda o: TerminalCategoryOrmModelFactory(id=o.category_id))
+    category = LazyAttribute(
+        lambda o: TerminalCategoryOrmModelFactory(id=o.category_id)
+    )
     vendor = LazyAttribute(lambda o: ProductVendorOrmModelFactory(id=o.vendor_id))
-    reviews = LazyAttribute(lambda o: ProductReviewOrmModelFactory.build_batch(3, product_id=o.id))
+    reviews = LazyAttribute(
+        lambda o: ProductReviewOrmModelFactory.build_batch(3, product_id=o.id)
+    )
 
 
 class ProductOrderingCriteriaFactory(Factory):

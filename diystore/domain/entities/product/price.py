@@ -1,4 +1,5 @@
 from decimal import Decimal
+from uuid import UUID
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -10,9 +11,7 @@ from .vat import VAT
 
 
 class ProductPrice(BaseModel):
-    value: Decimal = Field(
-        ge=0.01, le=999_999.99, decimal_places=2
-    )
+    value: Decimal = Field(ge=0.01, le=999_999.99, decimal_places=2)
     vat: VAT = Field()
     discount: Discount = Field(default=None)
     _rounding_template: Decimal = PrivateAttr(default=Decimal("1.00"))
@@ -35,16 +34,22 @@ class ProductPrice(BaseModel):
 
     def _round(self, value: Decimal) -> Decimal:
         return value.quantize(self._rounding_template)
-    
+
     def calculate_without_discount(self):
         return self._round(self._add_vat())
 
     def calculate(self):
         v = self.value if self.discount is None else self._apply_discount()
         return self._round(self._add_vat(v))
-    
+
+    def get_discount_id(self) -> UUID:
+        return self.discount.id
+
     def get_discount_rate(self) -> Decimal:
         return self.discount.rate
-    
+
+    def get_vat_id(self) -> UUID:
+        return self.vat.id
+
     def get_vat_rate(self) -> Decimal:
         return self.vat.rate

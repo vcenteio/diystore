@@ -114,6 +114,9 @@ class Product(BaseModel):
         cls._ensure_category_is_correct_type(category)
         return category
 
+    def get_id_in_bytes_format(self) -> bytes:
+        return self.id.bytes
+
     def get_final_price(self, with_discount: bool = True) -> Decimal:
         if with_discount:
             return self.price.calculate()
@@ -125,6 +128,12 @@ class Product(BaseModel):
     def set_base_price(self, price: Decimal):
         self.price.value = price
 
+    def get_discount_id(self) -> UUID:
+        return self.price.get_discount_id()
+
+    def get_discount_id_in_bytes_format(self) -> bytes:
+        return self.price.get_discount_id().bytes
+
     def get_discount_rate(self):
         return self.price.get_discount_rate()
 
@@ -133,6 +142,12 @@ class Product(BaseModel):
 
     def set_discount(self, discount: Discount):
         self.price.discount = discount
+
+    def get_vat_id(self) -> UUID:
+        return self.price.get_vat_id()
+
+    def get_vat_id_in_bytes_format(self) -> bytes:
+        return self.price.get_vat_id().bytes
 
     def get_vat_rate(self) -> Decimal:
         return self.price.get_vat_rate()
@@ -149,6 +164,15 @@ class Product(BaseModel):
     def get_dimensions_dict(self) -> dict:
         return self.dimensions.dict()
 
+    def get_height(self) -> Decimal:
+        return self.dimensions.height
+
+    def get_width(self) -> Decimal:
+        return self.dimensions.width
+
+    def get_length(self) -> Decimal:
+        return self.dimensions.length
+
     def set_dimensions(
         self,
         height: Union[Decimal, float, int, str],
@@ -161,6 +185,9 @@ class Product(BaseModel):
 
     def get_category_id(self) -> UUID:
         return self.category.id
+
+    def get_category_id_in_bytes_format(self) -> bytes:
+        return self.category.id.bytes
 
     def get_category_name(self) -> str:
         return self.category.name
@@ -246,6 +273,9 @@ class Product(BaseModel):
 
     def get_vendor_id(self) -> UUID:
         return self.vendor.id
+
+    def get_vendor_id_in_bytes_format(self) -> bytes:
+        return self.vendor.id.bytes
 
     def get_vendor_name(self) -> str:
         return self.vendor.name

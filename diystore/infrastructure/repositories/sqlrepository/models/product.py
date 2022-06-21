@@ -11,6 +11,11 @@ from sqlalchemy.orm import relationship
 
 from . import Base
 from . import tz
+from .vat import VatOrmModel
+from .discount import DiscountOrmModel
+from .categories import TerminalCategoryOrmModel
+from .vendor import ProductVendorOrmModel
+from .review import ProductReviewOrmModel
 from ..exceptions import OrmEntityNotFullyLoaded
 from ..helpers import validate_id
 from .....domain.entities.product import Product
@@ -98,3 +103,41 @@ class ProductOrmModel(Base):
             )
         except AttributeError:
             raise OrmEntityNotFullyLoaded
+
+    @classmethod
+    def from_domain_entity(cls, entity: Product) -> "ProductOrmModel":
+        try:
+            return cls(
+                id=entity.get_id_in_bytes_format(),
+                ean=entity.ean,
+                name=entity.name,
+                description=entity.description,
+                base_price=entity.get_base_price(),
+                vat_id=entity.get_vat_id_in_bytes_format(),
+                discount_id=entity.get_discount_id_in_bytes_format(),
+                quantity=entity.quantity,
+                creation_date=entity.creation_date,
+                height=entity.get_height(),
+                width=entity.get_width(),
+                length=entity.get_length(),
+                color=entity.color,
+                material=entity.material,
+                country_of_origin=entity.country_of_origin,
+                warranty=entity.warranty,
+                category_id=entity.get_category_id_in_bytes_format(),
+                rating=entity.rating,
+                thumbnail_photo_url=entity.get_thumbnail_photo_url(),
+                medium_size_photo_url=entity.get_medium_size_photo_url(),
+                large_size_photo_url=entity.get_large_size_photo_url(),
+                vendor_id=entity.get_vendor_id_in_bytes_format(),
+                vat=VatOrmModel.from_domain_entity(entity.get_vat()),
+                discount=DiscountOrmModel.from_domain_entity(entity.get_discount()),
+                category=TerminalCategoryOrmModel.from_domain_entity(entity.category),
+                vendor=ProductVendorOrmModel.from_domain_entity(entity.vendor),
+                reviews=[
+                    ProductReviewOrmModel.from_domain_entity(rev)
+                    for rev in entity.reviews
+                ],
+            )
+        except AttributeError:
+            raise TypeError("entity must be of type Product")
