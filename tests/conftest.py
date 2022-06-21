@@ -31,6 +31,7 @@ from diystore.domain.entities.product import MidLevelProductCategory
 from diystore.domain.entities.product import TerminalLevelProductCategory
 from diystore.domain.entities.product import ProductPhotoUrl
 from diystore.domain.entities.product import ProductVendor
+from diystore.domain.entities.product import EAN13
 from diystore.application.usecases.product import GetProductsInputDTO
 from diystore.application.usecases.product import ProductOrderingCriteria
 from diystore.application.usecases.product import GetProductOutputDTO
@@ -99,7 +100,7 @@ class VatOrmModelFactory(Factory):
     class Meta:
         model = VatOrmModel
 
-    id: bytes = uuid4().bytes
+    id: bytes = Faker("uuid4")
     rate: Decimal = Faker("pyfloat", right_digits=2, min_value=0, max_value=1)
     name: str = Faker("pystr", min_chars=2, max_chars=20)
 
@@ -310,6 +311,14 @@ class ProductOrmModelFactory(Factory):
     vendor_id = Faker("uuid4")
 
 
+class LoadedProductOrmModelFactory(ProductOrmModelFactory):
+    vat = LazyAttribute(lambda o: VatOrmModelFactory(id=o.vat_id))
+    discount = LazyAttribute(lambda o: DiscountOrmModelFactory(id=o.discount_id))
+    category = LazyAttribute(lambda o: TerminalCategoryOrmModelFactory(id=o.category_id))
+    vendor = LazyAttribute(lambda o: ProductVendorOrmModelFactory(id=o.vendor_id))
+    reviews = LazyAttribute(lambda o: ProductReviewOrmModelFactory.build_batch(3, product_id=o.id))
+
+
 class ProductOrderingCriteriaFactory(Factory):
     class Meta:
         model = ProductOrderingCriteria
@@ -513,7 +522,7 @@ def product_stub_list():
 
 @pytest.fixture(scope="session")
 def session_factory():
-    engine = create_engine("sqlite:///:memory:")
+    engine = create_engine("sqlite:///:memory:", echo=True, future=True)
     Base.metadata.create_all(engine)
     Session = sessionmaker(engine)
     return Session

@@ -8,11 +8,12 @@ from .conftest import ProductReviewOrmModelFactory
 from .conftest import ProductVendorOrmModelFactory
 from .conftest import VatOrmModelFactory
 from .conftest import ProductFactory
-from .conftest import ProductOrmModelFactory
 from .conftest import DiscountOrmModelFactory
 from .conftest import TerminalCategoryOrmModelFactory
 from .conftest import MidLevelCategoryOrmModelFactory
 from .conftest import TopLevelCategoryOrmModelFactory
+from .conftest import ProductOrmModelFactory
+from .conftest import LoadedProductOrmModelFactory
 from diystore.domain.entities.product import Product
 from diystore.domain.entities.product import VAT
 from diystore.domain.entities.product import Discount
@@ -22,8 +23,17 @@ from diystore.domain.entities.product import ProductVendor
 from diystore.domain.entities.product import ProductDimensions
 from diystore.domain.entities.product import ProductRating
 from diystore.domain.entities.product import ProductPhotoUrl
+from diystore.domain.entities.product import EAN13
 from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
+from diystore.infrastructure.repositories.sqlrepository import DiscountOrmModel
+from diystore.infrastructure.repositories.sqlrepository import TerminalCategoryOrmModel
+from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
+from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
+from diystore.infrastructure.repositories.sqlrepository import VatOrmModel
+from diystore.infrastructure.repositories.sqlrepository.exceptions import (
+    OrmEntityNotFullyLoaded,
+)
 
 
 def test_infra_sqlrepo_product_vat_relationship_non_existing_vat(orm_session: Session):
@@ -96,3 +106,45 @@ def test_infra_sqlrepo_product_review_relationship(orm_session: Session):
     assert product_orm.reviews == reviews
     for review in product_orm.reviews:
         assert review.product == product_orm
+
+
+def test_infra_sqlrepo_product_to_domain_entity_object_not_fully_loaded():
+    product_orm = ProductOrmModelFactory(vat=None)
+    with pytest.raises(OrmEntityNotFullyLoaded):
+        product_orm.to_domain_entity()
+
+
+def test_infra_sqlrepo_product_to_domain_entity(orm_session: Session):
+    product_orm = LoadedProductOrmModelFactory()
+    orm_session.add(product_orm)
+    orm_session.commit()
+
+    product_orm = (
+        orm_session.query(ProductOrmModel)
+        .join(VatOrmModel)
+        .join(DiscountOrmModel)
+        .join(TerminalCategoryOrmModel)
+        .join(ProductVendorOrmModel)
+        .join(ProductReviewOrmModel)
+        .filter(ProductOrmModel.id == product_orm.id)
+        .one()
+    )
+    product_entity = product_orm.to_domain_entity()
+    assert isinstance(product_entity, Product)
+    validated_entity = Product(**product_entity.dict())
+    assert product_entity.id == validated_entity.id
+    assert product_entity.ean == validated_entity.ean
+    assert product_entity.name == validated_entity.name
+    assert product_entity.price == validated_entity.price
+    assert product_entity.quantity == validated_entity.quantity
+    assert product_entity.creation_date == validated_entity.creation_date
+    assert product_entity.dimensions == validated_entity.dimensions
+    assert product_entity.color == validated_entity.color
+    assert product_entity.material == validated_entity.material
+    assert product_entity.country_of_origin == validated_entity.country_of_origin
+    assert product_entity.warranty == validated_entity.warranty
+    assert product_entity.category == validated_entity.category
+    assert product_entity.rating == validated_entity.rating
+    assert product_entity.reviews == validated_entity.reviews is None
+    assert product_entity.photo_url == validated_entity.photo_url
+    assert product_entity.vendor == validated_entity.vendor

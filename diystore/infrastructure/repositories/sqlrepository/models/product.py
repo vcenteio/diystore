@@ -1,3 +1,4 @@
+from uuid import UUID
 from sqlalchemy import Column
 from sqlalchemy import Numeric
 from sqlalchemy import BINARY
@@ -9,8 +10,18 @@ from sqlalchemy.orm import validates
 from sqlalchemy.orm import relationship
 
 from . import Base
+from . import tz
+from ..exceptions import OrmEntityNotFullyLoaded
 from ..helpers import validate_id
 from .....domain.entities.product import Product
+from .....domain.entities.product import EAN13
+from .....domain.entities.product import VAT
+from .....domain.entities.product import ProductPrice
+from .....domain.entities.product import ProductRating
+from .....domain.entities.product import ProductDimensions
+from .....domain.entities.product import ProductPhotoUrl
+from .....domain.entities.product import ProductVendor
+from .....domain.entities.product import ProductReview
 
 
 class ProductOrmModel(Base):
@@ -50,3 +61,40 @@ class ProductOrmModel(Base):
 
     def __repr__(self):
         return f"ProductOrmModel(ean={self.ean}, name={self.name}, price={self.base_price})"
+
+    def to_domain_entity(self, with_reviews=False) -> Product:
+        try:
+            return Product.construct(
+                id=UUID(bytes=self.id),
+                ean=EAN13(self.ean),
+                name=self.name,
+                price=ProductPrice(
+                    value=self.base_price,
+                    vat=self.vat.to_domain_entity(),
+                    discount=self.discount.to_domain_entity(),
+                ),
+                quantity=self.quantity,
+                creation_date=tz.convert(self.creation_date),
+                dimensions=ProductDimensions(
+                    height=self.height, width=self.width, length=self.length
+                ),
+                color=self.color.lower(),
+                material=self.material,
+                country_of_origin=self.country_of_origin,
+                warranty=self.warranty,
+                category=self.category.to_domain_entity(),
+                rating=ProductRating(self.rating),
+                reviews=(
+                    [rev.to_domain_entity() for rev in self.reviews]
+                    if with_reviews and self.reviews
+                    else None
+                ),
+                photo_url=ProductPhotoUrl(
+                    thumbnail=self.thumbnail_photo_url,
+                    medium=self.medium_size_photo_url,
+                    large=self.large_size_photo_url,
+                ),
+                vendor=self.vendor.to_domain_entity(),
+            )
+        except AttributeError:
+            raise OrmEntityNotFullyLoaded
