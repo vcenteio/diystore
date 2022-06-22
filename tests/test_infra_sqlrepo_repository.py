@@ -7,6 +7,7 @@ import pytest
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError
 from factory import Factory
+from devtools import debug
 
 
 from .conftest import ProductFactory, TerminalCategoryOrmModelFactory
@@ -242,3 +243,47 @@ def test_infra_sqlrepo_get_products_with_discounts_only_param_restricts_results(
 
     products = sqlrepo.get_products(UUID(bytes=category_id), with_discounts_only=True)
     assert len(products) == 1
+
+
+def test_infra_sqlrepo_get_products_ordering_by_rating_descending(
+    sqlrepo: SQLProductRepository,
+):
+    category_id = _persist_new_products_and_return_category_id(5, sqlrepo._session)
+
+    products = sqlrepo.get_products_ordering_by_rating(category_id, descending=True)
+    products_ratings = [p.rating for p in products]
+    expected_result = sorted(products_ratings, reverse=True)
+    assert products_ratings == expected_result
+
+
+def test_infra_sqlrepo_get_products_ordering_by_rating_ascending(
+    sqlrepo: SQLProductRepository,
+):
+    category_id = _persist_new_products_and_return_category_id(5, sqlrepo._session)
+
+    products = sqlrepo.get_products_ordering_by_rating(category_id, descending=False)
+    products_ratings = [p.rating for p in products]
+    expected_result = sorted(products_ratings)
+    assert products_ratings == expected_result
+
+
+def test_infra_sqlrepo_get_products_ordering_by_price_descending(
+    sqlrepo: SQLProductRepository,
+):
+    category_id = _persist_new_products_and_return_category_id(5, sqlrepo._session)
+
+    products = sqlrepo.get_products_ordering_by_price(category_id, descending=True)
+    products_prices = [p.get_base_price() for p in products]
+    expected_result = sorted(products_prices, reverse=True)
+    assert products_prices == expected_result
+
+
+def test_infra_sqlrepo_get_products_ordering_by_price_ascending(
+    sqlrepo: SQLProductRepository,
+):
+    category_id = _persist_new_products_and_return_category_id(5, sqlrepo._session)
+
+    products = sqlrepo.get_products_ordering_by_price(category_id, descending=False)
+    products_prices = [p.get_base_price() for p in products]
+    expected_result = sorted(products_prices)
+    assert products_prices == expected_result

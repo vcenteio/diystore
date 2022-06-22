@@ -2,6 +2,7 @@ from uuid import UUID
 from decimal import Decimal
 from typing import Optional
 
+from sqlalchemy import Column
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import create_engine
@@ -67,7 +68,36 @@ class SQLProductRepository(ProductRepository):
             rating_max = self.max_rating
         return price_min, price_max, rating_min, rating_max
 
-    def get_products(
+    def _generate_get_products_query(
+        self,
+        category_id: UUID,
+        session: Session,
+        price_min: Decimal = min_price,
+        price_max: Decimal = max_price,
+        rating_min: Decimal = min_rating,
+        rating_max: Decimal = max_rating,
+        with_discounts_only: bool = False,
+        orderby_attr: Column = None,
+        descending: bool = False,
+    ):
+        encoded_id = self._encode_uuid(category_id)
+        p_min, p_max, r_min, r_max = self._normalize_ranges(
+            price_min, price_max, rating_min, rating_max
+        )
+        query = session.query(ProductOrmModel).filter(
+            ProductOrmModel.category_id == encoded_id,
+            ProductOrmModel.base_price >= p_min,
+            ProductOrmModel.base_price <= p_max,
+            ProductOrmModel.rating >= r_min,
+            ProductOrmModel.rating <= r_max,
+        )
+        if with_discounts_only:
+            query = query.filter(ProductOrmModel.discount_id != None)
+        if orderby_attr is not None:
+            query = query.order_by(orderby_attr.desc() if descending else orderby_attr)
+        return query
+
+    def _get_products(
         self,
         category_id: UUID,
         price_min: Decimal = min_price,
@@ -75,27 +105,42 @@ class SQLProductRepository(ProductRepository):
         rating_min: Decimal = min_rating,
         rating_max: Decimal = max_rating,
         with_discounts_only: bool = False,
+        orderby_attr: Column = None,
+        descending: bool = False,
     ) -> list[Product]:
-        encoded_id = self._encode_uuid(category_id)
-        p_min, p_max, r_min, r_max = self._normalize_ranges(
-            price_min, price_max, rating_min, rating_max
-        )
         with self._session as s:
-            query = (
-                s.query(ProductOrmModel)
-                .filter(
-                    ProductOrmModel.category_id == encoded_id,
-                    ProductOrmModel.base_price >= p_min,
-                    ProductOrmModel.base_price <= p_max,
-                    ProductOrmModel.rating >= r_min,
-                    ProductOrmModel.rating <= r_max,
-                )
+            query = self._generate_get_products_query(
+                category_id,
+                s,
+                price_min,
+                price_max,
+                rating_min,
+                rating_max,
+                with_discounts_only,
+                orderby_attr,
+                descending,
             )
-            if with_discounts_only:
-                query = query.filter(ProductOrmModel.discount_id != None)
             products: list[ProductOrmModel] = query.all()
             domain_entities = [p.to_domain_entity() for p in products]
         return domain_entities
+
+    def get_products(
+        self,
+        category_id: UUID,
+        price_min: Decimal = Decimal("0.01"),
+        price_max: Decimal = Decimal("1_000_000"),
+        rating_min: Decimal = Decimal("0"),
+        rating_max: Decimal = Decimal("5"),
+        with_discounts_only: bool = False,
+    ) -> list[Product]:
+        return self._get_products(
+            category_id,
+            price_min,
+            price_max,
+            rating_min,
+            rating_max,
+            with_discounts_only,
+        )
 
     def get_products_ordering_by_rating(
         self,
@@ -105,9 +150,19 @@ class SQLProductRepository(ProductRepository):
         rating_min: Decimal = Decimal("0"),
         rating_max: Decimal = Decimal("5"),
         with_discounts_only: bool = False,
-        descending: bool = False,
+        descending: bool = True,
     ) -> list[Product]:
-        pass
+        orderby_attr = ProductOrmModel.rating
+        return self._get_products(
+            category_id,
+            price_min,
+            price_max,
+            rating_min,
+            rating_max,
+            with_discounts_only,
+            orderby_attr=orderby_attr,
+            descending=descending,
+        )
 
     def get_products_ordering_by_price(
         self,
@@ -119,4 +174,14 @@ class SQLProductRepository(ProductRepository):
         with_discounts_only: bool = False,
         descending: bool = False,
     ) -> list[Product]:
-        pass
+        orderby_attr = ProductOrmModel.base_price
+        return self._get_products(
+            category_id,
+            price_min,
+            price_max,
+            rating_min,
+            rating_max,
+            with_discounts_only,
+            orderby_attr=orderby_attr,
+            descending=descending,
+        )
