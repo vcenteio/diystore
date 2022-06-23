@@ -117,16 +117,20 @@ class Product(BaseModel):
     def get_id_in_bytes_format(self) -> bytes:
         return self.id.bytes
 
-    def get_final_price(self, with_discount: bool = True) -> Decimal:
-        if with_discount:
-            return self.price.calculate()
-        return self.price.calculate_without_discount()
+    def get_id_in_hex_format(self) -> str:
+        return self.id.hex
 
     def get_base_price(self) -> Decimal:
         return self.price.value
 
     def set_base_price(self, price: Decimal):
         self.price.value = price
+
+    def get_final_price(self) -> Decimal:
+        return self.price.calculate()
+    
+    def get_final_price_without_discount(self) -> Decimal:
+        return self.price.calculate_without_discount()
 
     def get_discount_id(self) -> UUID:
         return self.price.get_discount_id()
@@ -188,6 +192,9 @@ class Product(BaseModel):
 
     def get_category_id_in_bytes_format(self) -> bytes:
         return self.category.id.bytes
+
+    def get_category_id_in_hex_format(self) -> str:
+        return self.category.id.hex
 
     def get_category_name(self) -> str:
         return self.category.name
@@ -276,6 +283,9 @@ class Product(BaseModel):
 
     def get_vendor_id_in_bytes_format(self) -> bytes:
         return self.vendor.id.bytes
+
+    def get_vendor_id_in_hex_format(self) -> str:
+        return self.vendor.id.hex
 
     def get_vendor_name(self) -> str:
         return self.vendor.name

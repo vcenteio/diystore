@@ -152,7 +152,7 @@ def test_domain_product_get_final_price():
 def test_domain_product_get_final_price_without_discount():
     price: ProductPrice = ProductPriceFactory()
     p: Product = ProductFactory(price=price)
-    assert p.get_final_price(with_discount=False) == price.calculate_without_discount()
+    assert p.get_final_price_without_discount() == price.calculate_without_discount()
 
 
 @pytest.mark.parametrize("wrong_price", ("a", b"b", (1,), [2]))

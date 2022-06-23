@@ -366,6 +366,7 @@ class ProductOutputDTOFactory(Factory):
     )
     vat: Decimal = Faker("pyfloat", right_digits=2, min_value=0, max_value=1)
     in_stock: bool = Faker("pybool")
+    rating: Decimal = Faker("pyfloat", right_digits=1, min_value=0, max_value=5)
     height: Decimal = Faker("pyfloat", right_digits=1, min_value=1, max_value=99.9)
     width: Decimal = Faker("pyfloat", right_digits=1, min_value=1, max_value=99.9)
     length: Decimal = Faker("pyfloat", right_digits=1, min_value=1, max_value=99.9)

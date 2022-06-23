@@ -3,10 +3,11 @@ from typing import Iterable
 from pydantic import BaseModel
 
 from ..getproduct import GetProductOutputDTO
+from ....dto import DTO
 from .....domain.entities.product import Product
 
 
-class GetProductsOutputDTO(BaseModel):
+class GetProductsOutputDTO(BaseModel, DTO):
     products: list[GetProductOutputDTO]
 
     @classmethod
