@@ -85,6 +85,7 @@ class ProductOrmModel(Base):
                 id=UUID(bytes=self.id),
                 ean=EAN13(self.ean),
                 name=self.name,
+                description=self.description,
                 price=ProductPrice(
                     value=self.base_price,
                     vat=self.vat.to_domain_entity(),
