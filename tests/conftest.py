@@ -37,6 +37,7 @@ from diystore.application.usecases.product import ProductOrderingCriteria
 from diystore.application.usecases.product import GetProductOutputDTO
 from diystore.application.usecases.product import ProductRepository
 from diystore.application.usecases.product import GetProductInputDTO
+from diystore.infrastructure.settings import InfraSettings
 from diystore.infrastructure.repositories.sqlrepository import Base
 from diystore.infrastructure.repositories.sqlrepository import VatOrmModel
 from diystore.infrastructure.repositories.sqlrepository import DiscountOrmModel
@@ -47,6 +48,7 @@ from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmM
 from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
+from diystore.infrastructure.controllers.web import ProductController
 
 
 tz = timezone("UTC")
@@ -548,3 +550,30 @@ def orm_session(session_factory):
 @pytest.fixture()
 def sqlrepo():
     return SQLProductRepository(db_url="sqlite:///:memory:")
+
+
+@pytest.fixture(scope="session")
+def sqlite_json_infrasettings():
+    settings = InfraSettings(
+        repo=dict(type="sql", db_url="sqlite:///:memory:"), presentation_type="json"
+    )
+    return settings
+
+
+@pytest.fixture(scope="session")
+def testenv_infrasettings():
+    return InfraSettings(_env_file="test.env")
+
+
+def populate_db(no: int = 15):
+    pc = ProductController()
+    products = LoadedProductOrmModelFactory.build_batch(no)
+    with pc._repo._session as s:
+        s.add_all(products)
+        s.commit()
+
+
+def clean_db():
+    pc = ProductController()
+    Base.metadata.drop_all(pc._repo._engine)
+    Base.metadata.create_all(pc._repo._engine)
