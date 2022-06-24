@@ -7,12 +7,12 @@ import pytest
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError
 from factory import Factory
-from devtools import debug
 
 
-from .conftest import ProductFactory, TerminalCategoryOrmModelFactory
+from .conftest import TerminalCategoryOrmModelFactory
 from .conftest import ProductOrmModelFactory
 from .conftest import LoadedProductOrmModelFactory
+from .conftest import persist_new_products_and_return_category_id
 from diystore.domain.entities.product import Product
 from diystore.domain.entities.product import TerminalLevelProductCategory
 from diystore.domain.entities.product import MidLevelProductCategory
@@ -126,20 +126,8 @@ def test_infra_sqlrepo_get_products_non_existent_products(
     assert len(products) == 0
 
 
-def _persist_new_products_and_return_category_id(no: int, session: Session, **kwargs):
-    category = TerminalCategoryOrmModelFactory()
-    category_id = category.id
-    new_products = LoadedProductOrmModelFactory.build_batch(
-        no, category_id=category_id, category=category, **kwargs
-    )
-    with session as s:
-        s.add_all([category, *new_products])
-        s.commit()
-    return UUID(bytes=category_id)
-
-
 def test_infra_sqlrepo_get_products_existent_products(sqlrepo: SQLProductRepository):
-    category_id = _persist_new_products_and_return_category_id(3, sqlrepo._session)
+    category_id = persist_new_products_and_return_category_id(3, sqlrepo._session)
 
     products = sqlrepo.get_products(category_id=category_id)
     for product in products:
@@ -160,7 +148,7 @@ def test_infra_sqlrepo_get_products_out_of_bounds_price_ranges_are_ignored(
     sqlrepo: SQLProductRepository,
 ):
     no_products = 5
-    category_id = _persist_new_products_and_return_category_id(
+    category_id = persist_new_products_and_return_category_id(
         no_products, sqlrepo._session
     )
     products = sqlrepo.get_products(
@@ -173,7 +161,7 @@ def test_infra_sqlrepo_get_products_price_min_restricts_no_of_products(
     sqlrepo: SQLProductRepository,
 ):
     no_products = 5
-    category_id = _persist_new_products_and_return_category_id(
+    category_id = persist_new_products_and_return_category_id(
         no_products, sqlrepo._session, base_price=Decimal("99")
     )
     products = sqlrepo.get_products(category_id, price_min=Decimal("100"))
@@ -184,7 +172,7 @@ def test_infra_sqlrepo_get_products_price_max_restricts_no_of_products(
     sqlrepo: SQLProductRepository,
 ):
     no_products = 5
-    category_id = _persist_new_products_and_return_category_id(
+    category_id = persist_new_products_and_return_category_id(
         no_products, sqlrepo._session, base_price=Decimal("100")
     )
     products = sqlrepo.get_products(category_id, price_max=Decimal("99"))
@@ -207,7 +195,7 @@ def test_infra_sqlrepo_get_products_rating_min_restricts_no_of_products(
     sqlrepo: SQLProductRepository,
 ):
     no_products = 5
-    category_id = _persist_new_products_and_return_category_id(
+    category_id = persist_new_products_and_return_category_id(
         no_products, sqlrepo._session, rating=Decimal("3")
     )
     products = sqlrepo.get_products(category_id, rating_min=Decimal("4"))
@@ -218,7 +206,7 @@ def test_infra_sqlrepo_get_products_rating_max_restricts_results(
     sqlrepo: SQLProductRepository,
 ):
     no_products = 5
-    category_id = _persist_new_products_and_return_category_id(
+    category_id = persist_new_products_and_return_category_id(
         no_products, sqlrepo._session, rating=Decimal("4")
     )
     products = sqlrepo.get_products(category_id, rating_max=Decimal("3"))
@@ -248,7 +236,7 @@ def test_infra_sqlrepo_get_products_with_discounts_only_param_restricts_results(
 def test_infra_sqlrepo_get_products_ordering_by_rating_descending(
     sqlrepo: SQLProductRepository,
 ):
-    category_id = _persist_new_products_and_return_category_id(5, sqlrepo._session)
+    category_id = persist_new_products_and_return_category_id(5, sqlrepo._session)
 
     products = sqlrepo.get_products_ordering_by_rating(category_id, descending=True)
     products_ratings = [p.rating for p in products]
@@ -259,7 +247,7 @@ def test_infra_sqlrepo_get_products_ordering_by_rating_descending(
 def test_infra_sqlrepo_get_products_ordering_by_rating_ascending(
     sqlrepo: SQLProductRepository,
 ):
-    category_id = _persist_new_products_and_return_category_id(5, sqlrepo._session)
+    category_id = persist_new_products_and_return_category_id(5, sqlrepo._session)
 
     products = sqlrepo.get_products_ordering_by_rating(category_id, descending=False)
     products_ratings = [p.rating for p in products]
@@ -270,7 +258,7 @@ def test_infra_sqlrepo_get_products_ordering_by_rating_ascending(
 def test_infra_sqlrepo_get_products_ordering_by_price_descending(
     sqlrepo: SQLProductRepository,
 ):
-    category_id = _persist_new_products_and_return_category_id(5, sqlrepo._session)
+    category_id = persist_new_products_and_return_category_id(5, sqlrepo._session)
 
     products = sqlrepo.get_products_ordering_by_price(category_id, descending=True)
     products_prices = [p.get_base_price() for p in products]
@@ -281,7 +269,7 @@ def test_infra_sqlrepo_get_products_ordering_by_price_descending(
 def test_infra_sqlrepo_get_products_ordering_by_price_ascending(
     sqlrepo: SQLProductRepository,
 ):
-    category_id = _persist_new_products_and_return_category_id(5, sqlrepo._session)
+    category_id = persist_new_products_and_return_category_id(5, sqlrepo._session)
 
     products = sqlrepo.get_products_ordering_by_price(category_id, descending=False)
     products_prices = [p.get_base_price() for p in products]

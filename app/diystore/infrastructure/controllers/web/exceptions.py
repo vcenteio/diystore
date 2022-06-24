@@ -11,7 +11,7 @@ class BadRequest(Exception):
 class UnprocessableEntity(BadRequest):
     code = 422
 
-    def __init__(self, msg):
+    def __init__(self, msg="unprocessable entity"):
         super().__init__(msg)
 
 
@@ -20,6 +20,31 @@ class InvalidProductID(UnprocessableEntity):
 
     def __init__(self, msg=None, _id=None):
         self.msg = msg or self.default_msg.format(_id=_id if _id else "")
+        super().__init__(self.msg)
+
+
+class InvalidQueryArgument(UnprocessableEntity):
+    default_msg = "invalid query argument {text}"
+
+    def __init__(self, msg=None, parameter=None):
+        format_text = f"for parameter {parameter}" if parameter else ""
+        self.msg = msg or self.default_msg.format(text=format_text)
+        super().__init__(self.msg)
+
+
+class InvalidQueryParameter(UnprocessableEntity):
+    default_msg = "invalid query parameter {parameter}"
+
+    def __init__(self, msg=None, parameter=None):
+        self.msg = msg or self.default_msg.format(parameter=parameter or "")
+        super().__init__(self.msg)
+
+
+class ParameterMissing(UnprocessableEntity):
+    default_msg = "invalid query: missing parameter {parameter}"
+
+    def __init__(self, msg=None, parameter=None):
+        self.msg = msg or self.default_msg.format(parameter=parameter or "")
         super().__init__(self.msg)
 
 

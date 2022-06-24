@@ -4,6 +4,7 @@ from typing import Union
 from unittest.mock import Mock
 from uuid import UUID
 from uuid import uuid4
+from random import choice
 
 import pytest
 import pendulum
@@ -565,12 +566,34 @@ def testenv_infrasettings():
     return InfraSettings(_env_file="test.env")
 
 
-def populate_db(no: int = 15):
+def persist_new_products_and_return_category_id(no: int, session: Session, **kwargs):
+    category = TerminalCategoryOrmModelFactory()
+    category_id = category.id
+    new_products = LoadedProductOrmModelFactory.build_batch(
+        no, category_id=category_id, category=category, **kwargs
+    )
+    with session as s:
+        s.add_all([category, *new_products])
+        s.commit()
+    return UUID(bytes=category_id)
+
+
+def populate_db(no: int = 15, category_id: UUID = uuid4(), **kwargs):
     pc = ProductController()
-    products = LoadedProductOrmModelFactory.build_batch(no)
+    args = dict(**kwargs)
+    if category_id:
+        category = TerminalCategoryOrmModelFactory(id=category_id)
+        args.update(category_id=category_id, category=category)
+    products = []
+    get_discount_id = lambda: choice((uuid4(), None))
+    for _ in range(no):
+        products.append(
+            LoadedProductOrmModelFactory(discount_id=get_discount_id(), **args)
+        )
     with pc._repo._session as s:
         s.add_all(products)
         s.commit()
+    return category_id
 
 
 def clean_db():
