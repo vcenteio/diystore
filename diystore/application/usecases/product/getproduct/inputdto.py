@@ -1,9 +1,10 @@
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic.dataclasses import dataclass
 
 from ....dto import DTO
 
 
-class GetProductInputDTO(BaseModel, DTO):
+@dataclass(frozen=True)
+class GetProductInputDTO(DTO):
     product_id: UUID

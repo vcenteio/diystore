@@ -2,15 +2,16 @@ from uuid import UUID
 from decimal import Decimal
 
 from pydantic import Field
-from pydantic import BaseModel
 from pydantic import validator
+from pydantic.dataclasses import dataclass
 
 from ..orderingcriteria import ProductOrderingCriteria
 from ....dto import DTO
 from .....domain.helpers import round_decimal
 
 
-class GetProductsInputDTO(BaseModel, DTO):
+@dataclass(frozen=True)
+class GetProductsInputDTO(DTO):
     category_id: UUID = Field(...)
     price_min: Decimal = Field(default=0, ge=0, le=1_000_000)
     price_max: Decimal = Field(default=1_000_000, ge=0, le=1_000_000)
