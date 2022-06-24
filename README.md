@@ -23,8 +23,8 @@ Feature #1: Product fetching
 
 - [x] Domain
 - [x] Use cases
-- [ ] Database access with SQLAlchemy **(under current development)**
-- [ ] REST API with Flask
+- [x] Database access with SQLAlchemy
+- [ ] REST API with Flask **(under current development)**
 - [ ] Server-side caching with Redis
 
 Feature #2: Client authentication
