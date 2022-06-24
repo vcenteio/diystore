@@ -31,8 +31,7 @@ class ProductPrice(BaseModel):
         return self.value - (self.value * self.discount)
 
     def _add_vat(self, value: Decimal) -> Decimal:
-        v = value
-        return v + (v * self.vat)
+        return value + (value * self.vat)
 
     def _round(self, value: Decimal) -> Decimal:
         return value.quantize(self._rounding_template)

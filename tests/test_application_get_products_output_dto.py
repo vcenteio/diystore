@@ -13,12 +13,6 @@ def test_application_get_products_product_output_dto_id_is_hex():
     assert odto.id == _id.hex
 
 
-def test_application_get_products_product_output_dto_in_stock_is_lower_case(faker):
-    in_stock = faker.pybool()
-    odto = ProductOutputDTOFactory(in_stock=in_stock)
-    assert odto.in_stock == str(in_stock).lower()
-
-
 def test_application_get_products_product_output_dto_warranty_is_int(faker):
     warranty = faker.pyint(min_value=1, max_value=5)
     odto = ProductOutputDTOFactory(warranty=warranty)
@@ -34,23 +28,23 @@ def test_application_get_products_product_output_dto_from_product():
     assert odto.ean == product.ean
     assert odto.name == product.name
     assert odto.description == product.description
-    assert odto.price == str(product.get_final_price())
-    assert odto.price_without_discount == str(
+    assert odto.price == float(product.get_final_price())
+    assert odto.price_without_discount == float(
         product.get_final_price_without_discount()
     )
-    assert odto.discount == str(product.get_discount_rate())
-    assert odto.vat == str(product.get_vat_rate())
-    assert odto.in_stock == str(bool(product.quantity > 0)).lower()
-    assert odto.height == str(product.get_height())
-    assert odto.width == str(product.get_width())
-    assert odto.length == str(product.get_length())
+    assert odto.discount == float(product.get_discount_rate())
+    assert odto.vat == float(product.get_vat_rate())
+    assert odto.in_stock == bool(product.quantity > 0)
+    assert odto.rating == float(product.get_client_rating())
+    assert odto.height == float(product.get_height())
+    assert odto.width == float(product.get_width())
+    assert odto.length == float(product.get_length())
     assert odto.color == product.color
     assert odto.material == product.material
     assert odto.country_of_origin == product.country_of_origin
     assert odto.warranty == product.warranty
     assert odto.category_id == product.get_category_id_in_hex_format()
     assert odto.category_name == product.get_category_name()
-    assert odto.client_rating == str(product.get_client_rating())
     assert odto.thumbnail_photo_url == product.get_thumbnail_photo_url()
     assert odto.medium_size_photo_url == product.get_medium_size_photo_url()
     assert odto.large_size_photo_url == product.get_large_size_photo_url()

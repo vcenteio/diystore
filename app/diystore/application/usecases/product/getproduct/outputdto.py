@@ -14,22 +14,21 @@ class GetProductOutputDTO(BaseModel, DTO):
     ean: str
     name: str
     description: Optional[str]
-    price: str
-    price_without_discount: str
-    discount: Optional[str]
-    vat: str
-    in_stock: constr(to_lower=True)
-    rating: Optional[str]
-    height: Optional[str]
-    width: Optional[str]
-    length: Optional[str]
+    price: float
+    price_without_discount: float
+    discount: Optional[float]
+    vat: float
+    in_stock: bool
+    rating: Optional[float]
+    height: Optional[float]
+    width: Optional[float]
+    length: Optional[float]
     color: Optional[str]
     material: Optional[str]
     country_of_origin: str
     warranty: int
     category_id: str
     category_name: str
-    client_rating: str
     thumbnail_photo_url: Optional[str]
     medium_size_photo_url: Optional[str]
     large_size_photo_url: Optional[str]
@@ -67,7 +66,6 @@ class GetProductOutputDTO(BaseModel, DTO):
             warranty=product.warranty,
             category_id=product.get_category_id_in_hex_format(),
             category_name=product.get_category_name(),
-            client_rating=product.get_client_rating(),
             thumbnail_photo_url=product.get_thumbnail_photo_url(),
             medium_size_photo_url=product.get_medium_size_photo_url(),
             large_size_photo_url=product.get_large_size_photo_url(),
