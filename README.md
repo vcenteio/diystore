@@ -47,12 +47,12 @@ This application is a monolith with its design based on principles of DDD and Cl
 
 ### <u>Why it's a monolith</u>
 
-The intended scale of the application does require microservices or any other SOA-style architecture, so a monolith is a good choice.
+The intended scale of the application does not require microservices or any other SOA-style architecture, so a monolith is a good choice.
 
 
 ### <u>The layering system</u>
 
-The layering of the application is based on Uncle Bob's Clean Architecture. The entities and use cases form the core of the application and are completely oblivious of whats implemented outside of their boundaries and of whom is using them. They hold the business and application rules and are the reason for the application to exist.
+The layering of the application is based on Uncle Bob's Clean Architecture. The entities and use cases form the core of the application and are completely oblivious of what's implemented outside of their boundaries and of whom is using them. They hold the business and application rules and are the reason for the application to exist. Immediately outside of the core lies the infrastucture layer, which depends on the former. At the outermost layer lies the external interfaces.
 
 
 ### <u>Communication with the core</u>
