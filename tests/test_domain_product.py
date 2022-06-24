@@ -169,11 +169,16 @@ def test_domain_product_set_base_price_correct_type(price):
     assert p.get_base_price() == round_decimal(Decimal(price), "1.00")
 
 
-def test_domain_product_get_discount_rate():
+def test_domain_product_get_discount_rate_with_discount():
     price: ProductPrice = ProductPriceFactory()
     discount_rate = price.get_discount_rate()
     p = ProductFactory(price=price)
     assert p.get_discount_rate() == discount_rate
+
+def test_domain_product_get_discount_rate_no_discount():
+    price: ProductPrice = ProductPriceFactory(discount=None)
+    p = ProductFactory(price=price)
+    assert p.get_discount_rate() is None
 
 
 def test_domain_product_get_discount():
@@ -322,8 +327,11 @@ def test_domain_product_creation_date_non_utc_date_not_allowed():
 
 
 def test_domain_product_dimensions_are_optional():
-    p = ProductFactory(dimensions=None)
+    p: Product = ProductFactory(dimensions=None)
     assert p.dimensions is None
+    assert p.get_height() is None
+    assert p.get_width() is None
+    assert p.get_length() is None
 
 
 @pytest.mark.parametrize("wrong_dim", (1, "abc", (), [], {}, ProductPriceFactory()))

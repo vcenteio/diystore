@@ -3,7 +3,7 @@ from typing import Union
 
 
 def validate_id(_id: Union[UUID, bytes, int, str], key: str):
-    try: 
+    try:
         if _id is None:
             return _id
         if isinstance(_id, UUID):

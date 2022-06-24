@@ -1,5 +1,6 @@
 from uuid import UUID
 from uuid import uuid4
+from typing import Optional
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -44,7 +45,7 @@ class MidLevelProductCategory(ProductCategory):
     def get_parent_name(self) -> str:
         return self.parent.name
 
-    def get_parent_description(self) -> str:
+    def get_parent_description(self) -> Optional[str]:
         return self.parent.description
 
 
@@ -69,7 +70,7 @@ class TerminalLevelProductCategory(ProductCategory):
     def get_parent_name(self) -> str:
         return self.parent.name
     
-    def get_parent_description(self) -> str:
+    def get_parent_description(self) -> Optional[str]:
         return self.parent.description
 
     def get_top_level_category(self) -> TopLevelProductCategory:
@@ -84,5 +85,5 @@ class TerminalLevelProductCategory(ProductCategory):
     def get_top_level_category_name(self) -> str:
         return self.parent.get_parent_name()
     
-    def get_top_level_category_description(self) -> str:
+    def get_top_level_category_description(self) -> Optional[str]:
         return self.parent.get_parent_description()

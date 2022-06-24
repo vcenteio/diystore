@@ -1,5 +1,6 @@
 from decimal import Decimal
 from uuid import UUID
+from typing import Optional
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -8,11 +9,12 @@ from pydantic import PrivateAttr
 
 from .discount import Discount
 from .vat import VAT
+from ...helpers import optional
 
 
 class ProductPrice(BaseModel):
     value: Decimal = Field(ge=0.01, le=999_999.99, decimal_places=2)
-    vat: VAT = Field()
+    vat: VAT = Field(...)
     discount: Discount = Field(default=None)
     _rounding_template: Decimal = PrivateAttr(default=Decimal("1.00"))
 
@@ -28,24 +30,33 @@ class ProductPrice(BaseModel):
     def _apply_discount(self) -> Decimal:
         return self.value - (self.value * self.discount)
 
-    def _add_vat(self, value: Decimal = None) -> Decimal:
-        v = value or self.value
+    def _add_vat(self, value: Decimal) -> Decimal:
+        v = value
         return v + (v * self.vat)
 
     def _round(self, value: Decimal) -> Decimal:
         return value.quantize(self._rounding_template)
 
-    def calculate_without_discount(self):
-        return self._round(self._add_vat())
+    def calculate_without_discount(self) -> Decimal:
+        return self._round(self._add_vat(self.value))
 
-    def calculate(self):
-        v = self.value if self.discount is None else self._apply_discount()
+    def calculate(self) -> Decimal:
+        try:
+            v = self._apply_discount()
+        except TypeError:
+            v = self.value
         return self._round(self._add_vat(v))
 
-    def get_discount_id(self) -> UUID:
+    @optional(e=AttributeError)
+    def get_discount_id(self) -> Optional[UUID]:
         return self.discount.id
 
-    def get_discount_rate(self) -> Decimal:
+    @optional(e=AttributeError)
+    def get_discount_id_in_bytes_format(self) -> Optional[bytes]:
+        return self.discount.id.bytes
+
+    @optional(e=AttributeError)
+    def get_discount_rate(self) -> Optional[Decimal]:
         return self.discount.rate
 
     def get_vat_id(self) -> UUID:

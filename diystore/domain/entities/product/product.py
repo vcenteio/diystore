@@ -29,6 +29,7 @@ from .types import ProductRating
 from .photo import ProductPhotoUrl
 from .vendor import ProductVendor
 from ...helpers import round_decimal
+from ...helpers import optional
 
 
 class Product(BaseModel):
@@ -132,16 +133,16 @@ class Product(BaseModel):
     def get_final_price_without_discount(self) -> Decimal:
         return self.price.calculate_without_discount()
 
-    def get_discount_id(self) -> UUID:
+    def get_discount_id(self) -> Optional[UUID]:
         return self.price.get_discount_id()
 
-    def get_discount_id_in_bytes_format(self) -> bytes:
-        return self.price.get_discount_id().bytes
+    def get_discount_id_in_bytes_format(self) -> Optional[bytes]:
+        return self.price.get_discount_id_in_bytes_format()
 
-    def get_discount_rate(self):
+    def get_discount_rate(self) -> Optional[Decimal]:
         return self.price.get_discount_rate()
 
-    def get_discount(self):
+    def get_discount(self) -> Optional[Discount]:
         return self.price.discount
 
     def set_discount(self, discount: Discount):
@@ -162,18 +163,21 @@ class Product(BaseModel):
     def set_vat(self, vat: VAT):
         self.price.vat = vat
 
-    def get_dimensions_str(self) -> str:
+    def get_dimensions_str(self) -> Optional[str]:
         return self.dimensions.get_str()
 
-    def get_dimensions_dict(self) -> dict:
+    def get_dimensions_dict(self) -> Optional[dict]:
         return self.dimensions.dict()
 
+    @optional(e=AttributeError)
     def get_height(self) -> Decimal:
         return self.dimensions.height
 
+    @optional(e=AttributeError)
     def get_width(self) -> Decimal:
         return self.dimensions.width
 
+    @optional(e=AttributeError)
     def get_length(self) -> Decimal:
         return self.dimensions.length
 
@@ -183,9 +187,7 @@ class Product(BaseModel):
         width: Union[Decimal, float, int, str],
         length: Union[Decimal, float, int, str],
     ):
-        self.dimensions.height = height
-        self.dimensions.width = width
-        self.dimensions.length = length
+        self.dimensions = ProductDimensions(height, width, length)
 
     def get_category_id(self) -> UUID:
         return self.category.id
