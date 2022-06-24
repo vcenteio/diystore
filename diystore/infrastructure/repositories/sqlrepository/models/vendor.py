@@ -1,5 +1,5 @@
 from sqlalchemy import Column
-from sqlalchemy import BINARY
+from sqlalchemy import LargeBinary
 from sqlalchemy import String
 from sqlalchemy.orm import validates
 from sqlalchemy.orm import relationship
@@ -11,7 +11,7 @@ from .....domain.entities.product import ProductVendor
 
 class ProductVendorOrmModel(Base):
     __tablename__ = "vendor"
-    id = Column(BINARY(16), primary_key=True)
+    id = Column(LargeBinary(16), primary_key=True)
     name = Column(String(50))
     description = Column(String(3000))
     logo_url = Column(String(2000))

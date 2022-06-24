@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy import Column
 from sqlalchemy import String
-from sqlalchemy import BINARY
+from sqlalchemy import LargeBinary
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
@@ -38,7 +38,7 @@ class CategoryOrmModel:
 class TopLevelCategoryOrmModel(CategoryOrmModel, Base):
     __tablename__ = "toplevel_category"
 
-    id = Column(BINARY(16), primary_key=True)
+    id = Column(LargeBinary(16), primary_key=True)
     name = Column(String(50), nullable=False)
     description = Column(String(3000))
 
@@ -71,10 +71,10 @@ class TopLevelCategoryOrmModel(CategoryOrmModel, Base):
 class MidLevelCategoryOrmModel(CategoryOrmModel, Base):
     __tablename__ = "midlevel_category"
 
-    id = Column(BINARY(16), primary_key=True)
+    id = Column(LargeBinary(16), primary_key=True)
     name = Column(String(50), nullable=False)
     description = Column(String(300))
-    parent_id = Column(BINARY(16), ForeignKey("toplevel_category.id"), nullable=False)
+    parent_id = Column(LargeBinary(16), ForeignKey("toplevel_category.id"), nullable=False)
 
     parent = relationship("TopLevelCategoryOrmModel", back_populates="children")
     children = relationship("TerminalCategoryOrmModel", back_populates="parent")
@@ -120,10 +120,10 @@ class MidLevelCategoryOrmModel(CategoryOrmModel, Base):
 class TerminalCategoryOrmModel(CategoryOrmModel, Base):
     __tablename__ = "terminal_category"
 
-    id = Column(BINARY(16), primary_key=True)
+    id = Column(LargeBinary(16), primary_key=True)
     name = Column(String(50))
     description = Column(String(300))
-    parent_id = Column(BINARY(16), ForeignKey("midlevel_category.id"))
+    parent_id = Column(LargeBinary(16), ForeignKey("midlevel_category.id"))
 
     parent = relationship("MidLevelCategoryOrmModel", back_populates="children")
     products = relationship("ProductOrmModel", back_populates="category")

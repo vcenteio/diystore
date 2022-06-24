@@ -5,7 +5,7 @@ from decimal import Decimal
 from sqlalchemy import Column
 from sqlalchemy import String
 from sqlalchemy import Numeric
-from sqlalchemy import BINARY
+from sqlalchemy import LargeBinary
 from sqlalchemy.orm import validates
 
 from . import Base
@@ -17,7 +17,7 @@ from .....domain.helpers import round_decimal
 class VatOrmModel(Base):
     __tablename__ = "vat"
 
-    id = Column(BINARY(16), primary_key=True)
+    id = Column(LargeBinary(16), primary_key=True)
     name = Column(String(20), nullable=False)
     rate = Column(Numeric(precision=3, scale=2), nullable=False)
 

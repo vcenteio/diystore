@@ -1,7 +1,7 @@
 from sqlalchemy import Column
 from sqlalchemy import String
 from sqlalchemy import Numeric
-from sqlalchemy import BINARY
+from sqlalchemy import LargeBinary
 from sqlalchemy import DateTime
 from sqlalchemy.orm import validates
 
@@ -14,7 +14,7 @@ from .....domain.entities.product.discount import Discount
 class DiscountOrmModel(Base):
     __tablename__ = "product_discount"
 
-    id = Column(BINARY(16), primary_key=True)
+    id = Column(LargeBinary(16), primary_key=True)
     name = Column(String(50))
     rate = Column(Numeric(precision=3, scale=2))
     creation_date = Column(DateTime(timezone=True))

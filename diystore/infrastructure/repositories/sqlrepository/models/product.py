@@ -1,7 +1,7 @@
 from uuid import UUID
 from sqlalchemy import Column
 from sqlalchemy import Numeric
-from sqlalchemy import BINARY
+from sqlalchemy import LargeBinary
 from sqlalchemy import String
 from sqlalchemy import Integer
 from sqlalchemy import ForeignKey
@@ -31,13 +31,13 @@ from .....domain.entities.product import ProductReview
 
 class ProductOrmModel(Base):
     __tablename__ = "product"
-    id = Column(BINARY(16), primary_key=True)
+    id = Column(LargeBinary(16), primary_key=True)
     ean = Column(String(13), nullable=False)
     name = Column(String(50), nullable=False)
     description = Column(String(3000))
     base_price = Column(Numeric(precision=8, scale=2), nullable=False)
-    vat_id = Column(BINARY(16), ForeignKey("vat.id"), nullable=False)
-    discount_id = Column(BINARY(16), ForeignKey("product_discount.id"))
+    vat_id = Column(LargeBinary(16), ForeignKey("vat.id"), nullable=False)
+    discount_id = Column(LargeBinary(16), ForeignKey("product_discount.id"))
     quantity = Column(Integer, nullable=False)
     creation_date = Column(DateTime(timezone=True), nullable=False)
     height = Column(Numeric(precision=6, scale=1))
@@ -47,12 +47,12 @@ class ProductOrmModel(Base):
     material = Column(String(30))
     country_of_origin = Column(String(60), nullable=False)
     warranty = Column(Integer, nullable=False)
-    category_id = Column(BINARY(16), ForeignKey("terminal_category.id"), nullable=False)
+    category_id = Column(LargeBinary(16), ForeignKey("terminal_category.id"), nullable=False)
     rating = Column(Numeric(precision=2, scale=1))
     thumbnail_photo_url = Column(String(2000))
     medium_size_photo_url = Column(String(2000))
     large_size_photo_url = Column(String(2000))
-    vendor_id = Column(BINARY(16), ForeignKey("vendor.id"), nullable=False)
+    vendor_id = Column(LargeBinary(16), ForeignKey("vendor.id"), nullable=False)
 
     vat = relationship(VatOrmModel, lazy="joined")
     discount = relationship(DiscountOrmModel, lazy="joined")
