@@ -1,8 +1,8 @@
 from uuid import UUID
+from typing import Optional
 
 from pydantic import BaseModel
 from pydantic import constr
-from pydantic import conint
 from pydantic import validator
 
 from ....dto import DTO
@@ -13,26 +13,26 @@ class GetProductOutputDTO(BaseModel, DTO):
     id: str
     ean: str
     name: str
-    description: str
+    description: Optional[str]
     price: str
     price_without_discount: str
-    discount: str
+    discount: Optional[str]
     vat: str
     in_stock: constr(to_lower=True)
-    rating: str
-    height: str
-    width: str
-    length: str
-    color: str
-    material: str
+    rating: Optional[str]
+    height: Optional[str]
+    width: Optional[str]
+    length: Optional[str]
+    color: Optional[str]
+    material: Optional[str]
     country_of_origin: str
-    warranty: conint(strict=True)
+    warranty: int
     category_id: str
     category_name: str
     client_rating: str
-    thumbnail_photo_url: str
-    medium_size_photo_url: str
-    large_size_photo_url: str
+    thumbnail_photo_url: Optional[str]
+    medium_size_photo_url: Optional[str]
+    large_size_photo_url: Optional[str]
     vendor_id: str
     vendor_name: str
 
