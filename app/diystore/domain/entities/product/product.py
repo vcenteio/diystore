@@ -47,7 +47,7 @@ class Product(BaseModel):
     warranty: conint(strict=True, ge=0, le=10) = Field(...)
     category: TerminalLevelProductCategory = Field(...)
     rating: ProductRating = Field(default=None)
-    reviews: Optional[list[ProductReview]] = Field(default=[])
+    reviews: Optional[list[ProductReview]] = Field(default_factory=list)
     photo_url: ProductPhotoUrl = Field(default=None)
     vendor: ProductVendor = Field(...)
 
