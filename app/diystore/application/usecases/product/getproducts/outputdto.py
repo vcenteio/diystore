@@ -8,8 +8,8 @@ from .....domain.entities.product import Product
 
 
 class GetProductsOutputDTO(BaseModel, DTO):
-    products: list[GetProductOutputDTO]
+    products: tuple[GetProductOutputDTO, ...]
 
     @classmethod
     def from_products(cls, products: Iterable[Product]):
-        return cls(products=[GetProductOutputDTO.from_product(p) for p in products])
+        return cls(products=(GetProductOutputDTO.from_product(p) for p in products))
