@@ -15,12 +15,6 @@ def test_domain_product_review_invalid_rating_range(invalid_rating):
         ProductReviewFactory(rating=invalid_rating)
 
 
-@pytest.mark.parametrize("invalid_rating", (1.123, 0.01, 4.54321))
-def test_domain_product_review_invalid_rating_decimal_places(invalid_rating):
-    with pytest.raises(ValidationError):
-        ProductReviewFactory(rating=invalid_rating)
-
-
 @pytest.mark.parametrize(
     "rating",
     (

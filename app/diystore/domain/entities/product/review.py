@@ -1,5 +1,4 @@
 from datetime import datetime
-from decimal import Decimal
 from uuid import UUID
 from uuid import uuid4
 
@@ -10,24 +9,20 @@ from pydantic import Extra
 import pendulum
 from pendulum.datetime import DateTime
 
-from ...helpers import round_decimal
+from .types import ProductRating
 
 
 class ProductReview(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     product_id: UUID = Field(...)
     client_id: UUID = Field(...)
-    rating: Decimal = Field(decimal_places=1, ge=0, le=5)
+    rating: ProductRating = Field(...)
     creation_date: datetime = Field(...)
     feedback: str = Field(default=None, min_length=1, max_length=3000)
 
     class Config:
         frozen = True
         extra = Extra.forbid
-
-    @validator("rating")
-    def _round_rating(cls, rating):
-        return round_decimal(rating, "1.0")
 
     @staticmethod
     def _ensure_creation_date_is_not_future_date(date: DateTime):
