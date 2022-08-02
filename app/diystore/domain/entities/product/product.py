@@ -18,11 +18,9 @@ from .price import ProductPrice
 from .discount import Discount
 from .vat import VAT
 from .dimensions import ProductDimensions
-from .categories import (
-    MidLevelProductCategory,
-    TerminalLevelProductCategory,
-    TopLevelProductCategory,
-)
+from .categories import MidLevelProductCategory
+from .categories import TerminalLevelProductCategory
+from .categories import TopLevelProductCategory
 from .review import ProductReview
 from .types import EAN13
 from .types import ProductRating
@@ -54,12 +52,6 @@ class Product(BaseModel):
     class Config:
         validate_assignment = True
         extra = Extra.forbid
-
-    @validator("ean", pre=True)
-    def _validate_ean(cls, ean):
-        if not isinstance(ean, (str, int)):
-            raise ValueError(f"ean must be str or int, not {ean.__class__.__name__}")
-        return ean
 
     @staticmethod
     def _convert_datetime_to_correct_type(date: datetime) -> DateTime:
@@ -129,7 +121,7 @@ class Product(BaseModel):
 
     def get_final_price(self) -> Decimal:
         return self.price.calculate()
-    
+
     def get_final_price_without_discount(self) -> Decimal:
         return self.price.calculate_without_discount()
 
@@ -169,15 +161,15 @@ class Product(BaseModel):
     def get_dimensions_dict(self) -> Optional[dict]:
         return self.dimensions.dict()
 
-    @optional(e=AttributeError)
+    @optional()
     def get_height(self) -> Decimal:
         return self.dimensions.height
 
-    @optional(e=AttributeError)
+    @optional()
     def get_width(self) -> Decimal:
         return self.dimensions.width
 
-    @optional(e=AttributeError)
+    @optional()
     def get_length(self) -> Decimal:
         return self.dimensions.length
 
