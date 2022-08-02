@@ -6,7 +6,8 @@ from faker import Faker
 
 from diystore.domain.entities.product import ProductPrice
 
-from .conftest import DiscountFactory, ProductPriceFactory
+from .conftest import DiscountFactory
+from .conftest import ProductPriceFactory
 from .conftest import VATFactory
 
 
@@ -14,13 +15,13 @@ Faker.seed(0)
 faker = Faker()
 
 
-@pytest.mark.parametrize("wrong_value", ("abc", b"123", [], dict(), {}))
+@pytest.mark.parametrize("wrong_value", ([], dict(), {}))
 def test_domain_price_value_wrong_type(wrong_value):
     with pytest.raises(ValidationError):
         ProductPriceFactory(value=wrong_value)
 
 
-@pytest.mark.parametrize("wrong_value", (0, -1, "0", "-1", 0.00, -0.01))
+@pytest.mark.parametrize("wrong_value", ("abc", b"abc", 0, -1, "0", "-1", 0.00, -0.01))
 def test_domain_price_value_lt_min_value(wrong_value):
     with pytest.raises(ValidationError):
         ProductPriceFactory(value=wrong_value)
@@ -69,7 +70,7 @@ def test_domain_price_calculate_with_discount(discount_rate: float):
     vat = VATFactory()
     discount = DiscountFactory(rate=discount_rate)
     p: ProductPrice = ProductPriceFactory(vat=vat, discount=discount)
-    value_with_discount = (p.value - (p.value * p.discount))
+    value_with_discount = p.value - (p.value * p.discount)
     expected_price = value_with_discount + (value_with_discount * vat.rate)
     assert p.calculate() == expected_price.quantize(Decimal("1.00"))
 
@@ -81,3 +82,10 @@ def test_domain_price_calculate_without_discount(discount_rate: float):
     p: ProductPrice = ProductPriceFactory(vat=vat, discount=discount)
     expected_price = p.value + (p.value * Decimal(vat.rate))
     assert p.calculate_without_discount() == expected_price.quantize(Decimal("1.00"))
+
+
+def test_domain_price_get_discount_info_no_discount():
+    p: ProductPrice = ProductPriceFactory(discount=None)
+    assert p.get_discount_id() is None
+    assert p.get_discount_id_in_bytes_format() is None
+    assert p.get_discount_rate() is None

@@ -4,7 +4,6 @@ from typing import Optional
 
 from pydantic import BaseModel
 from pydantic import Field
-from pydantic import validator
 from pydantic import PrivateAttr
 
 from .discount import Discount
@@ -20,12 +19,6 @@ class ProductPrice(BaseModel):
 
     class Config:
         validate_assignment = True
-
-    @validator("value", pre=True)
-    def _ensure_correct_type(cls, value):
-        if not isinstance(value, (Decimal, int, float, str)):
-            raise ValueError("value should be of type Decimal, int, float or str")
-        return value
 
     def _apply_discount(self) -> Decimal:
         return self.value - (self.value * self.discount)
@@ -46,15 +39,15 @@ class ProductPrice(BaseModel):
             v = self.value
         return self._round(self._add_vat(v))
 
-    @optional(e=AttributeError)
+    @optional()
     def get_discount_id(self) -> Optional[UUID]:
         return self.discount.id
 
-    @optional(e=AttributeError)
+    @optional()
     def get_discount_id_in_bytes_format(self) -> Optional[bytes]:
         return self.discount.id.bytes
 
-    @optional(e=AttributeError)
+    @optional()
     def get_discount_rate(self) -> Optional[Decimal]:
         return self.discount.rate
 
