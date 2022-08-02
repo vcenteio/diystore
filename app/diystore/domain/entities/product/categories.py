@@ -25,65 +25,51 @@ class TopLevelProductCategory(ProductCategory):
     )
 
 
-class MidLevelProductCategory(ProductCategory):
+class ProductCategoryWithParent(ProductCategory):
     description: constr(strict=True, min_length=1, max_length=300) = Field(
         default=None, repr=False
     )
+    parent: ProductCategory = Field(...)
+    _parent_type = ProductCategory
+
+    def get_parent_id(self) -> UUID:
+        return self.parent.id
+
+    def get_parent_name(self) -> str:
+        return self.parent.name
+
+    def get_parent_description(self) -> Optional[str]:
+        return self.parent.description
+
+    @validator("parent", pre=True, always=True)
+    def _validate_parent(cls, parent):
+        if not isinstance(parent, (cls._parent_type, dict)):
+            raise ValueError(
+                f"parent must be a {cls._parent_type.__name__} object or a valid dict"
+            )
+        return parent
+
+
+class MidLevelProductCategory(ProductCategoryWithParent):
     parent: TopLevelProductCategory = Field(...)
-
-    @validator("parent", pre=True, always=True)
-    def _validate_parent(cls, parent):
-        if not isinstance(parent, (TopLevelProductCategory, dict)):
-            raise ValueError(
-                "parent must be a TopLevelProductCategory object or a valid dict"
-            )
-        return parent
-    
-    def get_parent_id(self) -> UUID:
-        return self.parent.id
-    
-    def get_parent_name(self) -> str:
-        return self.parent.name
-
-    def get_parent_description(self) -> Optional[str]:
-        return self.parent.description
+    _parent_type = TopLevelProductCategory
 
 
-class TerminalLevelProductCategory(ProductCategory):
-    description: constr(strict=True, min_length=1, max_length=300) = Field(
-        default=None,
-        repr=False,
-    )
+class TerminalLevelProductCategory(ProductCategoryWithParent):
     parent: MidLevelProductCategory = Field(...)
-
-    @validator("parent", pre=True, always=True)
-    def _validate_parent(cls, parent):
-        if not isinstance(parent, (MidLevelProductCategory, dict)):
-            raise ValueError(
-                "parent must be a MidLevelProductCategory object or a valid dict"
-            )
-        return parent
-    
-    def get_parent_id(self) -> UUID:
-        return self.parent.id
-
-    def get_parent_name(self) -> str:
-        return self.parent.name
-    
-    def get_parent_description(self) -> Optional[str]:
-        return self.parent.description
+    _parent_type = MidLevelProductCategory
 
     def get_top_level_category(self) -> TopLevelProductCategory:
         return self.parent.parent
 
     def set_top_level_category(self, category: TopLevelProductCategory):
         self.parent.parent = category
-    
+
     def get_top_level_category_id(self) -> UUID:
         return self.parent.get_parent_id()
 
     def get_top_level_category_name(self) -> str:
         return self.parent.get_parent_name()
-    
+
     def get_top_level_category_description(self) -> Optional[str]:
         return self.parent.get_parent_description()
