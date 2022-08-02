@@ -6,7 +6,7 @@ def round_decimal(decimal: Decimal, template: str):
     return decimal.quantize(Decimal(template))
 
 
-def optional(e: Exception):
+def optional(e: Exception = AttributeError):
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
