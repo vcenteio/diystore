@@ -130,6 +130,7 @@ def test_infra_sqlrepo_product_to_domain_entity(orm_session: Session):
         .one()
     )
     product_entity = product_orm.to_domain_entity()
+
     assert isinstance(product_entity, Product)
     validated_entity = Product(**product_entity.dict())
     assert product_entity.id == validated_entity.id
@@ -145,7 +146,7 @@ def test_infra_sqlrepo_product_to_domain_entity(orm_session: Session):
     assert product_entity.warranty == validated_entity.warranty
     assert product_entity.category == validated_entity.category
     assert product_entity.rating == validated_entity.rating
-    assert product_entity.reviews == validated_entity.reviews == []
+    assert product_entity.reviews == validated_entity.reviews == {}
     assert product_entity.photo_url == validated_entity.photo_url
     assert product_entity.vendor == validated_entity.vendor
 

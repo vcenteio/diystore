@@ -25,7 +25,7 @@ from .conftest import TerminalLevelProductCategoryFactory
 from .conftest import ProductVendorFactory
 
 
-@pytest.mark.parametrize("wrong_ean", ([], dict(), (), {}, type))
+@pytest.mark.parametrize("wrong_ean", (b"1234567891234", [], dict(), (), {}, type))
 def test_domain_product_ean_wrong_type(wrong_ean):
     with pytest.raises(ValidationError):
         ProductFactory(ean=wrong_ean)
@@ -63,11 +63,11 @@ def test_domain_product_ean_int_is_converted_to_str(faker):
     assert p.ean == str(int_ean)
 
 
-def test_domain_product_ean_bytes_is_converted_to_str(faker):
-    bytes_ean = faker.bothify(text="#############").encode()
-    with pytest.raises(ValidationError) as e:
-        ProductFactory(ean=bytes_ean)
-    assert e.match("ean must be str or int")
+# def test_domain_product_ean_bytes_is_converted_to_str(faker):
+#     bytes_ean = faker.bothify(text="#############").encode()
+#     with pytest.raises(ValidationError) as e:
+#         ProductFactory(ean=bytes_ean)
+#     assert e.match("ean must be str or int")
 
 
 @pytest.mark.parametrize("wrong_name", (123, b"abc", [], dict(), {}, (), type))
@@ -536,7 +536,8 @@ def test_domain_product_add_client_review_successfully_added(rating, reviews):
     new_review = ProductReviewFactory()
     product: Product = ProductFactory(rating=rating, reviews=reviews)
     product.add_client_review(new_review)
-    assert new_review in product.reviews
+    assert new_review.id.int in product.reviews
+    assert new_review in product.reviews.values()
 
 
 def test_domain_product_add_client_review_rating_is_updated():
@@ -545,7 +546,7 @@ def test_domain_product_add_client_review_rating_is_updated():
     )
     previous_rating = product.get_client_rating()
     product.add_client_review(ProductReviewFactory(rating=5))
-    assert product.rating == Product.calculate_rating(product.get_client_reviews())
+    assert product.rating == product.calculate_rating()
     assert product.rating != previous_rating
 
 
@@ -560,14 +561,16 @@ def test_domain_product_delete_client_review_not_found():
 
 
 def test_domain_product_delete_client_review_found():
-    reviews = [ProductReviewFactory(rating=1), ProductReviewFactory(rating=5)]
+    reviews = (ProductReviewFactory(rating=1), ProductReviewFactory(rating=5))
     product: Product = ProductFactory(reviews=reviews)
     product.update_client_rating()
     previous_rating = product.get_client_rating()
     existant_review = reviews[0]
-    product.delete_client_review(existant_review.id)
+    deleted_review = product.delete_client_review(existant_review.id)
     assert existant_review not in product.get_client_reviews()
     assert product.get_client_rating() != previous_rating
+    assert product.get_client_rating() == reviews[1].rating
+    assert deleted_review == existant_review
 
 
 def test_domain_product_photo_url_is_optional():

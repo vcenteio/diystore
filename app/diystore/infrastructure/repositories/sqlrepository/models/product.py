@@ -47,7 +47,9 @@ class ProductOrmModel(Base):
     material = Column(String(30))
     country_of_origin = Column(String(60), nullable=False)
     warranty = Column(Integer, nullable=False)
-    category_id = Column(LargeBinary(16), ForeignKey("terminal_category.id"), nullable=False)
+    category_id = Column(
+        LargeBinary(16), ForeignKey("terminal_category.id"), nullable=False
+    )
     rating = Column(Numeric(precision=2, scale=1))
     thumbnail_photo_url = Column(String(2000))
     medium_size_photo_url = Column(String(2000))
@@ -77,7 +79,10 @@ class ProductOrmModel(Base):
         return validate_id(_id, key)
 
     def __repr__(self):
-        return f"ProductOrmModel(ean={self.ean}, name={self.name}, price={self.base_price})"
+        return (
+            f"ProductOrmModel(ean={self.ean}, "
+            f"name={self.name}, price={self.base_price})"
+        )
 
     def to_domain_entity(self, with_reviews=False) -> Product:
         try:
@@ -105,9 +110,12 @@ class ProductOrmModel(Base):
                 category=self.category.to_domain_entity(),
                 rating=ProductRating(self.rating),
                 reviews=(
-                    [rev.to_domain_entity() for rev in self.reviews]
+                    {
+                        UUID(bytes=rev.id).int: rev.to_domain_entity()
+                        for rev in self.reviews
+                    }
                     if with_reviews and self.reviews
-                    else []
+                    else {}
                 ),
                 photo_url=ProductPhotoUrl(
                     thumbnail=self.thumbnail_photo_url,
@@ -116,8 +124,8 @@ class ProductOrmModel(Base):
                 ),
                 vendor=self.vendor.to_domain_entity(),
             )
-        except AttributeError:
-            raise OrmEntityNotFullyLoaded
+        except AttributeError as e:
+            raise OrmEntityNotFullyLoaded(str(e))
 
     @classmethod
     def from_domain_entity(cls, entity: Product) -> "ProductOrmModel":
@@ -150,8 +158,8 @@ class ProductOrmModel(Base):
                 category=TerminalCategoryOrmModel.from_domain_entity(entity.category),
                 vendor=ProductVendorOrmModel.from_domain_entity(entity.vendor),
                 reviews=[
-                    ProductReviewOrmModel.from_domain_entity(rev)
-                    for rev in entity.reviews
+                    ProductReviewOrmModel.from_domain_entity(entity.reviews[rev_id])
+                    for rev_id in entity.reviews
                 ],
             )
         except AttributeError:

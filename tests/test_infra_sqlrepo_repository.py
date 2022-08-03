@@ -108,7 +108,7 @@ def test_infra_sqlrepo_repository_get_product_that_has_no_reviews(
     )
 
     fetched_product = sqlrepo.get_product(product_id, with_reviews=True)
-    assert fetched_product.get_client_reviews() == []
+    assert fetched_product.get_client_reviews() == ()
 
 
 def test_infra_sqlrepo_get_products_wrong_id_type(sqlrepo: SQLProductRepository):
