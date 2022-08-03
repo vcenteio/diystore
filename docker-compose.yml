@@ -41,6 +41,8 @@ services:
       - APP_REPO__TYPE=${APP_REPO__TYPE}
       - APP_REPO__DB_URL=${APP_REPO__DB_URL}
       - APP_PRESENTATION_TYPE=${APP_PRESENTATION_TYPE}
+      - APP_API_CACHE_CONTROL__MAX_AGE=${APP_API_CACHE_CONTROL__MAX_AGE}
+      - APP_API_ADD_ETAG=${APP_API_ADD_ETAG}
     depends_on:
       - pg_db
     

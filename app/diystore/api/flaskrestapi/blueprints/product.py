@@ -4,6 +4,7 @@ from flask import jsonify
 from flask import Response
 from flask import request
 
+from ...api_settings import web_api_settings
 from ....infrastructure.controllers.web import ProductController
 from ....infrastructure.controllers.web.exceptions import BadRequest
 from ....infrastructure.controllers.web.exceptions import UnprocessableEntity
@@ -21,11 +22,26 @@ def handle_bad_request(e):
     return response
 
 
+def _create_response_with_client_side_caching(
+    representation: str,
+    *,
+    mimetype: str = "application/json",
+    add_etag: bool = web_api_settings.add_etag,
+    cache_control_max_age: int = web_api_settings.cache_control.max_age
+):
+    response = Response(representation, mimetype=mimetype)
+    response.cache_control.max_age = cache_control_max_age
+    response.cache_control.public = True
+    if add_etag:
+        response.add_etag()
+        response.make_conditional(request)
+    return response
+
+
 @bp.get("/product/<string:product_id>")
 def get_product(product_id: str):
-    _id = Markup.escape(product_id)
-    representation = product.get_one(_id)
-    return Response(representation, mimetype="application/json")
+    representation = product.get_one(Markup.escape(product_id))
+    return _create_response_with_client_side_caching(representation)
 
 
 # allowed GET /products endpoint parameters
@@ -58,4 +74,4 @@ def _get_representation_for_get_products_endpoint(args: dict):
 def get_products():
     args = _parse_args_for_get_products_endpoint(request.args)
     representation = _get_representation_for_get_products_endpoint(args)
-    return Response(representation, mimetype="application/json")
+    return _create_response_with_client_side_caching(representation)
