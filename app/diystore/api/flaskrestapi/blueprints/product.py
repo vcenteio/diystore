@@ -3,15 +3,10 @@ from flask import Blueprint
 from flask import jsonify
 from flask import Response
 from flask import request
-from flask import json
 
 from ....infrastructure.controllers.web import ProductController
-from ....infrastructure.controllers.web.exceptions import (
-    BadRequest,
-    UnprocessableEntity,
-)
-from ....infrastructure.controllers.web.exceptions import InvalidQueryArgument
-from ....infrastructure.controllers.web.exceptions import InvalidQueryParameter
+from ....infrastructure.controllers.web.exceptions import BadRequest
+from ....infrastructure.controllers.web.exceptions import UnprocessableEntity
 from ....infrastructure.controllers.web.exceptions import ParameterMissing
 
 
@@ -30,11 +25,11 @@ def handle_bad_request(e):
 def get_product(product_id: str):
     _id = Markup.escape(product_id)
     representation = product.get_one(_id)
-    response = Response(representation, mimetype="application/json")
-    return response
+    return Response(representation, mimetype="application/json")
 
 
-_allowed_get_products_endpoint_parameters = (
+# allowed GET /products endpoint parameters
+AGPEP = (
     "category_id",
     "price_min",
     "price_max",
@@ -47,8 +42,7 @@ _allowed_get_products_endpoint_parameters = (
 
 
 def _parse_args_for_get_products_endpoint(args: dict):
-    agpep = _allowed_get_products_endpoint_parameters
-    return {param: Markup.escape(arg) for param, arg in args.items() if param in agpep}
+    return {param: Markup.escape(args[param]) for param in AGPEP if param in args}
 
 
 def _get_representation_for_get_products_endpoint(args: dict):
@@ -64,5 +58,4 @@ def _get_representation_for_get_products_endpoint(args: dict):
 def get_products():
     args = _parse_args_for_get_products_endpoint(request.args)
     representation = _get_representation_for_get_products_endpoint(args)
-    response = Response(representation, mimetype="application/json")
-    return response
+    return Response(representation, mimetype="application/json")
