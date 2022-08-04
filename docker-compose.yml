@@ -5,7 +5,7 @@ services:
     image: postgres:latest
     restart: always
     ports:
-      - 5432:5432
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -16,7 +16,7 @@ services:
     image: dpage/pgadmin4:latest
     restart: always
     ports:
-      - 8080:8080
+      - ${PGADMIN_LISTEN_PORT}:${PGADMIN_LISTEN_PORT}
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     environment:
@@ -25,12 +25,30 @@ services:
       - PGADMIN_LISTEN_PORT=${PGADMIN_LISTEN_PORT}
     depends_on:
       - pg_db
+  
+  redis:
+    image: redis:7.0.4
+    restart: always
+    command: redis-server ${REDIS_CONF_PATH} --requirepass ${APP_CACHE__PASSWORD}
+    ports:
+      - ${APP_CACHE__PORT}:${APP_CACHE__PORT}
+    volumes:
+      - redis_data:/var/lib/redis
+      - redis_conf:${REDIS_CONF_PATH}
+
+  redis-insight:
+    image: redislabs/redisinsight
+    restart: always
+    ports:
+      - ${REDIS_INSIGHT_PORT}:${REDIS_INSIGHT_PORT}
+    volumes:
+      - redis_insight_data:/db
 
   app:
     build: ./app
     restart: always
     ports:
-      - 5050:5050
+      - ${FLASK_RUN_PORT}:${FLASK_RUN_PORT}
     volumes:
       - ./app:/app
     environment:
@@ -43,9 +61,17 @@ services:
       - APP_PRESENTATION_TYPE=${APP_PRESENTATION_TYPE}
       - APP_API_CACHE_CONTROL__MAX_AGE=${APP_API_CACHE_CONTROL__MAX_AGE}
       - APP_API_ADD_ETAG=${APP_API_ADD_ETAG}
+      - APP_CACHE__HOST=${APP_CACHE__HOST}
+      - APP_CACHE__PORT=${APP_CACHE__PORT}
+      - APP_CACHE__PASSWORD=${APP_CACHE__PASSWORD}
+      - APP_CACHE__DB=${APP_CACHE__DB}
+      - APP_CACHE__TTL=${APP_CACHE__TTL}
     depends_on:
       - pg_db
     
 volumes:
   postgres_data:
   pgadmin_data:
+  redis_data:
+  redis_conf:
+  redis_insight_data:
