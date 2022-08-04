@@ -1,0 +1,1 @@
+from .redis_product_cache import RedisProductRepresentationCache

@@ -1,4 +1,5 @@
 from typing import Optional
+from functools import wraps
 
 from pydantic import ValidationError
 
@@ -6,8 +7,11 @@ from .exceptions import UnprocessableEntity
 from .exceptions import InvalidQueryArgument
 from .exceptions import InvalidProductID
 from .exceptions import ProductNotFound
+from ...cache.interfaces import ProductCache
+from ...cache.redis_cache import RedisProductRepresentationCache
 from ..presenters import generate_json_presentation
 from ...repositories.sqlrepository import SQLProductRepository
+from ...settings import infra_settings
 from ...settings import InfraSettings
 from ....application.usecases.product import get_product_use_case
 from ....application.usecases.product import get_products_use_case
@@ -17,16 +21,32 @@ from ....application.usecases.product import ProductOrderingCriteria
 from ....application.usecases.product import OrderingProperty
 from ....application.usecases.product import OrderingType
 from ....application.dto import DTO
-from ...repositories.sqlrepository import ProductOrmModel
+
+
+cache_settings = infra_settings.cache
+
+
+# temporary solution until the Dependency Injection provider is implemented
+cache = RedisProductRepresentationCache(
+    host=cache_settings.host,
+    port=cache_settings.port,
+    db=cache_settings.db,
+    password=cache_settings.password,
+    ttl=cache_settings.ttl,
+)
 
 
 class ProductController:
 
+    # temporary solution until the Dependency Injection provider is implemented
     _repo_map = {"sql": SQLProductRepository}
     _presenter_map = {"json": generate_json_presentation}
 
-    def __init__(self, settings: InfraSettings = InfraSettings()):
+    def __init__(
+        self, settings: InfraSettings = infra_settings, cache: ProductCache = cache
+    ):
         self._settings = settings
+        self._cache = cache
         self._configure_repository()
         self._configure_presenter()
 
@@ -47,9 +67,36 @@ class ProductController:
                 f"unknown presentation type {self._settings.presentation_type}"
             )
 
+    @staticmethod
+    def _cache_one(f):
+        @wraps(f)
+        def wrapper(self: "ProductController", product_id: str):
+            cached_repr = self._cache.get_one(product_id)
+            if cached_repr is None:
+                new_repr = f(self, product_id)
+                self._cache.set_one(product_id, new_repr)
+                return new_repr
+            return cached_repr
+
+        return wrapper
+
+    @staticmethod
+    def _cache_many(f):
+        @wraps(f)
+        def wrapper(self: "ProductController", **kwargs):
+            cached_repr = self._cache.get_many(kwargs)
+            if cached_repr is None:
+                new_repr = f(self, **kwargs)
+                self._cache.set_many(kwargs, new_repr)
+                return new_repr
+            return cached_repr
+
+        return wrapper
+
     def _generate_presentation(self, output_dto: DTO) -> str:
         return self._presenter(output_dto)
 
+    @_cache_one
     def get_one(self, product_id: str) -> Optional[str]:
         try:
             input_dto = GetProductInputDTO(product_id=product_id)
@@ -105,8 +152,10 @@ class ProductController:
             loc = e.errors()[0].get("loc")[0]
             raise InvalidQueryArgument(None, loc)
 
+    @_cache_many
     def get_many(
         self,
+        *,
         category_id: str,
         price_min: float = 0.01,
         price_max: float = 1_000_000,

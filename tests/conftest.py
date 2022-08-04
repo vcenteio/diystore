@@ -50,6 +50,7 @@ from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmM
 from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
 from diystore.infrastructure.controllers.web import ProductController
+from diystore.infrastructure.cache.interfaces import ProductCache
 
 
 tz = timezone("UTC")
@@ -564,6 +565,19 @@ def sqlite_json_infrasettings():
 @pytest.fixture(scope="session")
 def testenv_infrasettings():
     return InfraSettings(_env_file="test.env")
+
+
+@pytest.fixture(scope="session")
+def mock_product_cache():
+    mock_cache = Mock(ProductCache)
+    mock_cache.get_one.return_value = None
+    mock_cache.get_many.return_value = None
+    return mock_cache
+
+
+@pytest.fixture(scope="session")
+def product_controller(sqlite_json_infrasettings, mock_product_cache):
+    return ProductController(sqlite_json_infrasettings, mock_product_cache)
 
 
 def persist_new_products_and_return_category_id(no: int, session: Session, **kwargs):
