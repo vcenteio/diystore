@@ -3,14 +3,14 @@ from uuid import UUID
 import pytest
 from sqlalchemy.orm import Session
 
-from .conftest import ProductVendorFactory
-from .conftest import ProductVendorOrmModelFactory
+from .conftest import ProductVendorStub
+from .conftest import ProductVendorOrmModelStub
 from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
 from diystore.domain.entities.product import ProductVendor
 
 
 def test_infra_sqlrepo_vendor_to_domain_entity(orm_session: Session):
-    vendor_orm = ProductVendorOrmModelFactory()
+    vendor_orm = ProductVendorOrmModelStub()
     orm_session.add(vendor_orm)
     orm_session.commit()
     vendor_orm = orm_session.get(ProductVendorOrmModel, vendor_orm.id)
@@ -25,11 +25,11 @@ def test_infra_sqlrepo_vendor_to_domain_entity(orm_session: Session):
 
 def test_infra_sqlrepo_vendor_from_domain_entity_wrong_type():
     with pytest.raises(TypeError):
-        ProductVendorOrmModelFactory().from_domain_entity(1)
+        ProductVendorOrmModelStub().from_domain_entity(1)
 
 
 def test_infra_sqlrepo_vendor_from_domain_entity_correct_type(orm_session: Session):
-    vendor_entity = ProductVendorFactory()
+    vendor_entity = ProductVendorStub()
     vendor_orm = ProductVendorOrmModel.from_domain_entity(vendor_entity)
     assert isinstance(vendor_orm, ProductVendorOrmModel)
 

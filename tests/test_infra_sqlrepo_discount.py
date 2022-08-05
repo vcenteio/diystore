@@ -6,13 +6,13 @@ from sqlalchemy.orm import Session
 
 from .conftest import tz
 from .conftest import DiscountOrmModel
-from .conftest import DiscountOrmModelFactory
-from .conftest import DiscountFactory
+from .conftest import DiscountOrmModelStub
+from .conftest import DiscountStub
 from diystore.domain.entities.product import Discount
 
 
 def test_infra_sqlrepo_discount_to_domain_entity(orm_session: Session):
-    discount_orm = DiscountOrmModelFactory()
+    discount_orm = DiscountOrmModelStub()
 
     orm_session.add(discount_orm)
     orm_session.commit()
@@ -35,7 +35,7 @@ def test_infra_sqlrepo_discount_from_domain_entity_wrong_type():
 
 
 def test_infra_sqlrepo_discount_from_domain_entity_correct_type(orm_session: Session):
-    discount_entity = DiscountFactory()
+    discount_entity = DiscountStub()
     discount_orm = DiscountOrmModel.from_domain_entity(discount_entity)
     assert isinstance(discount_orm, DiscountOrmModel)
 

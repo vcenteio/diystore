@@ -5,7 +5,7 @@ from uuid import UUID
 
 import pytest
 
-from .conftest import LoadedProductOrmModelFactory
+from .conftest import LoadedProductOrmModelStub
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
 from diystore.infrastructure.controllers.web.exceptions import InvalidProductID
 from diystore.infrastructure.controllers.web.exceptions import ProductNotFound
@@ -26,7 +26,7 @@ def test_infra_product_controller_get_one_existing_object(
     product_controller, sqlrepo: SQLProductRepository
 ):
     product_controller._repo = sqlrepo
-    products_orm = LoadedProductOrmModelFactory.build_batch(3)
+    products_orm = LoadedProductOrmModelStub.build_batch(3)
     valid_id = UUID(bytes=products_orm[0].id).hex
     with sqlrepo._session as s:
         s.add_all(products_orm)

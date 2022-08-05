@@ -3,25 +3,25 @@ from uuid import uuid4
 from diystore.application.usecases.product import GetProductOutputDTO
 from diystore.application.usecases.product import GetProductsOutputDTO
 from .conftest import Product
-from .conftest import ProductFactory
-from .conftest import ProductOutputDTOFactory
+from .conftest import ProductStub
+from .conftest import ProductOutputDTOStub
 
 
 def test_application_get_products_product_output_dto_id_is_hex():
     _id = uuid4()
-    odto = ProductOutputDTOFactory(id=_id)
+    odto = ProductOutputDTOStub(id=_id)
     assert odto.id == _id.hex
 
 
 def test_application_get_products_product_output_dto_warranty_is_int(faker):
     warranty = faker.pyint(min_value=1, max_value=5)
-    odto = ProductOutputDTOFactory(warranty=warranty)
+    odto = ProductOutputDTOStub(warranty=warranty)
     assert isinstance(odto.warranty, int)
     assert odto.warranty == warranty
 
 
 def test_application_get_products_product_output_dto_from_product():
-    product: Product = ProductFactory()
+    product: Product = ProductStub()
     odto = GetProductOutputDTO.from_product(product)
 
     assert odto.id == product.get_id_in_hex_format()

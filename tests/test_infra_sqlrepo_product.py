@@ -4,16 +4,16 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.orm import Session
 
-from .conftest import ProductReviewFactory, ProductReviewOrmModelFactory
-from .conftest import ProductVendorOrmModelFactory
-from .conftest import VatOrmModelFactory
-from .conftest import ProductFactory
-from .conftest import DiscountOrmModelFactory
-from .conftest import TerminalCategoryOrmModelFactory
-from .conftest import MidLevelCategoryOrmModelFactory
-from .conftest import TopLevelCategoryOrmModelFactory
-from .conftest import ProductOrmModelFactory
-from .conftest import LoadedProductOrmModelFactory
+from .conftest import ProductReviewStub, ProductReviewOrmModelStub
+from .conftest import ProductVendorOrmModelStub
+from .conftest import VatOrmModelStub
+from .conftest import ProductStub
+from .conftest import DiscountOrmModelStub
+from .conftest import TerminalCategoryOrmModelStub
+from .conftest import MidLevelCategoryOrmModelStub
+from .conftest import TopLevelCategoryOrmModelStub
+from .conftest import ProductOrmModelStub
+from .conftest import LoadedProductOrmModelStub
 from diystore.domain.entities.product import Product
 from diystore.domain.entities.product import VAT
 from diystore.domain.entities.product import Discount
@@ -37,7 +37,7 @@ from diystore.infrastructure.repositories.sqlrepository.exceptions import (
 
 
 def test_infra_sqlrepo_product_vat_relationship_non_existing_vat(orm_session: Session):
-    product_orm = ProductOrmModelFactory(vat_id=uuid4())
+    product_orm = ProductOrmModelStub(vat_id=uuid4())
     orm_session.add(product_orm)
     orm_session.commit()
     product_orm = orm_session.get(ProductOrmModel, product_orm.id)
@@ -45,8 +45,8 @@ def test_infra_sqlrepo_product_vat_relationship_non_existing_vat(orm_session: Se
 
 
 def test_infra_sqlrepo_product_vat_relationship_existing_vat(orm_session: Session):
-    vat_orm = VatOrmModelFactory()
-    product_orm = ProductOrmModelFactory(vat_id=vat_orm.id)
+    vat_orm = VatOrmModelStub()
+    product_orm = ProductOrmModelStub(vat_id=vat_orm.id)
     orm_session.add_all((vat_orm, product_orm))
     orm_session.commit()
     product_orm = orm_session.get(ProductOrmModel, product_orm.id)
@@ -56,7 +56,7 @@ def test_infra_sqlrepo_product_vat_relationship_existing_vat(orm_session: Sessio
 def test_infra_sqlrepo_product_discount_relationship_non_existing_discount(
     orm_session: Session,
 ):
-    product_orm = ProductOrmModelFactory(discount_id=uuid4())
+    product_orm = ProductOrmModelStub(discount_id=uuid4())
     orm_session.add(product_orm)
     orm_session.commit()
     product_orm = orm_session.get(ProductOrmModel, product_orm.id)
@@ -66,8 +66,8 @@ def test_infra_sqlrepo_product_discount_relationship_non_existing_discount(
 def test_infra_sqlrepo_product_discount_relationship_existing_discount(
     orm_session: Session,
 ):
-    discount_orm = DiscountOrmModelFactory()
-    product_orm = ProductOrmModelFactory(discount_id=discount_orm.id)
+    discount_orm = DiscountOrmModelStub()
+    product_orm = ProductOrmModelStub(discount_id=discount_orm.id)
     orm_session.add_all((discount_orm, product_orm))
     orm_session.commit()
     product_orm = orm_session.get(ProductOrmModel, product_orm.id)
@@ -75,8 +75,8 @@ def test_infra_sqlrepo_product_discount_relationship_existing_discount(
 
 
 def test_infra_sqlrepo_product_category_relationship(orm_session: Session):
-    category_orm = TerminalCategoryOrmModelFactory()
-    product_orm = ProductOrmModelFactory(category_id=category_orm.id)
+    category_orm = TerminalCategoryOrmModelStub()
+    product_orm = ProductOrmModelStub(category_id=category_orm.id)
     orm_session.add_all((category_orm, product_orm))
     orm_session.commit()
     product_orm = orm_session.get(ProductOrmModel, product_orm.id)
@@ -87,8 +87,8 @@ def test_infra_sqlrepo_product_category_relationship(orm_session: Session):
 
 
 def test_infra_sqlrepo_product_vendor_relationship(orm_session: Session):
-    vendor_orm = ProductVendorOrmModelFactory()
-    products = ProductOrmModelFactory.build_batch(10, vendor_id=vendor_orm.id)
+    vendor_orm = ProductVendorOrmModelStub()
+    products = ProductOrmModelStub.build_batch(10, vendor_id=vendor_orm.id)
     orm_session.add_all((vendor_orm, *products))
     orm_session.commit()
     vendor_orm = orm_session.get(ProductVendorOrmModel, vendor_orm.id)
@@ -98,8 +98,8 @@ def test_infra_sqlrepo_product_vendor_relationship(orm_session: Session):
 
 
 def test_infra_sqlrepo_product_review_relationship(orm_session: Session):
-    product_orm = ProductOrmModelFactory()
-    reviews = ProductReviewOrmModelFactory.build_batch(10, product_id=product_orm.id)
+    product_orm = ProductOrmModelStub()
+    reviews = ProductReviewOrmModelStub.build_batch(10, product_id=product_orm.id)
     orm_session.add_all((product_orm, *reviews))
     orm_session.commit()
     product_orm = orm_session.get(ProductOrmModel, product_orm.id)
@@ -109,13 +109,13 @@ def test_infra_sqlrepo_product_review_relationship(orm_session: Session):
 
 
 def test_infra_sqlrepo_product_to_domain_entity_object_not_fully_loaded():
-    product_orm = ProductOrmModelFactory(vat=None)
+    product_orm = ProductOrmModelStub(vat=None)
     with pytest.raises(OrmEntityNotFullyLoaded):
         product_orm.to_domain_entity()
 
 
 def test_infra_sqlrepo_product_to_domain_entity(orm_session: Session):
-    product_orm = LoadedProductOrmModelFactory()
+    product_orm = LoadedProductOrmModelStub()
     orm_session.add(product_orm)
     orm_session.commit()
 
@@ -157,7 +157,7 @@ def test_infra_sqlrepo_product_from_domain_entity_wrong_type():
 
 
 def test_infra_sqlrepo_product_from_domain_entity_correct_type(orm_session: Session):
-    product: Product = ProductFactory(reviews=ProductReviewFactory.build_batch(3))
+    product: Product = ProductStub(reviews=ProductReviewStub.build_batch(3))
     product_orm = ProductOrmModel.from_domain_entity(product)
 
     orm_session.add(product_orm)

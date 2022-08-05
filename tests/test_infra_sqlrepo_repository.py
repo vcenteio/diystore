@@ -9,9 +9,9 @@ from sqlalchemy.exc import OperationalError
 from factory import Factory
 
 
-from .conftest import TerminalCategoryOrmModelFactory
-from .conftest import ProductOrmModelFactory
-from .conftest import LoadedProductOrmModelFactory
+from .conftest import TerminalCategoryOrmModelStub
+from .conftest import ProductOrmModelStub
+from .conftest import LoadedProductOrmModelStub
 from .conftest import persist_new_products_and_return_category_id
 from diystore.domain.entities.product import Product
 from diystore.domain.entities.product import TerminalLevelProductCategory
@@ -49,7 +49,7 @@ def test_infra_sqlrepo_repository_get_product_wrong_id_type(
 def test_infra_sqlrepo_repository_get_product_inexistent_product(
     sqlrepo: SQLProductRepository,
 ):
-    products = ProductOrmModelFactory.build_batch(3)
+    products = ProductOrmModelStub.build_batch(3)
     with sqlrepo._session as s:
         s.add_all(products)
         s.commit()
@@ -73,7 +73,7 @@ def test_infra_sqlrepo_repository_get_product_without_its_reviews(
     sqlrepo: SQLProductRepository,
 ):
     product_id = _persist_new_object_and_return_its_id(
-        LoadedProductOrmModelFactory, sqlrepo._session
+        LoadedProductOrmModelStub, sqlrepo._session
     )
 
     fetched_product = sqlrepo.get_product(product_id)
@@ -92,7 +92,7 @@ def test_infra_sqlrepo_repository_get_product_with_its_reviews(
     sqlrepo: SQLProductRepository,
 ):
     product_id = _persist_new_object_and_return_its_id(
-        LoadedProductOrmModelFactory, sqlrepo._session
+        LoadedProductOrmModelStub, sqlrepo._session
     )
 
     fetched_product = sqlrepo.get_product(product_id, with_reviews=True)
@@ -104,7 +104,7 @@ def test_infra_sqlrepo_repository_get_product_that_has_no_reviews(
     sqlrepo: SQLProductRepository,
 ):
     product_id = _persist_new_object_and_return_its_id(
-        LoadedProductOrmModelFactory, sqlrepo._session, reviews=[]
+        LoadedProductOrmModelStub, sqlrepo._session, reviews=[]
     )
 
     fetched_product = sqlrepo.get_product(product_id, with_reviews=True)
@@ -120,7 +120,7 @@ def test_infra_sqlrepo_get_products_non_existent_products(
     sqlrepo: SQLProductRepository,
 ):
     category_id = _persist_new_object_and_return_its_id(
-        TerminalCategoryOrmModelFactory, sqlrepo._session
+        TerminalCategoryOrmModelStub, sqlrepo._session
     )
     products = sqlrepo.get_products(category_id=category_id)
     assert len(products) == 0
@@ -217,12 +217,12 @@ def test_infra_sqlrepo_get_products_with_discounts_only_param_restricts_results(
     sqlrepo: SQLProductRepository,
 ):
     no_products = 5
-    category = TerminalCategoryOrmModelFactory()
+    category = TerminalCategoryOrmModelStub()
     category_id = category.id
-    products_with_no_discount = LoadedProductOrmModelFactory.build_batch(
+    products_with_no_discount = LoadedProductOrmModelStub.build_batch(
         no_products, category_id=category_id, category=category, discount_id=None
     )
-    product_with_discount = LoadedProductOrmModelFactory(
+    product_with_discount = LoadedProductOrmModelStub(
         category_id=category_id, category=category
     )
     with sqlrepo._session as s:

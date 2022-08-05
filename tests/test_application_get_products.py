@@ -9,7 +9,7 @@ from diystore.application.usecases.product import OrderingProperty
 from diystore.application.usecases.product import OrderingType
 from diystore.application.usecases.product import GetProductsOutputDTO
 from diystore.domain.entities.product import Product
-from .conftest import GetProductsInputDTOFactory
+from .conftest import GetProductsInputDTOStub
 
 
 def test_application_get_products_use_case_input_dto_wrong_type():
@@ -20,7 +20,7 @@ def test_application_get_products_use_case_input_dto_wrong_type():
 def test_application_get_products_use_case_no_ordering_no_result(
     mock_products_repository: Union[Mock, ProductRepository]
 ):
-    input_dto = GetProductsInputDTOFactory(ordering_criteria=None)
+    input_dto = GetProductsInputDTOStub(ordering_criteria=None)
     mock_products_repository.get_products = Mock(return_value=[])
     result = get_products_use_case(
         input_dto=input_dto, repository=mock_products_repository
@@ -32,7 +32,7 @@ def test_application_get_products_use_case_no_ordering_no_result(
 def test_application_get_products_use_case_no_ordering_with_result(
     product_stub_list, mock_products_repository: Union[Mock, ProductRepository]
 ):
-    input_dto = GetProductsInputDTOFactory(ordering_criteria=None)
+    input_dto = GetProductsInputDTOStub(ordering_criteria=None)
     mock_products_repository.get_products = Mock(return_value=product_stub_list)
     result = get_products_use_case(
         input_dto=input_dto, repository=mock_products_repository
@@ -44,7 +44,7 @@ def test_application_get_products_use_case_no_ordering_with_result(
 def test_application_get_products_use_case_ordering_by_rating_no_result(
     mock_products_repository: Union[Mock, ProductRepository]
 ):
-    input_dto = GetProductsInputDTOFactory(
+    input_dto = GetProductsInputDTOStub(
         ordering_criteria__type=OrderingType.DESCESDING,
         ordering_criteria__property=OrderingProperty.RATING,
     )
@@ -59,7 +59,7 @@ def test_application_get_products_use_case_ordering_by_rating_no_result(
 def test_application_get_products_use_case_ordering_by_rating_with_results(
     product_stub_list, mock_products_repository: Union[Mock, ProductRepository]
 ):
-    input_dto = GetProductsInputDTOFactory(
+    input_dto = GetProductsInputDTOStub(
         ordering_criteria__type=OrderingType.DESCESDING,
         ordering_criteria__property=OrderingProperty.RATING,
     )
@@ -76,7 +76,7 @@ def test_application_get_products_use_case_ordering_by_rating_with_results(
 def test_application_get_products_use_case_ordering_by_price_no_result(
     mock_products_repository: Union[Mock, ProductRepository]
 ):
-    input_dto = GetProductsInputDTOFactory(
+    input_dto = GetProductsInputDTOStub(
         ordering_criteria__type=OrderingType.DESCESDING,
         ordering_criteria__property=OrderingProperty.PRICE,
     )
@@ -91,7 +91,7 @@ def test_application_get_products_use_case_ordering_by_price_no_result(
 def test_application_get_products_use_case_ordering_by_price_with_results(
     product_stub_list, mock_products_repository: Union[Mock, ProductRepository]
 ):
-    input_dto = GetProductsInputDTOFactory(
+    input_dto = GetProductsInputDTOStub(
         ordering_criteria__type=OrderingType.DESCESDING,
         ordering_criteria__property=OrderingProperty.PRICE,
     )

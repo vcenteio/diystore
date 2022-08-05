@@ -56,7 +56,7 @@ from diystore.infrastructure.cache.interfaces import ProductCache
 tz = timezone("UTC")
 
 
-class DiscountFactory(Factory):
+class DiscountStub(Factory):
     class Meta:
         model = Discount
 
@@ -74,7 +74,7 @@ class DiscountFactory(Factory):
     id: UUID = Faker("uuid4")
 
 
-class DiscountOrmModelFactory(Factory):
+class DiscountOrmModelStub(Factory):
     class Meta:
         model = DiscountOrmModel
 
@@ -92,7 +92,7 @@ class DiscountOrmModelFactory(Factory):
     id: UUID = Faker("uuid4")
 
 
-class VATFactory(Factory):
+class VATStub(Factory):
     class Meta:
         model = VAT
 
@@ -101,7 +101,7 @@ class VATFactory(Factory):
     name: str = Faker("pystr", min_chars=2, max_chars=20)
 
 
-class VatOrmModelFactory(Factory):
+class VatOrmModelStub(Factory):
     class Meta:
         model = VatOrmModel
 
@@ -110,16 +110,16 @@ class VatOrmModelFactory(Factory):
     name: str = Faker("pystr", min_chars=2, max_chars=20)
 
 
-class ProductPriceFactory(Factory):
+class ProductPriceStub(Factory):
     class Meta:
         model = ProductPrice
 
     value: Decimal = Faker("pyfloat", right_digits=2, min_value=0.01, max_value=999.99)
-    vat: VAT = SubFactory(VATFactory)
-    discount: Discount = SubFactory(DiscountFactory)
+    vat: VAT = SubFactory(VATStub)
+    discount: Discount = SubFactory(DiscountStub)
 
 
-class ProductDimensionsFactory(Factory):
+class ProductDimensionsStub(Factory):
     class Meta:
         model = ProductDimensions
 
@@ -128,7 +128,7 @@ class ProductDimensionsFactory(Factory):
     length: Decimal = Faker("pyfloat", right_digits=1, min_value=1, max_value=99.9)
 
 
-class TopLevelProductCategoryFactory(Factory):
+class TopLevelProductCategoryStub(Factory):
     class Meta:
         model = TopLevelProductCategory
 
@@ -137,27 +137,27 @@ class TopLevelProductCategoryFactory(Factory):
     description: str = Faker("pystr", min_chars=1, max_chars=3000)
 
 
-class MidLevelProductCategoryFactory(Factory):
+class MidLevelProductCategoryStub(Factory):
     class Meta:
         model = MidLevelProductCategory
 
     id: UUID = Faker("uuid4")
     name: str = Faker("pystr", min_chars=2, max_chars=50)
     description: str = Faker("pystr", min_chars=1, max_chars=300)
-    parent = SubFactory(TopLevelProductCategoryFactory)
+    parent = SubFactory(TopLevelProductCategoryStub)
 
 
-class TerminalLevelProductCategoryFactory(Factory):
+class TerminalLevelProductCategoryStub(Factory):
     class Meta:
         model = TerminalLevelProductCategory
 
     id: UUID = Faker("uuid4")
     name: str = Faker("pystr", min_chars=2, max_chars=50)
     description: str = Faker("pystr", min_chars=1, max_chars=300)
-    parent = SubFactory(MidLevelProductCategoryFactory)
+    parent = SubFactory(MidLevelProductCategoryStub)
 
 
-class TopLevelCategoryOrmModelFactory(Factory):
+class TopLevelCategoryOrmModelStub(Factory):
     class Meta:
         model = TopLevelCategoryOrmModel
 
@@ -166,7 +166,7 @@ class TopLevelCategoryOrmModelFactory(Factory):
     description: str = Faker("pystr", min_chars=1, max_chars=3000)
 
 
-class MidLevelCategoryOrmModelFactory(Factory):
+class MidLevelCategoryOrmModelStub(Factory):
     class Meta:
         model = MidLevelCategoryOrmModel
 
@@ -174,10 +174,10 @@ class MidLevelCategoryOrmModelFactory(Factory):
     name: str = Faker("pystr", min_chars=2, max_chars=50)
     description: str = Faker("pystr", min_chars=1, max_chars=300)
     parent_id: UUID = Faker("uuid4")
-    parent = SubFactory(TopLevelCategoryOrmModelFactory)
+    parent = SubFactory(TopLevelCategoryOrmModelStub)
 
 
-class TerminalCategoryOrmModelFactory(Factory):
+class TerminalCategoryOrmModelStub(Factory):
     class Meta:
         model = TerminalCategoryOrmModel
 
@@ -185,10 +185,10 @@ class TerminalCategoryOrmModelFactory(Factory):
     name: str = Faker("pystr", min_chars=2, max_chars=50)
     description: str = Faker("pystr", min_chars=1, max_chars=300)
     parent_id: UUID = Faker("uuid4")
-    parent = SubFactory(MidLevelCategoryOrmModelFactory)
+    parent = SubFactory(MidLevelCategoryOrmModelStub)
 
 
-class ProductReviewFactory(Factory):
+class ProductReviewStub(Factory):
     class Meta:
         model = ProductReview
 
@@ -202,7 +202,7 @@ class ProductReviewFactory(Factory):
     feedback: str = Faker("pystr", min_chars=1, max_chars=3000)
 
 
-class ProductReviewOrmModelFactory(Factory):
+class ProductReviewOrmModelStub(Factory):
     class Meta:
         model = ProductReviewOrmModel
 
@@ -220,7 +220,7 @@ def generate_dummy_image_url(name: str, width: int, height: int):
     return f"https://cdn.diystore.com/{name}.jpg?size={width}x{height}"
 
 
-class ProductPhotoUrlFactory(Factory):
+class ProductPhotoUrlStub(Factory):
     class Meta:
         model = ProductPhotoUrl
 
@@ -240,7 +240,7 @@ def generate_dummy_logo_url(o):
     return f"https://www.{name}.com/logo.png"
 
 
-class ProductVendorFactory(Factory):
+class ProductVendorStub(Factory):
     class Meta:
         model = ProductVendor
 
@@ -250,7 +250,7 @@ class ProductVendorFactory(Factory):
     logo_url = LazyAttribute(generate_dummy_logo_url)
 
 
-class ProductVendorOrmModelFactory(Factory):
+class ProductVendorOrmModelStub(Factory):
     class Meta:
         model = ProductVendorOrmModel
 
@@ -260,7 +260,7 @@ class ProductVendorOrmModelFactory(Factory):
     logo_url = LazyAttribute(generate_dummy_logo_url)
 
 
-class ProductFactory(Factory):
+class ProductStub(Factory):
     class Meta:
         model = Product
 
@@ -268,23 +268,23 @@ class ProductFactory(Factory):
     ean = Faker("bothify", text="#############")
     name = Faker("word")
     description = Faker("pystr", min_chars=1, max_chars=300)
-    price = SubFactory(ProductPriceFactory)
+    price = SubFactory(ProductPriceStub)
     quantity = Faker("pyint", min_value=0, max_value=1_000_000)
     creation_date = Faker("date_time_between", tzinfo=tz)
-    dimensions = SubFactory(ProductDimensionsFactory)
+    dimensions = SubFactory(ProductDimensionsStub)
     color = Faker("color_name")
     material = Faker("word")
     country_of_origin = Faker("country")
     warranty = Faker("pyint", min_value=0, max_value=5)
-    category = SubFactory(TerminalLevelProductCategoryFactory)
+    category = SubFactory(TerminalLevelProductCategoryStub)
     rating: Decimal = Faker(
         "pydecimal", right_digits=1, min_value=Decimal("0"), max_value=Decimal("5")
     )
-    photo_url = SubFactory(ProductPhotoUrlFactory)
-    vendor = SubFactory(ProductVendorFactory)
+    photo_url = SubFactory(ProductPhotoUrlStub)
+    vendor = SubFactory(ProductVendorStub)
 
 
-class ProductOrmModelFactory(Factory):
+class ProductOrmModelStub(Factory):
     class Meta:
         model = ProductOrmModel
 
@@ -316,23 +316,23 @@ class ProductOrmModelFactory(Factory):
     vendor_id = Faker("uuid4")
 
 
-class LoadedProductOrmModelFactory(ProductOrmModelFactory):
-    vat = LazyAttribute(lambda o: VatOrmModelFactory(id=o.vat_id))
+class LoadedProductOrmModelStub(ProductOrmModelStub):
+    vat = LazyAttribute(lambda o: VatOrmModelStub(id=o.vat_id))
     discount = LazyAttribute(
-        lambda o: DiscountOrmModelFactory(id=o.discount_id)
+        lambda o: DiscountOrmModelStub(id=o.discount_id)
         if o.discount_id is not None
         else None
     )
     category = LazyAttribute(
-        lambda o: TerminalCategoryOrmModelFactory(id=o.category_id)
+        lambda o: TerminalCategoryOrmModelStub(id=o.category_id)
     )
-    vendor = LazyAttribute(lambda o: ProductVendorOrmModelFactory(id=o.vendor_id))
+    vendor = LazyAttribute(lambda o: ProductVendorOrmModelStub(id=o.vendor_id))
     reviews = LazyAttribute(
-        lambda o: ProductReviewOrmModelFactory.build_batch(3, product_id=o.id)
+        lambda o: ProductReviewOrmModelStub.build_batch(3, product_id=o.id)
     )
 
 
-class ProductOrderingCriteriaFactory(Factory):
+class ProductOrderingCriteriaStub(Factory):
     class Meta:
         model = ProductOrderingCriteria
 
@@ -340,7 +340,7 @@ class ProductOrderingCriteriaFactory(Factory):
     type = Faker("random_element", elements=(1, 2))
 
 
-class GetProductsInputDTOFactory(Factory):
+class GetProductsInputDTOStub(Factory):
     class Meta:
         model = GetProductsInputDTO
 
@@ -349,11 +349,11 @@ class GetProductsInputDTOFactory(Factory):
     price_max = Faker("pydecimal", min_value=100, max_value=999, right_digits=2)
     rating_min = Faker("pydecimal", min_value=0, max_value=2, right_digits=1)
     rating_max = Faker("pydecimal", min_value=3, max_value=5, right_digits=1)
-    ordering_criteria = SubFactory(ProductOrderingCriteriaFactory)
+    ordering_criteria = SubFactory(ProductOrderingCriteriaStub)
     with_discounts_only = Faker("pybool")
 
 
-class ProductOutputDTOFactory(Factory):
+class ProductOutputDTOStub(Factory):
     class Meta:
         model = GetProductOutputDTO
 
@@ -390,7 +390,7 @@ class ProductOutputDTOFactory(Factory):
     vendor_name = Faker("word")
 
 
-class GetProductInputDTOFactory(Factory):
+class GetProductInputDTOStub(Factory):
     class Meta:
         model = GetProductInputDTO
 
@@ -531,7 +531,7 @@ def mock_products_repository():
 
 @pytest.fixture(scope="session")
 def product_stub_list():
-    return [ProductFactory() for _ in range(30)]
+    return [ProductStub() for _ in range(30)]
 
 
 @pytest.fixture(scope="session")
@@ -581,9 +581,9 @@ def product_controller(sqlite_json_infrasettings, mock_product_cache):
 
 
 def persist_new_products_and_return_category_id(no: int, session: Session, **kwargs):
-    category = TerminalCategoryOrmModelFactory()
+    category = TerminalCategoryOrmModelStub()
     category_id = category.id
-    new_products = LoadedProductOrmModelFactory.build_batch(
+    new_products = LoadedProductOrmModelStub.build_batch(
         no, category_id=category_id, category=category, **kwargs
     )
     with session as s:
@@ -596,13 +596,13 @@ def populate_db(no: int = 15, category_id: UUID = uuid4(), **kwargs):
     pc = ProductController()
     args = dict(**kwargs)
     if category_id:
-        category = TerminalCategoryOrmModelFactory(id=category_id)
+        category = TerminalCategoryOrmModelStub(id=category_id)
         args.update(category_id=category_id, category=category)
     products = []
     get_discount_id = lambda: choice((uuid4(), None))
     for _ in range(no):
         products.append(
-            LoadedProductOrmModelFactory(discount_id=get_discount_id(), **args)
+            LoadedProductOrmModelStub(discount_id=get_discount_id(), **args)
         )
     with pc._repo._session as s:
         s.add_all(products)

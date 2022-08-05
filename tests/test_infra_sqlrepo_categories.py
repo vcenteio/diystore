@@ -4,12 +4,12 @@ from uuid import UUID
 import pytest
 from sqlalchemy.orm import Session
 
-from .conftest import TopLevelCategoryOrmModelFactory
-from .conftest import MidLevelCategoryOrmModelFactory
-from .conftest import TerminalCategoryOrmModelFactory
-from .conftest import TopLevelProductCategoryFactory
-from .conftest import MidLevelProductCategoryFactory
-from .conftest import TerminalLevelProductCategoryFactory
+from .conftest import TopLevelCategoryOrmModelStub
+from .conftest import MidLevelCategoryOrmModelStub
+from .conftest import TerminalCategoryOrmModelStub
+from .conftest import TopLevelProductCategoryStub
+from .conftest import MidLevelProductCategoryStub
+from .conftest import TerminalLevelProductCategoryStub
 from diystore.infrastructure.repositories.sqlrepository import TopLevelCategoryOrmModel
 from diystore.infrastructure.repositories.sqlrepository import MidLevelCategoryOrmModel
 from diystore.infrastructure.repositories.sqlrepository import TerminalCategoryOrmModel
@@ -23,12 +23,12 @@ from diystore.domain.entities.product import TerminalLevelProductCategory
 
 def test_infra_sqlrepo_categories_id_is_necessary():
     with pytest.raises(TypeError):
-        TopLevelCategoryOrmModelFactory(id=None)
+        TopLevelCategoryOrmModelStub(id=None)
 
 
 def test_infra_sqlrepo_categories_id_uuid_obj_is_accepted(orm_session: Session):
     _id = uuid4()
-    t = TopLevelCategoryOrmModelFactory(id=_id)
+    t = TopLevelCategoryOrmModelStub(id=_id)
     orm_session.add(t)
     orm_session.commit()
     assert t.id == _id.bytes
@@ -36,7 +36,7 @@ def test_infra_sqlrepo_categories_id_uuid_obj_is_accepted(orm_session: Session):
 
 def test_infra_sqlrepo_categories_id_str_uuid_is_accepted(orm_session: Session):
     _id = str(uuid4())
-    t = TopLevelCategoryOrmModelFactory(id=_id)
+    t = TopLevelCategoryOrmModelStub(id=_id)
     orm_session.add(t)
     orm_session.commit()
     assert t.id == UUID(_id).bytes
@@ -44,7 +44,7 @@ def test_infra_sqlrepo_categories_id_str_uuid_is_accepted(orm_session: Session):
 
 def test_infra_sqlrepo_categories_id_bytes_uuid_is_accepted(orm_session: Session):
     _id = uuid4().bytes
-    t = TopLevelCategoryOrmModelFactory(id=_id)
+    t = TopLevelCategoryOrmModelStub(id=_id)
     orm_session.add(t)
     orm_session.commit()
     assert t.id == _id
@@ -52,7 +52,7 @@ def test_infra_sqlrepo_categories_id_bytes_uuid_is_accepted(orm_session: Session
 
 def test_infra_sqlrepo_categories_id_int_uuid_is_accepted(orm_session: Session):
     _id = uuid4().int
-    t = TopLevelCategoryOrmModelFactory(id=_id)
+    t = TopLevelCategoryOrmModelStub(id=_id)
     orm_session.add(t)
     orm_session.commit()
     assert t.id == UUID(int=_id).bytes
@@ -65,41 +65,41 @@ def test_infra_sqlrepo_categories_id_int_uuid_is_accepted(orm_session: Session):
 def test_infra_sqlrepo_categories_id_wrong_type(wrong_id):
     _id = wrong_id
     with pytest.raises(TypeError):
-        TopLevelCategoryOrmModelFactory(id=_id)
+        TopLevelCategoryOrmModelStub(id=_id)
 
 
 def test_infra_sqlrepo_categories_id_invalid_str_uuid(invalid_uuid_str):
     with pytest.raises(ValueError):
-        TopLevelCategoryOrmModelFactory(id=invalid_uuid_str)
+        TopLevelCategoryOrmModelStub(id=invalid_uuid_str)
 
 
 def test_infra_sqlrepo_categories_id_invalid_bytes_uuid():
     _id = uuid4().bytes
     with pytest.raises(ValueError):
-        TopLevelCategoryOrmModelFactory(id=_id[0:-2])
+        TopLevelCategoryOrmModelStub(id=_id[0:-2])
 
 
 def test_infra_sqlrepo_categories_id_invalid_int_uuid():
     with pytest.raises(ValueError):
-        TopLevelCategoryOrmModelFactory(id=100000000003242434123123123123123123123123)
+        TopLevelCategoryOrmModelStub(id=100000000003242434123123123123123123123123)
 
 
 @pytest.mark.parametrize(
     "wrong_children",
     (
-        TopLevelCategoryOrmModelFactory.build_batch(2),
-        TerminalCategoryOrmModelFactory.build_batch(2),
+        TopLevelCategoryOrmModelStub.build_batch(2),
+        TerminalCategoryOrmModelStub.build_batch(2),
     ),
 )
 def test_infra_sqlrepo_top_level_category_children_wrong_type(wrong_children):
-    t = TopLevelCategoryOrmModelFactory()
+    t = TopLevelCategoryOrmModelStub()
     with pytest.raises(TypeError):
         t.children = wrong_children
 
 
 def test_infra_sqlrepo_top_level_category_children_correct_type(orm_session: Session):
-    t = TopLevelCategoryOrmModelFactory()
-    t.children = MidLevelCategoryOrmModelFactory.build_batch(2)
+    t = TopLevelCategoryOrmModelStub()
+    t.children = MidLevelCategoryOrmModelStub.build_batch(2)
     orm_session.add(t)
     orm_session.commit()
     children = orm_session.get(TopLevelCategoryOrmModel, t.id).children
@@ -110,19 +110,19 @@ def test_infra_sqlrepo_top_level_category_children_correct_type(orm_session: Ses
 @pytest.mark.parametrize(
     "wrong_children",
     (
-        TopLevelCategoryOrmModelFactory.build_batch(2),
-        MidLevelCategoryOrmModelFactory.build_batch(2),
+        TopLevelCategoryOrmModelStub.build_batch(2),
+        MidLevelCategoryOrmModelStub.build_batch(2),
     ),
 )
 def test_infra_sqlrepo_mid_level_category_children_wrong_type(wrong_children):
-    m = MidLevelCategoryOrmModelFactory()
+    m = MidLevelCategoryOrmModelStub()
     with pytest.raises((TypeError, KeyError)):
         m.children = wrong_children
 
 
 def test_infra_sqlrepo_mid_level_category_children_correct_type(orm_session: Session):
-    m = MidLevelCategoryOrmModelFactory()
-    m.children = TerminalCategoryOrmModelFactory.build_batch(2)
+    m = MidLevelCategoryOrmModelStub()
+    m.children = TerminalCategoryOrmModelStub.build_batch(2)
     orm_session.add(m)
     orm_session.commit()
     children = orm_session.get(MidLevelCategoryOrmModel, m.id).children
@@ -132,17 +132,17 @@ def test_infra_sqlrepo_mid_level_category_children_correct_type(orm_session: Ses
 
 @pytest.mark.parametrize(
     "wrong_parent",
-    (MidLevelCategoryOrmModelFactory(), TerminalCategoryOrmModelFactory()),
+    (MidLevelCategoryOrmModelStub(), TerminalCategoryOrmModelStub()),
 )
 def test_infra_sqlrepo_mid_level_category_parent_wrong_type(wrong_parent):
-    m = MidLevelCategoryOrmModelFactory()
+    m = MidLevelCategoryOrmModelStub()
     with pytest.raises(TypeError):
         m.parent = wrong_parent
 
 
 def test_infra_sqlrepo_mid_level_category_parent_correct_type(orm_session: Session):
-    m = MidLevelCategoryOrmModelFactory()
-    m.parent = TopLevelCategoryOrmModelFactory()
+    m = MidLevelCategoryOrmModelStub()
+    m.parent = TopLevelCategoryOrmModelStub()
     orm_session.add(m)
     orm_session.commit()
     parent = orm_session.get(MidLevelCategoryOrmModel, m.id).parent
@@ -151,17 +151,17 @@ def test_infra_sqlrepo_mid_level_category_parent_correct_type(orm_session: Sessi
 
 @pytest.mark.parametrize(
     "wrong_parent",
-    (TopLevelCategoryOrmModelFactory(), TerminalCategoryOrmModelFactory()),
+    (TopLevelCategoryOrmModelStub(), TerminalCategoryOrmModelStub()),
 )
 def test_infra_sqlrepo_terminal_category_parent_wrong_type(wrong_parent):
-    c = TerminalCategoryOrmModelFactory()
+    c = TerminalCategoryOrmModelStub()
     with pytest.raises(TypeError):
         c.parent = wrong_parent
 
 
 def test_infra_sqlrepo_terminal_category_parent_correct_type(orm_session: Session):
-    c = TerminalCategoryOrmModelFactory()
-    c.parent = MidLevelCategoryOrmModelFactory()
+    c = TerminalCategoryOrmModelStub()
+    c.parent = MidLevelCategoryOrmModelStub()
     orm_session.add(c)
     orm_session.commit()
     parent = orm_session.get(TerminalCategoryOrmModel, c.id).parent
@@ -169,7 +169,7 @@ def test_infra_sqlrepo_terminal_category_parent_correct_type(orm_session: Sessio
 
 
 def test_infra_sqlrepo_top_level_category_to_domain_entity():
-    tlc_orm: TopLevelCategoryOrmModel = TopLevelCategoryOrmModelFactory()
+    tlc_orm: TopLevelCategoryOrmModel = TopLevelCategoryOrmModelStub()
     tlc_entity = tlc_orm.to_domain_entity()
     assert isinstance(tlc_entity, TopLevelProductCategory)
     assert tlc_entity.id.bytes == tlc_orm.id
@@ -179,7 +179,7 @@ def test_infra_sqlrepo_top_level_category_to_domain_entity():
 
 @pytest.mark.parametrize(
     "wrong_entity",
-    (MidLevelProductCategoryFactory(), TerminalLevelProductCategoryFactory()),
+    (MidLevelProductCategoryStub(), TerminalLevelProductCategoryStub()),
 )
 def test_infra_sqlrepo_top_level_category_from_domain_entity_wrong_type(wrong_entity):
     with pytest.raises(TypeError):
@@ -187,7 +187,7 @@ def test_infra_sqlrepo_top_level_category_from_domain_entity_wrong_type(wrong_en
 
 
 def test_infra_sqlrepo_top_level_category_from_domain_entity_correct_type():
-    tlc_entity: TopLevelProductCategory = TopLevelProductCategoryFactory()
+    tlc_entity: TopLevelProductCategory = TopLevelProductCategoryStub()
     tlc_orm = TopLevelCategoryOrmModel.from_domain_entity(tlc_entity)
     assert isinstance(tlc_orm, TopLevelCategoryOrmModel)
     assert tlc_orm.id == tlc_entity.id.bytes
@@ -196,8 +196,8 @@ def test_infra_sqlrepo_top_level_category_from_domain_entity_correct_type():
 
 
 def test_infra_sqlrepo_mid_level_category_to_domain_entity_fully_loaded():
-    parent = TopLevelCategoryOrmModelFactory()
-    mlc_orm: MidLevelCategoryOrmModel = MidLevelCategoryOrmModelFactory()
+    parent = TopLevelCategoryOrmModelStub()
+    mlc_orm: MidLevelCategoryOrmModel = MidLevelCategoryOrmModelStub()
     mlc_orm.parent = parent
     mlc_entity = mlc_orm.to_domain_entity()
     assert isinstance(mlc_entity, MidLevelProductCategory)
@@ -210,7 +210,7 @@ def test_infra_sqlrepo_mid_level_category_to_domain_entity_fully_loaded():
 
 @pytest.mark.parametrize(
     "wrong_entity",
-    (TopLevelProductCategoryFactory(), TerminalLevelProductCategoryFactory()),
+    (TopLevelProductCategoryStub(), TerminalLevelProductCategoryStub()),
 )
 def test_infra_sqlrepo_mid_level_category_from_domain_entity_wrong_type(wrong_entity):
     with pytest.raises(TypeError):
@@ -218,7 +218,7 @@ def test_infra_sqlrepo_mid_level_category_from_domain_entity_wrong_type(wrong_en
 
 
 def test_infra_sqlrepo_mid_level_category_from_domain_entity_correct_type():
-    mlc_entity: MidLevelProductCategory = MidLevelProductCategoryFactory()
+    mlc_entity: MidLevelProductCategory = MidLevelProductCategoryStub()
     mlc_orm = MidLevelCategoryOrmModel.from_domain_entity(mlc_entity)
     assert isinstance(mlc_orm, MidLevelCategoryOrmModel)
     assert mlc_orm.id == mlc_entity.id.bytes
@@ -228,9 +228,9 @@ def test_infra_sqlrepo_mid_level_category_from_domain_entity_correct_type():
 
 
 def test_infra_sqlrepo_terminal_level_category_to_domain_entity_fully_loaded():
-    parent = MidLevelCategoryOrmModelFactory()
-    parent.parent = TopLevelCategoryOrmModelFactory()
-    tmc_orm: TerminalCategoryOrmModel = TerminalCategoryOrmModelFactory()
+    parent = MidLevelCategoryOrmModelStub()
+    parent.parent = TopLevelCategoryOrmModelStub()
+    tmc_orm: TerminalCategoryOrmModel = TerminalCategoryOrmModelStub()
     tmc_orm.parent = parent
     tmc_entity = tmc_orm.to_domain_entity()
     assert isinstance(tmc_entity, TerminalLevelProductCategory)
@@ -244,7 +244,7 @@ def test_infra_sqlrepo_terminal_level_category_to_domain_entity_fully_loaded():
 
 @pytest.mark.parametrize(
     "wrong_entity",
-    (TopLevelProductCategoryFactory(), MidLevelProductCategoryFactory()),
+    (TopLevelProductCategoryStub(), MidLevelProductCategoryStub()),
 )
 def test_infra_sqlrepo_terminal_level_category_from_domain_entity_wrong_type(
     wrong_entity,
@@ -254,7 +254,7 @@ def test_infra_sqlrepo_terminal_level_category_from_domain_entity_wrong_type(
 
 
 def test_infra_sqlrepo_terminal_level_category_from_domain_entity_correct_type():
-    tmc_entity: TerminalLevelProductCategory = TerminalLevelProductCategoryFactory()
+    tmc_entity: TerminalLevelProductCategory = TerminalLevelProductCategoryStub()
     tmc_orm = TerminalCategoryOrmModel.from_domain_entity(tmc_entity)
     assert isinstance(tmc_orm, TerminalCategoryOrmModel)
     assert tmc_orm.id == tmc_entity.id.bytes

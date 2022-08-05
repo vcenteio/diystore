@@ -4,14 +4,14 @@ import pytest
 from sqlalchemy.orm import Session
 
 from .conftest import tz
-from .conftest import ProductReviewFactory
-from .conftest import ProductReviewOrmModelFactory
+from .conftest import ProductReviewStub
+from .conftest import ProductReviewOrmModelStub
 from diystore.domain.entities.product import ProductReview
 from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
 
 
 def test_infra_sqlrepo_to_domain_entity(orm_session: Session):
-    review_orm = ProductReviewOrmModelFactory()
+    review_orm = ProductReviewOrmModelStub()
     orm_session.add(review_orm)
     orm_session.commit()
     review_orm = orm_session.get(ProductReviewOrmModel, review_orm.id)
@@ -26,11 +26,11 @@ def test_infra_sqlrepo_to_domain_entity(orm_session: Session):
 
 def test_infra_sqlrepo_from_domain_entity_wrong_type():
     with pytest.raises(TypeError):
-        ProductReviewOrmModelFactory().from_domain_entity(1)
+        ProductReviewOrmModelStub().from_domain_entity(1)
 
 
 def test_infra_sqlrepo_from_domain_entity_correct_type(orm_session: Session):
-    review_entity = ProductReviewFactory()
+    review_entity = ProductReviewStub()
     review_orm = ProductReviewOrmModel.from_domain_entity(review_entity)
     assert isinstance(review_orm, ProductReviewOrmModel)
 
