@@ -5,9 +5,7 @@ from decimal import Decimal
 
 import pytest
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import OperationalError
 from factory import Factory
-
 
 from .conftest import TerminalCategoryOrmModelStub
 from .conftest import ProductOrmModelStub
@@ -20,23 +18,6 @@ from diystore.domain.entities.product import TopLevelProductCategory
 from diystore.domain.entities.product import ProductVendor
 from diystore.domain.entities.product import ProductReview
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
-
-
-@pytest.mark.parametrize("wrong_url", (1, [], b"a"))
-def test_infra_sqlrepo_repository_init_wrong_url_type(wrong_url):
-    with pytest.raises(TypeError):
-        SQLProductRepository(wrong_url)
-
-
-@pytest.mark.parametrize("wrong_url", ("abc", "123", "\/\/", ":", "/"))
-def test_infra_sqlrepo_repository_init_malformed_url(wrong_url):
-    with pytest.raises(ValueError):
-        SQLProductRepository(wrong_url)
-
-
-def test_infra_sqlrepo_repository_init_unreacheable_database_server():
-    with pytest.raises(OperationalError):
-        SQLProductRepository("postgresql://user:pass@localhost:1234/dummydb")
 
 
 def test_infra_sqlrepo_repository_get_product_wrong_id_type(

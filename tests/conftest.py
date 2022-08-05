@@ -38,7 +38,8 @@ from diystore.application.usecases.product import ProductOrderingCriteria
 from diystore.application.usecases.product import GetProductOutputDTO
 from diystore.application.usecases.product import ProductRepository
 from diystore.application.usecases.product import GetProductInputDTO
-from diystore.infrastructure.settings import InfraSettings
+from diystore.infrastructure.main.settings import InfraSettings
+from diystore.infrastructure.controllers.web.factories import ProductControllerFactory
 from diystore.infrastructure.repositories.sqlrepository import Base
 from diystore.infrastructure.repositories.sqlrepository import VatOrmModel
 from diystore.infrastructure.repositories.sqlrepository import DiscountOrmModel
@@ -51,6 +52,7 @@ from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
 from diystore.infrastructure.controllers.web import ProductController
 from diystore.infrastructure.cache.interfaces import ProductCache
+from diystore.infrastructure.controllers.presenters import generate_json_presentation
 
 
 tz = timezone("UTC")
@@ -549,17 +551,9 @@ def orm_session(session_factory):
     session.close()
 
 
-@pytest.fixture()
-def sqlrepo():
-    return SQLProductRepository(db_url="sqlite:///:memory:")
-
-
 @pytest.fixture(scope="session")
-def sqlite_json_infrasettings():
-    settings = InfraSettings(
-        repo=dict(type="sql", db_url="sqlite:///:memory:"), presentation_type="json"
-    )
-    return settings
+def sqlrepo():
+    return SQLProductRepository(scheme="sqlite", host="/:memory:")
 
 
 @pytest.fixture(scope="session")
@@ -576,8 +570,8 @@ def mock_product_cache():
 
 
 @pytest.fixture(scope="session")
-def product_controller(sqlite_json_infrasettings, mock_product_cache):
-    return ProductController(sqlite_json_infrasettings, mock_product_cache)
+def product_controller(sqlrepo, mock_product_cache) -> ProductController:
+    return ProductControllerFactory(repo=sqlrepo, cache=mock_product_cache)
 
 
 def persist_new_products_and_return_category_id(no: int, session: Session, **kwargs):
@@ -593,7 +587,7 @@ def persist_new_products_and_return_category_id(no: int, session: Session, **kwa
 
 
 def populate_db(no: int = 15, category_id: UUID = uuid4(), **kwargs):
-    pc = ProductController()
+    pc = ProductControllerFactory()
     args = dict(**kwargs)
     if category_id:
         category = TerminalCategoryOrmModelStub(id=category_id)
@@ -611,6 +605,6 @@ def populate_db(no: int = 15, category_id: UUID = uuid4(), **kwargs):
 
 
 def clean_db():
-    pc = ProductController()
+    pc = ProductControllerFactory()
     Base.metadata.drop_all(pc._repo._engine)
     Base.metadata.create_all(pc._repo._engine)

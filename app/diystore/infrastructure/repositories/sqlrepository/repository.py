@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import create_engine
 from sqlalchemy.exc import ArgumentError
+from pydantic import AnyUrl
 
 from .models import Base
 from .models.product import ProductOrmModel
@@ -20,16 +21,26 @@ class SQLProductRepository(ProductRepository):
     min_rating = Decimal("0")
     max_rating = Decimal("5")
 
-    @staticmethod
-    def _validate_url(url):
-        if not isinstance(url, str):
-            raise TypeError(f"wrong type for url: {type(url).__name__}")
-        return url
-
-    def __init__(self, db_url: str, base=Base):
-        self._db_url = self._validate_url(db_url)
+    def __init__(
+        self,
+        scheme: str,
+        host: str,
+        port: int = None,
+        user: str = None,
+        password: str = None,
+        dbname: str = None,
+        base=Base,
+    ):
+        db_url = AnyUrl.build(
+            scheme=scheme,
+            host=host,
+            port=str(port) if port is not None else None,
+            user=user,
+            password=password,
+            path=f"/{dbname}" if dbname is not None else None,
+        )
         try:
-            self._engine = create_engine(self._db_url)
+            self._engine = create_engine(db_url)
         except ArgumentError:
             raise ValueError(f"invalid url passed as argument: {db_url}")
         base.metadata.create_all(self._engine)

@@ -3,10 +3,16 @@ from pydantic import BaseSettings
 
 class RepositorySettings(BaseSettings):
     type: str
-    db_url: str
+    scheme: str
+    host: str
+    port: int
+    user: str
+    password: str
+    dbname: str
 
 
 class CacheSettings(BaseSettings):
+    type: str
     host: str
     port: int
     password: str
@@ -23,6 +29,3 @@ class InfraSettings(BaseSettings):
         env_file = ".env"
         env_prefix = "app_"
         env_nested_delimiter = "__"
-
-
-infra_settings = InfraSettings()

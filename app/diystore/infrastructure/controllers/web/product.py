@@ -1,18 +1,14 @@
 from typing import Optional
+from typing import Callable
 from functools import wraps
 
 from pydantic import ValidationError
 
-from .exceptions import UnprocessableEntity
 from .exceptions import InvalidQueryArgument
 from .exceptions import InvalidProductID
 from .exceptions import ProductNotFound
 from ...cache.interfaces import ProductCache
-from ...cache.redis_cache import RedisProductRepresentationCache
-from ..presenters import generate_json_presentation
-from ...repositories.sqlrepository import SQLProductRepository
-from ...settings import infra_settings
-from ...settings import InfraSettings
+from ....application.usecases.product import ProductRepository
 from ....application.usecases.product import get_product_use_case
 from ....application.usecases.product import get_products_use_case
 from ....application.usecases.product import GetProductInputDTO
@@ -23,49 +19,13 @@ from ....application.usecases.product import OrderingType
 from ....application.dto import DTO
 
 
-cache_settings = infra_settings.cache
-
-
-# temporary solution until the Dependency Injection provider is implemented
-cache = RedisProductRepresentationCache(
-    host=cache_settings.host,
-    port=cache_settings.port,
-    db=cache_settings.db,
-    password=cache_settings.password,
-    ttl=cache_settings.ttl,
-)
-
-
 class ProductController:
-
-    # temporary solution until the Dependency Injection provider is implemented
-    _repo_map = {"sql": SQLProductRepository}
-    _presenter_map = {"json": generate_json_presentation}
-
     def __init__(
-        self, settings: InfraSettings = infra_settings, cache: ProductCache = cache
+        self, repo: ProductRepository, cache: ProductCache, presenter: Callable
     ):
-        self._settings = settings
+        self._repo = repo
         self._cache = cache
-        self._configure_repository()
-        self._configure_presenter()
-
-    def _configure_repository(self):
-        try:
-            repo = self._repo_map.get(self._settings.repo.type)
-            self._repo = repo(db_url=self._settings.repo.db_url)
-        except KeyError:
-            raise ValueError(
-                f"unknown repository type setting: {self._settings.repo.type}"
-            )
-
-    def _configure_presenter(self):
-        try:
-            self._presenter = self._presenter_map.get(self._settings.presentation_type)
-        except KeyError:
-            raise ValueError(
-                f"unknown presentation type {self._settings.presentation_type}"
-            )
+        self._presenter = presenter
 
     @staticmethod
     def _cache_one(f):

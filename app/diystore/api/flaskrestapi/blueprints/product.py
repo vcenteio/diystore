@@ -6,13 +6,14 @@ from flask import request
 
 from ...api_settings import web_api_settings
 from ....infrastructure.controllers.web import ProductController
+from ....infrastructure.controllers.web.factories import ProductControllerFactory
 from ....infrastructure.controllers.web.exceptions import BadRequest
 from ....infrastructure.controllers.web.exceptions import UnprocessableEntity
 from ....infrastructure.controllers.web.exceptions import ParameterMissing
 
 
 bp = Blueprint("product", __name__)
-product = ProductController()
+product: ProductController = ProductControllerFactory()
 
 
 @bp.errorhandler(BadRequest)

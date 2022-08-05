@@ -63,13 +63,6 @@ def test_domain_product_ean_int_is_converted_to_str(faker):
     assert p.ean == str(int_ean)
 
 
-# def test_domain_product_ean_bytes_is_converted_to_str(faker):
-#     bytes_ean = faker.bothify(text="#############").encode()
-#     with pytest.raises(ValidationError) as e:
-#         ProductFactory(ean=bytes_ean)
-#     assert e.match("ean must be str or int")
-
-
 @pytest.mark.parametrize("wrong_name", (123, b"abc", [], dict(), {}, (), type))
 def test_domain_product_name_wrong_type(wrong_name):
     with pytest.raises(ValidationError) as e:
@@ -174,6 +167,7 @@ def test_domain_product_get_discount_rate_with_discount():
     discount_rate = price.get_discount_rate()
     p = ProductStub(price=price)
     assert p.get_discount_rate() == discount_rate
+
 
 def test_domain_product_get_discount_rate_no_discount():
     price: ProductPrice = ProductPriceStub(discount=None)
@@ -541,9 +535,7 @@ def test_domain_product_add_client_review_successfully_added(rating, reviews):
 
 
 def test_domain_product_add_client_review_rating_is_updated():
-    product: Product = ProductStub(
-        rating=1, reviews=[ProductReviewStub(rating=1)]
-    )
+    product: Product = ProductStub(rating=1, reviews=[ProductReviewStub(rating=1)])
     previous_rating = product.get_client_rating()
     product.add_client_review(ProductReviewStub(rating=5))
     assert product.rating == product.calculate_rating()
