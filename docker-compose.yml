@@ -43,19 +43,21 @@ services:
       - ${REDIS_INSIGHT_PORT}:${REDIS_INSIGHT_PORT}
     volumes:
       - redis_insight_data:/db
+    depends_on:
+      - redis
 
   app:
     build: ./app
     restart: always
     ports:
-      - ${FLASK_RUN_PORT}:${FLASK_RUN_PORT}
+      - ${PORT}:${PORT}
     volumes:
       - ./app:/app
     environment:
-      - FLASK_APP=${FLASK_APP}
-      - FLASK_ENV=${FLASK_ENV}
-      - FLASK_RUN_HOST=${FLASK_RUN_HOST}
-      - FLASK_RUN_PORT=${FLASK_RUN_PORT}
+      - HOST=${HOST}
+      - PORT=${PORT}
+      - WEB_CONCURRENCY=${WEB_CONCURRENCY}
+      - WEB_RELOAD=${WEB_RELOAD}
       - APP_REPO__TYPE=${APP_REPO__TYPE}
       - APP_REPO__SCHEME=${APP_REPO__SCHEME}
       - APP_REPO__HOST=${APP_REPO__HOST}

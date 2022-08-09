@@ -6,6 +6,6 @@ EXPOSE 5050
 
 COPY . /app/
 
-RUN pip install poetry && poetry install --no-root --no-dev;
+RUN /bin/bash -c "pip install poetry && poetry export > requirements.txt && pip install -r requirements.txt;"
 
-CMD ["poetry", "run", "flask", "run"]
+CMD gunicorn 'diystore.api.flaskrestapi:create_app()'
