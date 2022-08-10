@@ -42,7 +42,7 @@ def create_response_with_client_side_caching(
 @bp.get("/product/<string:product_id>")
 def get_product(product_id: str):
     representation = product.get_one(Markup.escape(product_id))
-    return Response(representation, mimetype="application/json")
+    return Response(representation, mimetype=settings.mimetype)
 
 
 # allowed GET /products endpoint parameters
@@ -75,4 +75,4 @@ def _get_representation_for_get_products_endpoint(args: dict):
 def get_products():
     args = _parse_args_for_get_products_endpoint(request.args)
     representation = _get_representation_for_get_products_endpoint(args)
-    return Response(representation, mimetype="application/json")
+    return Response(representation, mimetype=settings.mimetype)
