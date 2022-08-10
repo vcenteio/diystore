@@ -51,6 +51,7 @@ def _setup_caches(ioc: IoCContainer, settings: InfraSettings):
             password=redis_url.password,
             db=redis_url.path.strip("/"),
             ttl=settings.cache.redis_ttl,
+            ssl=redis_url.scheme == "rediss",
         )
         return
     raise ValueError(f"no cache url configured")

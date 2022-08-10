@@ -12,10 +12,11 @@ class RedisProductRepresentationCache(ProductCache):
         port: int,
         db: int = 0,
         password: str = None,
+        ssl: bool = True,
         ttl: int = 360,
     ):
         self._conn = Redis(
-            host=host, port=port, db=db, password=password, decode_responses=True
+            host=host, port=port, db=db, password=password, decode_responses=True, ssl=ssl, ssl_cert_reqs=None
         )
         self._ttl = ttl
 
