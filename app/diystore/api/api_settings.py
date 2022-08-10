@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import BaseSettings
 
 
@@ -8,7 +9,7 @@ class CacheControlSettings(BaseSettings):
 class WebAPISettings(BaseSettings):
     cache_control: CacheControlSettings
     add_etag: bool
-    development: bool = False
+    env: Literal["production", "development"] = "development"
 
     class Config:
         env_file = ".env"
