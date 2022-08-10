@@ -8,8 +8,8 @@ class CacheControlSettings(BaseSettings):
 
 class WebAPISettings(BaseSettings):
     cache_control: CacheControlSettings
-    add_etag: bool
-    env: Literal["production", "development"] = "development"
+    add_etag: bool = True
+    env: Literal["production", "development"] = "production"
 
     class Config:
         env_file = ".env"
