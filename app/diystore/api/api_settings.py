@@ -8,11 +8,9 @@ class CacheControlSettings(BaseSettings):
 class WebAPISettings(BaseSettings):
     cache_control: CacheControlSettings
     add_etag: bool
+    development: bool = False
 
     class Config:
         env_file = ".env"
-        env_prefix = "app_api_"
+        env_prefix = "api_"
         env_nested_delimiter = "__"
-
-
-web_api_settings = WebAPISettings()

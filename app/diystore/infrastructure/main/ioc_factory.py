@@ -1,3 +1,7 @@
+import re
+
+from sqlalchemy.dialects import __all__ as supported_sqla_dialects
+
 from .settings import InfraSettings
 from .ioc import IoCContainer
 from ..cache.interfaces import ProductCache
@@ -7,45 +11,57 @@ from ..repositories.sqlrepository import SQLProductRepository
 from ...application.usecases.product import ProductRepository
 
 
+def _normalize_sql_repo_url_scheme(
+    scheme: str, supported_dialects: tuple = supported_sqla_dialects
+):
+    for dialect in supported_dialects:
+        if re.match(scheme, dialect):
+            return dialect
+    return None
+
+
 def _setup_repos(ioc: IoCContainer, settings: InfraSettings):
-    if settings.repo.type == "sql":
-        rs = settings.repo
+    db_url = settings.repo.url
+    sql_scheme = _normalize_sql_repo_url_scheme(db_url.scheme)
+
+    if sql_scheme is not None:
+        db_url.scheme = sql_scheme
         ioc.register(
             ProductRepository,
             SQLProductRepository,
-            scheme=rs.scheme,
-            host=rs.host,
-            port=rs.port,
-            user=rs.user,
-            password=rs.password,
-            dbname=rs.dbname,
+            scheme=db_url.scheme,
+            host=db_url.host,
+            port=db_url.port,
+            user=db_url.user,
+            password=db_url.password,
+            dbname=db_url.path.strip("/"),
         )
-    else:
-        raise ValueError(f"unknown repo type {settings.repo.type}")
+        return
+    raise ValueError(f"unknown url scheme {db_url.scheme}")
 
 
 def _setup_caches(ioc: IoCContainer, settings: InfraSettings):
-    if settings.cache.type == "redis":
-        cs = settings.cache
+    redis_url = settings.cache.redis_url
+    if redis_url is not None:
         ioc.register(
             ProductCache,
             RedisProductRepresentationCache,
-            host=cs.host,
-            port=cs.port,
-            db=cs.db,
-            password=cs.password,
-            ttl=cs.ttl,
+            host=redis_url.host,
+            port=redis_url.port,
+            password=redis_url.password,
+            db=redis_url.path.strip("/"),
+            ttl=settings.cache.redis_ttl,
         )
-    else:
-        raise ValueError(f"unknown cache type {settings.cache.type}")
+        return
+    raise ValueError(f"no cache url configured")
 
 
 def _setup_presenters(ioc: IoCContainer, settings: InfraSettings):
-    pt = settings.presentation_type
-    if pt == "json":
+    rt = settings.representation_type
+    if rt == "json":
         ioc.register_function("presenter", generate_json_presentation)
-    else:
-        raise ValueError(f"unknown presentation type {pt}")
+        return
+    raise ValueError(f"unknown representation type {rt}")
 
 
 def create_ioc_container(settings: InfraSettings = InfraSettings()):

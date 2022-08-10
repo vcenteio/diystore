@@ -5,12 +5,12 @@ services:
     image: postgres:latest
     restart: always
     ports:
-      - ${APP_REPO__PORT}:${APP_REPO__PORT}
+      - ${POSTGRES_PORT}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=${APP_REPO__USER}
-      - POSTGRES_PASSWORD=${APP_REPO__PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -29,9 +29,9 @@ services:
   redis:
     image: redis:7.0.4
     restart: always
-    command: redis-server ${REDIS_CONF_PATH} --requirepass ${APP_CACHE__PASSWORD}
+    command: redis-server ${REDIS_CONF_PATH} --requirepass ${REDIS_PASSWORD}
     ports:
-      - ${APP_CACHE__PORT}:${APP_CACHE__PORT}
+      - ${REDIS_PORT}
     volumes:
       - redis_data:/var/lib/redis
       - redis_conf:${REDIS_CONF_PATH}
@@ -58,22 +58,13 @@ services:
       - PORT=${PORT}
       - WEB_CONCURRENCY=${WEB_CONCURRENCY}
       - WEB_RELOAD=${WEB_RELOAD}
-      - APP_REPO__TYPE=${APP_REPO__TYPE}
-      - APP_REPO__SCHEME=${APP_REPO__SCHEME}
-      - APP_REPO__HOST=${APP_REPO__HOST}
-      - APP_REPO__PORT=${APP_REPO__PORT}
-      - APP_REPO__USER=${APP_REPO__USER}
-      - APP_REPO__PASSWORD=${APP_REPO__PASSWORD}
-      - APP_REPO__DBNAME=${APP_REPO__DBNAME}
-      - APP_PRESENTATION_TYPE=${APP_PRESENTATION_TYPE}
-      - APP_API_CACHE_CONTROL__MAX_AGE=${APP_API_CACHE_CONTROL__MAX_AGE}
-      - APP_API_ADD_ETAG=${APP_API_ADD_ETAG}
-      - APP_CACHE__TYPE=${APP_CACHE__TYPE}
-      - APP_CACHE__HOST=${APP_CACHE__HOST}
-      - APP_CACHE__PORT=${APP_CACHE__PORT}
-      - APP_CACHE__PASSWORD=${APP_CACHE__PASSWORD}
-      - APP_CACHE__DB=${APP_CACHE__DB}
-      - APP_CACHE__TTL=${APP_CACHE__TTL}
+      - API_CACHE_CONTROL__MAX_AGE=${API_CACHE_CONTROL__MAX_AGE}
+      - API_ADD_ETAG=${API_ADD_ETAG}
+      - REPRESENTATION_TYPE=${REPRESENTATION_TYPE}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_DB=0
+      - REDIS_TTL=60
     depends_on:
       - pg_db
       - redis

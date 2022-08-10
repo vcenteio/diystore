@@ -4,7 +4,7 @@ from flask import jsonify
 from flask import Response
 from flask import request
 
-from ...api_settings import web_api_settings
+from ...api_settings import WebAPISettings
 from ....infrastructure.controllers.web import ProductController
 from ....infrastructure.controllers.web.factories import ProductControllerFactory
 from ....infrastructure.controllers.web.exceptions import BadRequest
@@ -14,6 +14,7 @@ from ....infrastructure.controllers.web.exceptions import ParameterMissing
 
 bp = Blueprint("product", __name__)
 product: ProductController = ProductControllerFactory()
+settings = WebAPISettings()
 
 
 @bp.errorhandler(BadRequest)
@@ -27,8 +28,8 @@ def _create_response_with_client_side_caching(
     representation: str,
     *,
     mimetype: str = "application/json",
-    add_etag: bool = web_api_settings.add_etag,
-    cache_control_max_age: int = web_api_settings.cache_control.max_age
+    add_etag: bool = settings.add_etag,
+    cache_control_max_age: int = settings.cache_control.max_age
 ):
     response = Response(representation, mimetype=mimetype)
     response.cache_control.max_age = cache_control_max_age
