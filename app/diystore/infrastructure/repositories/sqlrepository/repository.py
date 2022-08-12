@@ -11,6 +11,7 @@ from pydantic import AnyUrl
 
 from .models import Base
 from .models.product import ProductOrmModel
+from .models.categories import TopLevelCategoryOrmModel
 from ....domain.entities.product import Product
 from ....domain.entities.product import TopLevelProductCategory
 from ....application.usecases.product import ProductRepository
@@ -198,5 +199,13 @@ class SQLProductRepository(ProductRepository):
             descending=descending,
         )
 
-    def get_top_level_category(self, category_id: UUID) -> TopLevelProductCategory:
-        pass
+    def get_top_level_category(
+        self, category_id: UUID
+    ) -> Optional[TopLevelProductCategory]:
+        encoded_id = self._encode_uuid(category_id)
+        with self._session as s:
+            orm_category: TopLevelCategoryOrmModel = s.get(
+                TopLevelCategoryOrmModel, encoded_id
+            )
+            domain_entity = orm_category.to_domain_entity() if orm_category else None
+        return domain_entity

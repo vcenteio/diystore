@@ -7,6 +7,8 @@ import pytest
 from sqlalchemy.orm import Session
 from factory import Factory
 
+from .conftest import TopLevelProductCategoryStub
+from .conftest import TopLevelCategoryOrmModelStub
 from .conftest import TerminalCategoryOrmModelStub
 from .conftest import ProductOrmModelStub
 from .conftest import LoadedProductOrmModelStub
@@ -256,3 +258,46 @@ def test_infra_sqlrepo_get_products_ordering_by_price_ascending(
     products_prices = [p.get_base_price() for p in products]
     expected_result = sorted(products_prices)
     assert products_prices == expected_result
+
+
+def test_infra_sqlrepo_get_top_level_category_wrong_id_type(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a invalid id type
+    # WHEN a search for a top level category is made with such id
+    # THEN a error is raised
+    with pytest.raises(TypeError):
+        sqlrepo.get_top_level_category(1)
+
+
+def test_infra_sqlrepo_get_top_level_category_non_existent_category(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a valid id not related to any top level category
+    non_existent_id = uuid1()
+
+    # WHEN a search for a top level category is made with such id
+    result = sqlrepo.get_top_level_category(non_existent_id)
+
+    # THEN None is returned
+    assert result is None
+
+
+def test_infra_sqlrepo_get_top_level_category_existent_category(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a valid id associated with an existing category
+    cat = TopLevelCategoryOrmModelStub()
+    _id, name, description = UUID(bytes=cat.id), cat.name, cat.description
+
+    with sqlrepo._session as s:
+        s.add(cat)
+        s.commit()
+
+    # WHEN a search for a top level category is made with such id
+    retrieved_category = sqlrepo.get_top_level_category(_id)
+
+    # THEN the correct category is returned
+    assert retrieved_category.id == _id
+    assert retrieved_category.name == name
+    assert retrieved_category.description == description
