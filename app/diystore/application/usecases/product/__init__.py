@@ -8,3 +8,6 @@ from .getproducts import get_products_use_case
 from .getproduct import GetProductOutputDTO
 from .getproduct import GetProductInputDTO
 from .getproduct import get_product_use_case
+from .gettoplevelcategory import GetTopLevelCategoryInputDTO
+from .gettoplevelcategory import GetTopLevelCategoryOutputDTO
+from .gettoplevelcategory import get_top_level_category

@@ -4,6 +4,7 @@ from decimal import Decimal
 from uuid import UUID
 
 from ....domain.entities.product import Product
+from ....domain.entities.product import TopLevelProductCategory
 
 
 class ProductRepository(ABC):
@@ -47,4 +48,8 @@ class ProductRepository(ABC):
         with_discounts_only: bool = False,
         descending: bool = False,
     ) -> list[Product]:
+        ...
+
+    @abstractmethod
+    def get_top_level_category(self, category_id: UUID) -> TopLevelProductCategory:
         ...

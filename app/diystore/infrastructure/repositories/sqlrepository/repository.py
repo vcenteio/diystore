@@ -12,6 +12,7 @@ from pydantic import AnyUrl
 from .models import Base
 from .models.product import ProductOrmModel
 from ....domain.entities.product import Product
+from ....domain.entities.product import TopLevelProductCategory
 from ....application.usecases.product import ProductRepository
 
 
@@ -196,3 +197,6 @@ class SQLProductRepository(ProductRepository):
             orderby_attr=orderby_attr,
             descending=descending,
         )
+
+    def get_top_level_category(self, category_id: UUID) -> TopLevelProductCategory:
+        pass
