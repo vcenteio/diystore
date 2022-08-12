@@ -39,7 +39,7 @@ def create_response_with_client_side_caching(
     return response
 
 
-@bp.get("/product/<string:product_id>")
+@bp.get("/products/<string:product_id>")
 def get_product(product_id: str):
     representation = product.get_one(Markup.escape(product_id))
     return Response(representation, mimetype=settings.mimetype)
