@@ -48,9 +48,9 @@ class ParameterMissing(UnprocessableEntity):
         super().__init__(self.msg)
 
 
-# 401 Not Found Exceptions
+# 404 Not Found Exceptions
 class NotFound(BadRequest):
-    code = 401
+    code = 404
 
     def __init__(self, msg):
         super().__init__(msg)
