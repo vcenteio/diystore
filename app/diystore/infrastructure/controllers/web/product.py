@@ -1,6 +1,7 @@
 from typing import Optional
 from typing import Callable
 from functools import wraps
+from functools import partial
 
 from pydantic import ValidationError
 
@@ -8,6 +9,7 @@ from .exceptions import InvalidQueryArgument
 from .exceptions import InvalidProductID
 from .exceptions import ProductNotFound
 from ...cache.interfaces import ProductCache
+from ....application.dto import DTO
 from ....application.usecases.product import ProductRepository
 from ....application.usecases.product import get_product_use_case
 from ....application.usecases.product import get_products_use_case
@@ -24,30 +26,24 @@ class ProductController:
         self, repo: ProductRepository, cache: ProductCache, presenter: Callable
     ):
         self._repo = repo
-        self._cache = cache
+        self._cache_repo = cache
         self._presenter = presenter
 
-    @staticmethod
-    def _cache_one(f):
-        @wraps(f)
-        def wrapper(self: "ProductController", product_id: str):
-            cached_repr = self._cache.get_one(product_id)
-            if cached_repr is None:
-                new_repr = f(self, product_id)
-                self._cache.set_one(product_id, new_repr)
-                return new_repr
-            return cached_repr
-
-        return wrapper
+    def _select_cache_methods(self, args, kwargs):
+        c = self._cache_repo
+        if len(kwargs):
+            return partial(c.get_many, **kwargs), partial(c.set_many, **kwargs)
+        return partial(c.get_one, _id=args[0]), partial(c.set_one, _id=args[0])
 
     @staticmethod
-    def _cache_many(f):
+    def _cache(f):
         @wraps(f)
-        def wrapper(self: "ProductController", **kwargs):
-            cached_repr = self._cache.get_many(kwargs)
+        def wrapper(self: "ProductController", *args, **kwargs):
+            get_method, set_method = self._select_cache_methods(args, kwargs)
+            cached_repr = get_method()
             if cached_repr is None:
-                new_repr = f(self, **kwargs)
-                self._cache.set_many(kwargs, new_repr)
+                new_repr = f(self, **kwargs) if len(kwargs) else f(self, args[0])
+                set_method(representation=new_repr)
                 return new_repr
             return cached_repr
 
@@ -56,7 +52,7 @@ class ProductController:
     def _generate_presentation(self, output_dto: DTO) -> str:
         return self._presenter(output_dto)
 
-    @_cache_one
+    @_cache
     def get_one(self, product_id: str) -> Optional[str]:
         try:
             input_dto = GetProductInputDTO(product_id=product_id)
@@ -112,7 +108,7 @@ class ProductController:
             loc = e.errors()[0].get("loc")[0]
             raise InvalidQueryArgument(None, loc)
 
-    @_cache_many
+    @_cache
     def get_many(
         self,
         *,

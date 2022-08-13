@@ -1,4 +1,5 @@
 from typing import Optional
+from hashlib import sha1
 
 from redis import Redis
 
@@ -20,32 +21,32 @@ class RedisProductRepresentationCache(ProductCache):
         )
         self._ttl = ttl
 
-    def _generate_product_key(self, product_id: str):
-        return f"product:{product_id}"
+    def _generate_document_key(self, _id: str):
+        return sha1(_id.encode()).hexdigest()
 
-    def _generate_products_key(self, args: dict):
-        return ":".join(v for v in ("products", *args.values()))
+    def _generate_collection_key(self, args: dict):
+        return sha1(":".join(v for v in args.values()).encode()).hexdigest()
 
-    def get_one(self, product_id: str) -> Optional[str]:
-        key = self._generate_product_key(product_id)
+    def get_one(self, _id: str) -> Optional[str]:
+        key = self._generate_document_key(_id)
         return self._conn.get(key)
 
-    def get_many(self, args: dict) -> Optional[str]:
-        key = self._generate_products_key(args)
+    def get_many(self, **args: dict) -> Optional[str]:
+        key = self._generate_collection_key(args)
         return self._conn.get(key)
 
-    def set_one(self, product_id: str, representation: str):
-        key = self._generate_product_key(product_id)
+    def set_one(self, *, representation: str, _id: str):
+        key = self._generate_document_key(_id)
         return self._conn.set(key, representation, ex=self._ttl)
 
-    def set_many(self, args: dict, representation: str):
-        key = self._generate_products_key(args)
+    def set_many(self, *, representation: str, **args: dict):
+        key = self._generate_collection_key(args)
         return self._conn.set(key, representation, ex=self._ttl)
 
-    def del_one(self, product_id: str):
-        key = self._generate_product_key(product_id)
+    def del_one(self, _id: str):
+        key = self._generate_document_key(_id)
         self._conn.delete(key)
 
-    def del_many(self, args: dict):
-        key = self._generate_products_key(args)
+    def del_many(self, **args: dict):
+        key = self._generate_collection_key(args)
         self._conn.delete(key)
