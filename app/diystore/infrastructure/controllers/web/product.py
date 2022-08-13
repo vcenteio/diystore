@@ -7,7 +7,9 @@ from pydantic import ValidationError
 
 from .exceptions import InvalidQueryArgument
 from .exceptions import InvalidProductID
+from .exceptions import InvalidCategoryID
 from .exceptions import ProductNotFound
+from .exceptions import TopCategoryNotFound
 from ...cache.interfaces import ProductCache
 from ....application.dto import DTO
 from ....application.usecases.product import ProductRepository
@@ -18,7 +20,9 @@ from ....application.usecases.product import GetProductsInputDTO
 from ....application.usecases.product import ProductOrderingCriteria
 from ....application.usecases.product import OrderingProperty
 from ....application.usecases.product import OrderingType
-from ....application.dto import DTO
+from ....application.usecases.product import get_top_level_category
+from ....application.usecases.product import GetTopLevelCategoryInputDTO
+from ....application.usecases.product import GetTopLevelCategoryOutputDTO
 
 
 class ProductController:
@@ -132,4 +136,16 @@ class ProductController:
             with_discounts_only,
         )
         output_dto = get_products_use_case(input_dto, self._repo)
+        return self._generate_presentation(output_dto)
+
+
+    @_cache
+    def get_top_category(self, category_id: str) -> Optional[str]:
+        try:
+            input_dto = GetTopLevelCategoryInputDTO(category_id=category_id)
+        except ValidationError:
+            raise InvalidCategoryID(_id=category_id)
+        output_dto = get_top_level_category(input_dto, self._repo)
+        if output_dto is None:
+            raise TopCategoryNotFound(_id=category_id)
         return self._generate_presentation(output_dto)

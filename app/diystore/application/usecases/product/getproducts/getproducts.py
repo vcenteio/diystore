@@ -35,7 +35,7 @@ def _select_correct_repository_method(
 
 def _is_descending_order(input_dto: GetProductsInputDTO):
     criteria = input_dto.ordering_criteria
-    return criteria and criteria.type is OrderingType.DESCESDING
+    return criteria.type is OrderingType.DESCESDING
 
 
 def _call_method_with_correct_arguments(
