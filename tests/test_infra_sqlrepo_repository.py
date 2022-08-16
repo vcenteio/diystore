@@ -301,3 +301,31 @@ def test_infra_sqlrepo_get_top_level_category_existent_category(
     assert retrieved_category.id == _id
     assert retrieved_category.name == name
     assert retrieved_category.description == description
+
+
+def test_infra_sqlrepo_get_top_level_category_no_categories(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a repository with no top categories
+    # WHEN a search for a top category is made
+    result = sqlrepo.get_top_level_categories()
+
+    # THEN no top categories are returned
+    assert result == ()
+
+
+def test_infra_sqlrepo_get_top_level_category_existent_categories(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a repository with existing top categories
+    orm_categories = TopLevelCategoryOrmModelStub.build_batch(3)
+    expected = tuple(c.to_domain_entity() for c in orm_categories)
+    with sqlrepo._session as s:
+        s.add_all(orm_categories)
+        s.commit()
+    
+    # WHEN a search for all top categories is made
+    retrieved_categories = sqlrepo.get_top_level_categories()
+
+    # THEN all the top categories should be returned
+    assert retrieved_categories == expected

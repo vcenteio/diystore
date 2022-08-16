@@ -211,4 +211,6 @@ class SQLProductRepository(ProductRepository):
         return domain_entity
 
     def get_top_level_categories(self) -> tuple[TopLevelProductCategory]:
-        pass
+        with self._session as s:
+            categories = s.query(TopLevelCategoryOrmModel).all()
+        return tuple(c.to_domain_entity() for c in categories)

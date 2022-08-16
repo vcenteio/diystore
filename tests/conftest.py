@@ -551,7 +551,7 @@ def orm_session(session_factory):
     session.close()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def sqlrepo():
     return SQLProductRepository(scheme="sqlite", host="/:memory:")
 
@@ -561,7 +561,7 @@ def testenv_infrasettings():
     return InfraSettings(_env_file="test.env")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def mock_product_cache():
     mock_cache = Mock(ProductCache)
     mock_cache.get_one.return_value = None
@@ -569,7 +569,7 @@ def mock_product_cache():
     return mock_cache
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def product_controller(sqlrepo, mock_product_cache) -> ProductController:
     return ProductControllerFactory(repo=sqlrepo, cache=mock_product_cache)
 
