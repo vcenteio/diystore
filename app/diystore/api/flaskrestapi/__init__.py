@@ -5,6 +5,7 @@ from flask import request
 
 from ..api_settings import WebAPISettings
 from .blueprints.product import bp as product_bp
+from .blueprints.category import bp as category_bp
 from ...infrastructure.controllers.web.exceptions import BadRequest
 
 
@@ -39,6 +40,7 @@ def _configure_app(app: Flask, settings: WebAPISettings):
             return "pong"
 
     app.register_blueprint(product_bp)
+    app.register_blueprint(category_bp)
 
 
 def create_app(settings: WebAPISettings = settings) -> Flask:
