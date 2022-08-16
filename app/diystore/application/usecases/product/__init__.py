@@ -11,3 +11,5 @@ from .getproduct import get_product_use_case
 from .gettoplevelcategory import GetTopLevelCategoryInputDTO
 from .gettoplevelcategory import GetTopLevelCategoryOutputDTO
 from .gettoplevelcategory import get_top_level_category
+from .gettoplevelcategories import GetTopLevelCategoriesOutputDTO
+from .gettoplevelcategories import get_top_level_categories

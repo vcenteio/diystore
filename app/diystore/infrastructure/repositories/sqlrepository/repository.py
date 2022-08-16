@@ -209,3 +209,6 @@ class SQLProductRepository(ProductRepository):
             )
             domain_entity = orm_category.to_domain_entity() if orm_category else None
         return domain_entity
+
+    def get_top_level_categories(self) -> tuple[TopLevelProductCategory]:
+        pass
