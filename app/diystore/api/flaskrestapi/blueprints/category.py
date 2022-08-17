@@ -18,3 +18,9 @@ settings = WebAPISettings()
 def get_top_category(category_id: str):
     representation = product.get_top_category(Markup.escape(category_id))
     return Response(representation, mimetype=settings.mimetype)
+
+
+@bp.get("/top-categories")
+def get_top_categories():
+    representation = product.get_top_categories()
+    return Response(representation, mimetype=settings.mimetype)
