@@ -22,3 +22,9 @@ def get_top_category(category_id: str):
 def get_top_categories():
     representation = product.get_top_categories()
     return Response(representation, mimetype=settings.mimetype)
+
+
+@bp.get("/mid-categories/<string:category_id>")
+def get_mid_category(category_id: str):
+    representation = product.get_mid_category(category_id=Markup.escape(category_id))
+    return Response(representation, mimetype=settings.mimetype)
