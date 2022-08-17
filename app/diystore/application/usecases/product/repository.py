@@ -3,8 +3,10 @@ from abc import abstractmethod
 from decimal import Decimal
 from uuid import UUID
 
+
 from ....domain.entities.product import Product
 from ....domain.entities.product import TopLevelProductCategory
+from ....domain.entities.product import MidLevelProductCategory
 
 
 class ProductRepository(ABC):
@@ -56,4 +58,8 @@ class ProductRepository(ABC):
 
     @abstractmethod
     def get_top_level_categories(self) -> tuple[TopLevelProductCategory]:
+        ...
+
+    @abstractmethod
+    def get_mid_level_category(self, category_id: UUID) -> MidLevelProductCategory:
         ...

@@ -14,6 +14,7 @@ from .models.product import ProductOrmModel
 from .models.categories import TopLevelCategoryOrmModel
 from ....domain.entities.product import Product
 from ....domain.entities.product import TopLevelProductCategory
+from ....domain.entities.product import MidLevelProductCategory
 from ....application.usecases.product import ProductRepository
 
 
@@ -214,3 +215,6 @@ class SQLProductRepository(ProductRepository):
         with self._session as s:
             categories = s.query(TopLevelCategoryOrmModel).all()
         return tuple(c.to_domain_entity() for c in categories)
+
+    def get_mid_level_category(self, category_id: UUID) -> MidLevelProductCategory:
+        pass
