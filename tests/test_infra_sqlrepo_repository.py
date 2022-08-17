@@ -7,8 +7,8 @@ import pytest
 from sqlalchemy.orm import Session
 from factory import Factory
 
-from .conftest import TopLevelProductCategoryStub
 from .conftest import TopLevelCategoryOrmModelStub
+from .conftest import MidLevelCategoryOrmModelStub
 from .conftest import TerminalCategoryOrmModelStub
 from .conftest import ProductOrmModelStub
 from .conftest import LoadedProductOrmModelStub
@@ -303,7 +303,7 @@ def test_infra_sqlrepo_get_top_level_category_existent_category(
     assert retrieved_category.description == description
 
 
-def test_infra_sqlrepo_get_top_level_category_no_categories(
+def test_infra_sqlrepo_get_top_level_categories_no_categories(
     sqlrepo: SQLProductRepository,
 ):
     # GIVEN a repository with no top categories
@@ -314,7 +314,7 @@ def test_infra_sqlrepo_get_top_level_category_no_categories(
     assert result == ()
 
 
-def test_infra_sqlrepo_get_top_level_category_existent_categories(
+def test_infra_sqlrepo_get_top_level_categories_existent_categories(
     sqlrepo: SQLProductRepository,
 ):
     # GIVEN a repository with existing top categories
@@ -323,9 +323,52 @@ def test_infra_sqlrepo_get_top_level_category_existent_categories(
     with sqlrepo._session as s:
         s.add_all(orm_categories)
         s.commit()
-    
+
     # WHEN a search for all top categories is made
     retrieved_categories = sqlrepo.get_top_level_categories()
 
     # THEN all the top categories should be returned
     assert retrieved_categories == expected
+
+
+def test_infra_sqlrepo_get_mid_level_category_wrong_id_type(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a invalid id type
+    # WHEN a search for a mid level category is made with such id
+    # THEN a error is raised
+    with pytest.raises(TypeError):
+        sqlrepo.get_mid_level_category(1)
+
+
+def test_infra_sqlrepo_get_mid_level_category_non_existent_category(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a valid id not related to any mid level category
+    non_existent_id = uuid1()
+
+    # WHEN a search for a mid level category is made with such id
+    category = sqlrepo.get_mid_level_category(non_existent_id)
+
+    # THEN no category is returned
+    assert category is None
+
+
+def test_infra_sqlrepo_get_mid_level_category_existent_category(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a valid id associated with an existing mid level category
+    cat = MidLevelCategoryOrmModelStub()
+    _id, name, description = UUID(bytes=cat.id), cat.name, cat.description
+
+    with sqlrepo._session as s:
+        s.add(cat)
+        s.commit()
+
+    # WHEN a search for a mid level category is made with such id
+    retrieved_category = sqlrepo.get_mid_level_category(_id)
+
+    # THEN the correct category is returned
+    assert retrieved_category.id == _id
+    assert retrieved_category.name == name
+    assert retrieved_category.description == description

@@ -12,6 +12,7 @@ from pydantic import AnyUrl
 from .models import Base
 from .models.product import ProductOrmModel
 from .models.categories import TopLevelCategoryOrmModel
+from .models.categories import MidLevelCategoryOrmModel
 from ....domain.entities.product import Product
 from ....domain.entities.product import TopLevelProductCategory
 from ....domain.entities.product import MidLevelProductCategory
@@ -216,5 +217,13 @@ class SQLProductRepository(ProductRepository):
             categories = s.query(TopLevelCategoryOrmModel).all()
         return tuple(c.to_domain_entity() for c in categories)
 
-    def get_mid_level_category(self, category_id: UUID) -> MidLevelProductCategory:
-        pass
+    def get_mid_level_category(
+        self, category_id: UUID
+    ) -> Optional[MidLevelProductCategory]:
+        encoded_id = self._encode_uuid(category_id)
+        with self._session as s:
+            orm_category: MidLevelCategoryOrmModel = s.get(
+                MidLevelCategoryOrmModel, encoded_id
+            )
+            domain_entity = orm_category.to_domain_entity() if orm_category else None
+        return domain_entity
