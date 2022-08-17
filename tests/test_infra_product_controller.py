@@ -5,13 +5,16 @@ from uuid import UUID
 
 import pytest
 
-from .conftest import LoadedProductOrmModelStub, TopLevelCategoryOrmModelStub
+from .conftest import LoadedProductOrmModelStub
+from .conftest import TopLevelCategoryOrmModelStub
+from .conftest import MidLevelCategoryOrmModelStub
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
 from diystore.infrastructure.controllers.web import ProductController
 from diystore.infrastructure.controllers.web.exceptions import InvalidProductID
 from diystore.infrastructure.controllers.web.exceptions import InvalidCategoryID
 from diystore.infrastructure.controllers.web.exceptions import ProductNotFound
 from diystore.infrastructure.controllers.web.exceptions import TopCategoryNotFound
+from diystore.infrastructure.controllers.web.exceptions import MidCategoryNotFound
 from diystore.infrastructure.controllers.web.exceptions import InvalidQueryArgument
 
 
@@ -219,3 +222,47 @@ def test_infra_product_controller_get_top_categories_existing_categories(
         assert category.id.hex in representation
         assert category.name in representation
         assert category.description in representation
+
+
+@pytest.mark.parametrize("_id", (2, "abc", (1, 2, 3)))
+def test_infra_product_controller_get_mid_category_invalid_id(
+    _id, product_controller: ProductController
+):
+    # GIVEN an invalid category id
+    # WHEN a mid category is searched using such id
+    # THEN an error is raised
+    with pytest.raises(InvalidCategoryID):
+        product_controller.get_mid_category(category_id=_id)
+
+
+def test_infra_product_controller_get_mid_category_non_existent_category(
+    product_controller: ProductController,
+):
+    # GIVEN an id not associated with a mid category
+    _id = uuid1().hex
+
+    # WHEN a mid category is searched using such id
+    # THEN an error is raised
+    with pytest.raises(MidCategoryNotFound):
+        product_controller.get_mid_category(category_id=_id)
+
+
+def test_infra_product_controller_get_mid_category_existent_category(
+    product_controller: ProductController, sqlrepo: SQLProductRepository
+):
+    # GIVEN an id associated with an existent mid category
+    category = MidLevelCategoryOrmModelStub()
+    _id = UUID(bytes=category.id).hex
+    name, description = category.name, category.description
+    product_controller._repo = sqlrepo
+    with sqlrepo._session as s:
+        s.add(category)
+        s.commit()
+
+    # WHEN a mid category is searched using such id
+    representation = product_controller.get_mid_category(category_id=_id)
+
+    # THEN a correct representation of the category is returned
+    assert _id in representation
+    assert name in representation
+    assert description in representation

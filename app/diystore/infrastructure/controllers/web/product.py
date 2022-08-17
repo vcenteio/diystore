@@ -1,7 +1,5 @@
-from typing import Optional
 from typing import Callable
 from functools import wraps
-from functools import partial
 
 from pydantic import ValidationError
 
@@ -10,6 +8,7 @@ from .exceptions import InvalidProductID
 from .exceptions import InvalidCategoryID
 from .exceptions import ProductNotFound
 from .exceptions import TopCategoryNotFound
+from .exceptions import MidCategoryNotFound
 from ...cache.interfaces import Cache
 from ....application.dto import DTO
 from ....application.usecases.product import ProductRepository
@@ -25,12 +24,12 @@ from ....application.usecases.product import GetTopLevelCategoryInputDTO
 from ....application.usecases.product import GetTopLevelCategoryOutputDTO
 from ....application.usecases.product import get_top_level_categories
 from ....application.usecases.product import GetTopLevelCategoriesOutputDTO
+from ....application.usecases.product import GetMidLevelCategoryInputDTO
+from ....application.usecases.product import get_mid_level_category
 
 
 class ProductController:
-    def __init__(
-        self, repo: ProductRepository, cache: Cache, presenter: Callable
-    ):
+    def __init__(self, repo: ProductRepository, cache: Cache, presenter: Callable):
         self._repo = repo
         self._cache_repo = cache
         self._presenter = presenter
@@ -148,4 +147,15 @@ class ProductController:
     @_cache
     def get_top_categories(self) -> str:
         output_dto = get_top_level_categories(self._repo)
+        return self._generate_presentation(output_dto)
+
+    @_cache
+    def get_mid_category(self, *, category_id: str) -> str:
+        try:
+            input_dto = GetMidLevelCategoryInputDTO(category_id=category_id)
+        except ValidationError:
+            raise InvalidCategoryID(_id=category_id)
+        output_dto = get_mid_level_category(input_dto, self._repo)
+        if output_dto is None:
+            raise MidCategoryNotFound(_id=category_id)
         return self._generate_presentation(output_dto)

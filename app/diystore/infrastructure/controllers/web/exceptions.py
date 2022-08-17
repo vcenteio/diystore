@@ -78,3 +78,11 @@ class TopCategoryNotFound(NotFound):
     def __init__(self, msg=None, _id=None):
         self.msg = msg or self.default_msg.format(_id=_id if _id else "")
         super().__init__(self.msg)
+
+
+class MidCategoryNotFound(NotFound):
+    default_msg = "no mid category associated with the id {_id}"
+
+    def __init__(self, msg=None, _id=None):
+        self.msg = msg or self.default_msg.format(_id=_id if _id else "")
+        super().__init__(self.msg)
