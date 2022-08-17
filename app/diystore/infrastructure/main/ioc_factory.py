@@ -4,8 +4,8 @@ from sqlalchemy.dialects import __all__ as supported_sqla_dialects
 
 from .settings import InfraSettings
 from .ioc import IoCContainer
-from ..cache.interfaces import ProductCache
-from ..cache.redis_cache import RedisProductRepresentationCache
+from ..cache.interfaces import Cache
+from ..cache.redis_cache import RedisRepresentationCache
 from ..controllers.presenters import generate_json_presentation
 from ..repositories.sqlrepository import SQLProductRepository
 from ...application.usecases.product import ProductRepository
@@ -44,8 +44,8 @@ def _setup_caches(ioc: IoCContainer, settings: InfraSettings):
     redis_url = settings.cache.redis_url
     if redis_url is not None:
         ioc.register(
-            ProductCache,
-            RedisProductRepresentationCache,
+            Cache,
+            RedisRepresentationCache,
             host=redis_url.host,
             port=redis_url.port,
             password=redis_url.password,

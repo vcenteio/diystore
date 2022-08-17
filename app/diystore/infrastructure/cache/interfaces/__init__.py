@@ -1,1 +1,1 @@
-from .product_cache_interface import ProductCache
+from .cache_interface import Cache

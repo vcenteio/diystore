@@ -17,7 +17,7 @@ settings = WebAPISettings()
 
 @bp.get("/products/<string:product_id>")
 def get_product(product_id: str):
-    representation = product.get_one(Markup.escape(product_id))
+    representation = product.get_one(product_id=Markup.escape(product_id))
     return Response(representation, mimetype=settings.mimetype)
 
 

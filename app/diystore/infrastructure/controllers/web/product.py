@@ -10,7 +10,7 @@ from .exceptions import InvalidProductID
 from .exceptions import InvalidCategoryID
 from .exceptions import ProductNotFound
 from .exceptions import TopCategoryNotFound
-from ...cache.interfaces import ProductCache
+from ...cache.interfaces import Cache
 from ....application.dto import DTO
 from ....application.usecases.product import ProductRepository
 from ....application.usecases.product import get_product_use_case
@@ -29,27 +29,21 @@ from ....application.usecases.product import GetTopLevelCategoriesOutputDTO
 
 class ProductController:
     def __init__(
-        self, repo: ProductRepository, cache: ProductCache, presenter: Callable
+        self, repo: ProductRepository, cache: Cache, presenter: Callable
     ):
         self._repo = repo
         self._cache_repo = cache
         self._presenter = presenter
 
-    def _select_cache_methods(self, args, kwargs):
-        c = self._cache_repo
-        if len(kwargs):
-            return partial(c.get_many, **kwargs), partial(c.set_many, **kwargs)
-        return partial(c.get_one, _id=args[0]), partial(c.set_one, _id=args[0])
-
     @staticmethod
     def _cache(f):
         @wraps(f)
-        def wrapper(self: "ProductController", *args, **kwargs):
-            get_method, set_method = self._select_cache_methods(args, kwargs)
-            cached_repr = get_method()
+        def wrapper(self: "ProductController", **kwargs):
+            args = dict(cname=type(self).__name__, fname=f.__name__, **kwargs)
+            cached_repr = self._cache_repo.get(**args)
             if cached_repr is None:
-                new_repr = f(self, **kwargs) if len(kwargs) else f(self, args[0])
-                set_method(representation=new_repr)
+                new_repr = f(self, **kwargs)
+                self._cache_repo.set(new_repr, **args)
                 return new_repr
             return cached_repr
 
@@ -59,7 +53,7 @@ class ProductController:
         return self._presenter(output_dto)
 
     @_cache
-    def get_one(self, product_id: str) -> Optional[str]:
+    def get_one(self, *, product_id: str) -> str:
         try:
             input_dto = GetProductInputDTO(product_id=product_id)
         except ValidationError:
@@ -141,7 +135,7 @@ class ProductController:
         return self._generate_presentation(output_dto)
 
     @_cache
-    def get_top_category(self, category_id: str) -> str:
+    def get_top_category(self, *, category_id: str) -> str:
         try:
             input_dto = GetTopLevelCategoryInputDTO(category_id=category_id)
         except ValidationError:
@@ -151,6 +145,7 @@ class ProductController:
             raise TopCategoryNotFound(_id=category_id)
         return self._generate_presentation(output_dto)
 
+    @_cache
     def get_top_categories(self) -> str:
         output_dto = get_top_level_categories(self._repo)
         return self._generate_presentation(output_dto)

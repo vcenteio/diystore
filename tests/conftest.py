@@ -51,7 +51,7 @@ from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmM
 from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
 from diystore.infrastructure.controllers.web import ProductController
-from diystore.infrastructure.cache.interfaces import ProductCache
+from diystore.infrastructure.cache.interfaces import Cache
 from diystore.infrastructure.controllers.presenters import generate_json_presentation
 
 
@@ -563,9 +563,8 @@ def testenv_infrasettings():
 
 @pytest.fixture
 def mock_product_cache():
-    mock_cache = Mock(ProductCache)
-    mock_cache.get_one.return_value = None
-    mock_cache.get_many.return_value = None
+    mock_cache = Mock(Cache)
+    mock_cache.get.return_value = None
     return mock_cache
 
 
