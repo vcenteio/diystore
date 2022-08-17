@@ -7,7 +7,7 @@ from .....domain.entities.product import TopLevelProductCategory
 from ..gettoplevelcategory.outputdto import GetTopLevelCategoryOutputDTO
 
 
-class GetTopLevelCategoriesOutputDTO(DTO, BaseModel):
+class GetTopLevelCategoriesOutputDTO(BaseModel, DTO):
     categories: tuple[GetTopLevelCategoryOutputDTO, ...]
 
     class Config:

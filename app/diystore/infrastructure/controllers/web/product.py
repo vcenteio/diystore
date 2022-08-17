@@ -23,6 +23,8 @@ from ....application.usecases.product import OrderingType
 from ....application.usecases.product import get_top_level_category
 from ....application.usecases.product import GetTopLevelCategoryInputDTO
 from ....application.usecases.product import GetTopLevelCategoryOutputDTO
+from ....application.usecases.product import get_top_level_categories
+from ....application.usecases.product import GetTopLevelCategoriesOutputDTO
 
 
 class ProductController:
@@ -138,9 +140,8 @@ class ProductController:
         output_dto = get_products_use_case(input_dto, self._repo)
         return self._generate_presentation(output_dto)
 
-
     @_cache
-    def get_top_category(self, category_id: str) -> Optional[str]:
+    def get_top_category(self, category_id: str) -> str:
         try:
             input_dto = GetTopLevelCategoryInputDTO(category_id=category_id)
         except ValidationError:
@@ -148,4 +149,8 @@ class ProductController:
         output_dto = get_top_level_category(input_dto, self._repo)
         if output_dto is None:
             raise TopCategoryNotFound(_id=category_id)
+        return self._generate_presentation(output_dto)
+
+    def get_top_categories(self) -> str:
+        output_dto = get_top_level_categories(self._repo)
         return self._generate_presentation(output_dto)

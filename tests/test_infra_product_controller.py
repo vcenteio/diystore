@@ -159,3 +159,35 @@ def test_infra_product_controller_get_top_category_existent_category(
     assert _id in representation
     assert name in representation
     assert description in representation
+
+
+def test_infra_product_controller_get_top_categories_no_categories(
+    product_controller: ProductController,
+):
+    # GIVEN a repository with no top categories
+    # WHEN all the top categories are requested
+    representation = product_controller.get_top_categories()
+
+    # THEN a representation of no top categories is returned
+    assert representation == '{"categories": []}'
+
+
+def test_infra_product_controller_get_top_categories_existing_categories(
+    product_controller: ProductController,
+):
+    # GIVEN a repository with existing top categories
+    categories = TopLevelCategoryOrmModelStub.build_batch(3)
+    entity_categories = tuple(c.to_domain_entity() for c in categories)
+    repo = product_controller._repo
+    with repo._session as s:
+        s.add_all(categories)
+        s.commit()
+
+    # WHEN all the top categories are requested
+    representation = product_controller.get_top_categories()
+
+    # THEN a representation containing all top categories is returned
+    for category in entity_categories:
+        assert category.id.hex in representation
+        assert category.name in representation
+        assert category.description in representation
