@@ -26,6 +26,9 @@ from ....application.usecases.product import get_top_level_categories
 from ....application.usecases.product import GetTopLevelCategoriesOutputDTO
 from ....application.usecases.product import GetMidLevelCategoryInputDTO
 from ....application.usecases.product import get_mid_level_category
+from ....application.usecases.product import get_mid_level_categories
+from ....application.usecases.product import GetMidLevelCategoriesInputDTO
+from ....application.usecases.product import GetMidLevelCategoriesOutputDTO
 
 
 class ProductController:
@@ -158,4 +161,15 @@ class ProductController:
         output_dto = get_mid_level_category(input_dto, self._repo)
         if output_dto is None:
             raise MidCategoryNotFound(_id=category_id)
+        return self._generate_presentation(output_dto)
+
+    @_cache
+    def get_mid_categories(self, *, parent_id: str) -> str:
+        try:
+            input_dto = GetMidLevelCategoriesInputDTO(parent_id=parent_id)
+        except ValidationError:
+            raise InvalidCategoryID(_id=parent_id)
+        output_dto = get_mid_level_categories(input_dto, self._repo)
+        if output_dto is None:
+            raise TopCategoryNotFound(_id=parent_id)
         return self._generate_presentation(output_dto)

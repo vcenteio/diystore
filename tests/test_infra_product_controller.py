@@ -266,3 +266,70 @@ def test_infra_product_controller_get_mid_category_existent_category(
     assert _id in representation
     assert name in representation
     assert description in representation
+
+
+def test_infra_product_controller_get_mid_categories_invalid_parent_id(
+    product_controller: ProductController,
+):
+    # GIVEN an invalid parent id
+    parent_id = 123
+
+    # WHEN mid level categories are requested based on such id
+    # THEN an error occurs
+    with pytest.raises(InvalidCategoryID):
+        product_controller.get_mid_categories(parent_id=parent_id)
+
+
+def test_infra_product_controller_get_mid_categories_non_existent_parent_category(
+    product_controller: ProductController,
+):
+
+    # GIVEN an id not associated with any top category
+    parent_id = uuid1()
+
+    # WHEN mid level categories are requested based on such id
+    # THEN an error occurs
+    with pytest.raises(TopCategoryNotFound):
+        product_controller.get_mid_categories(parent_id=parent_id)
+
+
+def test_infra_product_controller_get_mid_categories_no_categories(
+    product_controller: ProductController,
+):
+    # GIVEN a top category with no child mid categories
+    top_category = TopLevelCategoryOrmModelStub()
+    parent_id = UUID(bytes=top_category.id).hex
+    repo = product_controller._repo
+    with repo._session as s:
+        s.add(top_category)
+        s.commit()
+
+    # WHEN all of its child mid categories are requested
+    representation = product_controller.get_mid_categories(parent_id=parent_id)
+
+    # THEN a representation with no mid categories is returned
+    assert representation == '{"categories": []}'
+
+
+def test_infra_product_controller_get_mid_categories_existing_categories(
+    product_controller: ProductController,
+):
+    # GIVEN a top category with existing child mid categories
+    top_category = TopLevelCategoryOrmModelStub()
+    parent_id = UUID(bytes=top_category.id).hex
+    mid_categories = MidLevelCategoryOrmModelStub.build_batch(3, parent=top_category)
+    entity_categories = tuple(c.to_domain_entity() for c in mid_categories)
+    repo = product_controller._repo
+    with repo._session as s:
+        s.add(top_category)
+        s.add_all(mid_categories)
+        s.commit()
+
+    # WHEN all of its child mid categories are requested
+    representation = product_controller.get_mid_categories(parent_id=parent_id)
+
+    # THEN a representation containing all of its children is returned
+    for category in entity_categories:
+        assert category.id.hex in representation
+        assert category.name in representation
+        assert category.description in representation
