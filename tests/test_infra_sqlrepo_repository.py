@@ -372,3 +372,53 @@ def test_infra_sqlrepo_get_mid_level_category_existent_category(
     assert retrieved_category.id == _id
     assert retrieved_category.name == name
     assert retrieved_category.description == description
+
+
+def test_infra_sqlrepo_get_mid_level_categories_non_existent_parent_category(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN an id not associated with a top level category
+    parent_id = uuid4()
+
+    # WHEN a search for mid level categories is made based on such id
+    result = sqlrepo.get_mid_level_categories(parent_id)
+
+    # THEN None is returned
+    assert result is None
+
+
+def test_infra_sqlrepo_get_mid_level_categories_no_categories(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a top category with no child mid level categories
+    top_cat = TopLevelCategoryOrmModelStub()
+    parent_id = UUID(bytes=top_cat.id)
+    with sqlrepo._session as s:
+        s.add(top_cat)
+        s.commit()
+
+    # WHEN a search for its child mid level categories is made
+    result = sqlrepo.get_mid_level_categories(parent_id)
+
+    # THEN no mid categories are returned
+    assert result == ()
+
+
+def test_infra_sqlrepo_get_mid_level_categories_existent_categories(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a top category with child mid level categories
+    top_category = TopLevelCategoryOrmModelStub()
+    parent_id = UUID(bytes=top_category.id)
+    mid_categories = MidLevelCategoryOrmModelStub.build_batch(3, parent=top_category)
+    expected = tuple(c.to_domain_entity() for c in mid_categories)
+    with sqlrepo._session as s:
+        s.add(top_category)
+        s.add_all(mid_categories)
+        s.commit()
+
+    # WHEN a search for all child mid level categories is made
+    retrieved_categories = sqlrepo.get_mid_level_categories(parent_id)
+
+    # THEN all the child mid categories should be returned
+    assert retrieved_categories == expected

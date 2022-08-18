@@ -3,6 +3,7 @@ from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy import Column
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import create_engine
@@ -44,7 +45,7 @@ class SQLProductRepository(ProductRepository):
             path=f"/{dbname}" if dbname is not None else None,
         )
         try:
-            self._engine = create_engine(db_url)
+            self._engine = create_engine(db_url, future=True)
         except ArgumentError:
             raise ValueError(f"invalid url passed as argument: {db_url}")
         base.metadata.create_all(self._engine)
@@ -230,5 +231,15 @@ class SQLProductRepository(ProductRepository):
 
     def get_mid_level_categories(
         self, parent_id: UUID
-    ) -> tuple[MidLevelProductCategory]:
-        pass
+    ) -> Optional[tuple[MidLevelProductCategory]]:
+        encoded_id = self._encode_uuid(parent_id)
+        with self._session as s:
+            top_category: TopLevelCategoryOrmModel = s.get(
+                TopLevelCategoryOrmModel,
+                encoded_id,
+                options=(joinedload(TopLevelCategoryOrmModel.children),),
+            )
+            if top_category is None:
+                return None
+            categories = tuple(c.to_domain_entity() for c in top_category.children)
+        return categories
