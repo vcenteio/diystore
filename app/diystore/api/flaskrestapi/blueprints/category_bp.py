@@ -17,6 +17,11 @@ def get_top_categories():
     return product.get_top_categories()
 
 
+@bp.get("/top-categories/<string:parent_id>/mid-categories")
+def get_mid_categories(parent_id: str):
+    return product.get_mid_categories(parent_id=escape(parent_id))
+
+
 @bp.get("/mid-categories/<string:category_id>")
 def get_mid_category(category_id: str):
     return product.get_mid_category(category_id=escape(category_id))
