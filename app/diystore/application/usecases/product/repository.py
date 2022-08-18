@@ -63,3 +63,7 @@ class ProductRepository(ABC):
     @abstractmethod
     def get_mid_level_category(self, category_id: UUID) -> MidLevelProductCategory:
         ...
+
+    @abstractmethod
+    def get_mid_level_categories(self, parent_id: UUID) -> tuple[MidLevelProductCategory]:
+        ...

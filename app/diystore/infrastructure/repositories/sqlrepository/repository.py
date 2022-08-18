@@ -227,3 +227,8 @@ class SQLProductRepository(ProductRepository):
             )
             domain_entity = orm_category.to_domain_entity() if orm_category else None
         return domain_entity
+
+    def get_mid_level_categories(
+        self, parent_id: UUID
+    ) -> tuple[MidLevelProductCategory]:
+        pass

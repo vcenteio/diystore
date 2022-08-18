@@ -16,3 +16,6 @@ from .gettoplevelcategories import get_top_level_categories
 from .getmidlevelcategory import GetMidLevelCategoryInputDTO
 from .getmidlevelcategory import GetMidLevelCategoryOutputDTO
 from .getmidlevelcategory import get_mid_level_category
+from .getmidlevelcategories import GetMidLevelCategoriesInputDTO
+from .getmidlevelcategories import GetMidLevelCategoriesOutputDTO
+from .getmidlevelcategories import get_mid_level_categories
