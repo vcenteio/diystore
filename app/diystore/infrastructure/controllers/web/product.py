@@ -9,6 +9,7 @@ from .exceptions import InvalidCategoryID
 from .exceptions import ProductNotFound
 from .exceptions import TopCategoryNotFound
 from .exceptions import MidCategoryNotFound
+from .exceptions import TerminalCategoryNotFound
 from ...cache.interfaces import Cache
 from ....application.dto import DTO
 from ....application.usecases.product import ProductRepository
@@ -29,6 +30,8 @@ from ....application.usecases.product import get_mid_level_category
 from ....application.usecases.product import get_mid_level_categories
 from ....application.usecases.product import GetMidLevelCategoriesInputDTO
 from ....application.usecases.product import GetMidLevelCategoriesOutputDTO
+from ....application.usecases.product import GetTerminalLevelCategoryInputDTO
+from ....application.usecases.product import get_terminal_level_category
 
 
 class ProductController:
@@ -172,4 +175,15 @@ class ProductController:
         output_dto = get_mid_level_categories(input_dto, self._repo)
         if output_dto is None:
             raise TopCategoryNotFound(_id=parent_id)
+        return self._generate_presentation(output_dto)
+
+    @_cache
+    def get_terminal_category(self, *, category_id: str) -> str:
+        try:
+            input_dto = GetTerminalLevelCategoryInputDTO(category_id=category_id)
+        except ValidationError:
+            raise InvalidCategoryID(_id=category_id)
+        output_dto = get_terminal_level_category(input_dto, self._repo)
+        if output_dto is None:
+            raise TerminalCategoryNotFound
         return self._generate_presentation(output_dto)
