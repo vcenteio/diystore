@@ -422,3 +422,46 @@ def test_infra_sqlrepo_get_mid_level_categories_existent_categories(
 
     # THEN all the child mid categories should be returned
     assert retrieved_categories == expected
+
+
+def test_infra_sqlrepo_get_terminal_level_category_wrong_id_type(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a invalid id type
+    # WHEN a search for a terminal level category is made with such id
+    # THEN a error is raised
+    with pytest.raises(TypeError):
+        sqlrepo.get_terminal_level_category(1)
+
+
+def test_infra_sqlrepo_get_terminal_level_category_non_existent_category(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a valid id not related to any terminal level category
+    non_existent_id = uuid1()
+
+    # WHEN a search for a terminal level category is made with such id
+    category = sqlrepo.get_terminal_level_category(non_existent_id)
+
+    # THEN no category is returned
+    assert category is None
+
+
+def test_infra_sqlrepo_get_terminal_level_category_existent_category(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a valid id associated with an existing teminal level category
+    cat = TerminalCategoryOrmModelStub()
+    _id, name, description = UUID(bytes=cat.id), cat.name, cat.description
+
+    with sqlrepo._session as s:
+        s.add(cat)
+        s.commit()
+
+    # WHEN a search for a terminal level category is made with such id
+    retrieved_category = sqlrepo.get_terminal_level_category(_id)
+
+    # THEN the correct category is returned
+    assert retrieved_category.id == _id
+    assert retrieved_category.name == name
+    assert retrieved_category.description == description

@@ -14,6 +14,7 @@ from .models import Base
 from .models.product import ProductOrmModel
 from .models.categories import TopLevelCategoryOrmModel
 from .models.categories import MidLevelCategoryOrmModel
+from .models.categories import TerminalCategoryOrmModel
 from ....domain.entities.product import Product
 from ....domain.entities.product import TopLevelProductCategory
 from ....domain.entities.product import MidLevelProductCategory
@@ -245,5 +246,13 @@ class SQLProductRepository(ProductRepository):
             categories = tuple(c.to_domain_entity() for c in top_category.children)
         return categories
 
-    def get_terminal_level_category(self, category_id: UUID) -> Optional[TerminalLevelProductCategory]:
-        pass
+    def get_terminal_level_category(
+        self, category_id: UUID
+    ) -> Optional[TerminalLevelProductCategory]:
+        encoded_id = self._encode_uuid(category_id)
+        with self._session as s:
+            orm_category: TerminalCategoryOrmModel = s.get(
+                TerminalCategoryOrmModel, encoded_id
+            )
+            category = orm_category.to_domain_entity() if orm_category else None
+        return category
