@@ -1,17 +1,20 @@
 from abc import ABC
 from abc import abstractmethod
 from decimal import Decimal
+from typing import Optional
 from uuid import UUID
-
 
 from ....domain.entities.product import Product
 from ....domain.entities.product import TopLevelProductCategory
 from ....domain.entities.product import MidLevelProductCategory
+from ....domain.entities.product import TerminalLevelProductCategory
 
 
 class ProductRepository(ABC):
     @abstractmethod
-    def get_product(self, product_id: UUID, with_reviews: bool = False):
+    def get_product(
+        self, product_id: UUID, with_reviews: bool = False
+    ) -> Optional[Product]:
         ...
 
     @abstractmethod
@@ -53,7 +56,9 @@ class ProductRepository(ABC):
         ...
 
     @abstractmethod
-    def get_top_level_category(self, category_id: UUID) -> TopLevelProductCategory:
+    def get_top_level_category(
+        self, category_id: UUID
+    ) -> Optional[TopLevelProductCategory]:
         ...
 
     @abstractmethod
@@ -61,9 +66,19 @@ class ProductRepository(ABC):
         ...
 
     @abstractmethod
-    def get_mid_level_category(self, category_id: UUID) -> MidLevelProductCategory:
+    def get_mid_level_category(
+        self, category_id: UUID
+    ) -> Optional[MidLevelProductCategory]:
         ...
 
     @abstractmethod
-    def get_mid_level_categories(self, parent_id: UUID) -> tuple[MidLevelProductCategory]:
+    def get_mid_level_categories(
+        self, parent_id: UUID
+    ) -> Optional[tuple[MidLevelProductCategory]]:
+        ...
+
+    @abstractmethod
+    def get_terminal_level_category(
+        self, category_id: UUID
+    ) -> Optional[TerminalLevelProductCategory]:
         ...

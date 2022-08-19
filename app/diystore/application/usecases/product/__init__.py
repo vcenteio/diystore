@@ -19,3 +19,6 @@ from .getmidlevelcategory import get_mid_level_category
 from .getmidlevelcategories import GetMidLevelCategoriesInputDTO
 from .getmidlevelcategories import GetMidLevelCategoriesOutputDTO
 from .getmidlevelcategories import get_mid_level_categories
+from .getterminallevelcategory import GetTerminalLevelCategoryInputDTO
+from .getterminallevelcategory import GetTerminalLevelCategoryOutputDTO
+from .getterminallevelcategory import get_terminal_level_category
