@@ -30,3 +30,8 @@ def get_mid_category(category_id: str):
 @bp.get("/terminal-categories/<string:category_id>")
 def get_terminal_category(category_id: str):
     return product.get_terminal_category(category_id=escape(category_id))
+
+
+@bp.get("/mid-categories/<string:parent_id>/terminal-categories")
+def get_terminal_categories(parent_id: str):
+    return product.get_terminal_categories(parent_id=escape(parent_id))
