@@ -379,3 +379,71 @@ def test_infra_product_controller_get_terminal_category_existent_category(
     assert _id in representation
     assert name in representation
     assert description in representation
+
+
+def test_infra_product_controller_get_terminal_categories_invalid_parent_id(
+    product_controller: ProductController,
+):
+    # GIVEN an invalid parent id
+    parent_id = 123
+
+    # WHEN terminal level categories are requested based on such id
+    # THEN an error occurs
+    with pytest.raises(InvalidCategoryID):
+        product_controller.get_terminal_categories(parent_id=parent_id)
+
+
+def test_infra_product_controller_get_terminal_categories_non_existent_parent_category(
+    product_controller: ProductController,
+):
+
+    # GIVEN an id not associated with any mid category
+    parent_id = uuid1()
+
+    # WHEN terminal level categories are requested based on such id
+    # THEN an error occurs
+    with pytest.raises(MidCategoryNotFound):
+        product_controller.get_terminal_categories(parent_id=parent_id)
+
+
+def test_infra_product_controller_get_terminal_categories_no_categories(
+    product_controller: ProductController,
+):
+    # GIVEN a mid category with no child categories
+    mid_category = MidLevelCategoryOrmModelStub()
+    parent_id = UUID(bytes=mid_category.id).hex
+    repo = product_controller._repo
+    with repo._session as s:
+        s.add(mid_category)
+        s.commit()
+
+    # WHEN all of its child categories are requested
+    representation = product_controller.get_terminal_categories(parent_id=parent_id)
+
+    # THEN a representation with no terminal categories is returned
+    dict_repr = json.loads(representation)
+    assert len(dict_repr["categories"]) == 0
+
+
+def test_infra_product_controller_get_terminal_categories_existing_categories(
+    product_controller: ProductController,
+):
+    # GIVEN a mid category with existing child categories
+    mid_category = MidLevelCategoryOrmModelStub()
+    parent_id = UUID(bytes=mid_category.id).hex
+    children = TerminalCategoryOrmModelStub.build_batch(3, parent=mid_category)
+    entity_categories = tuple(c.to_domain_entity() for c in children)
+    repo = product_controller._repo
+    with repo._session as s:
+        s.add(mid_category)
+        s.add_all(children)
+        s.commit()
+
+    # WHEN all of its child categories are requested
+    representation = product_controller.get_terminal_categories(parent_id=parent_id)
+
+    # THEN a representation containing all of its children is returned
+    for category in entity_categories:
+        assert category.id.hex in representation
+        assert category.name in representation
+        assert category.description in representation
