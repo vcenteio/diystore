@@ -272,7 +272,15 @@ class SQLProductRepository(ProductRepository):
         )
         return orm_category.to_domain_entity() if orm_category else None
 
+    @_crud_operation
     def get_terminal_level_categories(
-        self, parent_id: UUID
+        self, parent_id: UUID, _session: Session = None
     ) -> Optional[tuple[TerminalLevelProductCategory]]:
-        pass
+        encoded_id = self._encode_uuid(parent_id)
+        parent: MidLevelCategoryOrmModel = _session.get(
+            MidLevelCategoryOrmModel,
+            encoded_id,
+            options=(joinedload(MidLevelCategoryOrmModel.children),),
+        )
+        if parent is not None:
+            return tuple(c.to_domain_entity() for c in parent.children)

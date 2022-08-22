@@ -465,3 +465,53 @@ def test_infra_sqlrepo_get_terminal_level_category_existent_category(
     assert retrieved_category.id == _id
     assert retrieved_category.name == name
     assert retrieved_category.description == description
+
+
+def test_infra_sqlrepo_get_terminal_level_categories_non_existent_parent_category(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN an id not associated with a mid level category
+    parent_id = uuid4()
+
+    # WHEN a search for child terminal level categories is made based on such id
+    result = sqlrepo.get_terminal_level_categories(parent_id)
+
+    # THEN None is returned
+    assert result is None
+
+
+def test_infra_sqlrepo_get_terminal_level_categories_no_categories(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a mid level category with no child categories
+    mid_cat = MidLevelCategoryOrmModelStub()
+    parent_id = UUID(bytes=mid_cat.id)
+    with sqlrepo._session as s:
+        s.add(mid_cat)
+        s.commit()
+
+    # WHEN a search for its child categories is made
+    result = sqlrepo.get_terminal_level_categories(parent_id)
+
+    # THEN no terminal categories are returned
+    assert result == ()
+
+
+def test_infra_sqlrepo_get_terminal_level_categories_existent_categories(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN a mid category with child categories
+    mid_cat = MidLevelCategoryOrmModelStub()
+    parent_id = UUID(bytes=mid_cat.id)
+    terminal_categories = TerminalCategoryOrmModelStub.build_batch(3, parent=mid_cat)
+    expected = tuple(c.to_domain_entity() for c in terminal_categories)
+    with sqlrepo._session as s:
+        s.add(mid_cat)
+        s.add_all(terminal_categories)
+        s.commit()
+
+    # WHEN a search for all child categories is made
+    retrieved_categories = sqlrepo.get_terminal_level_categories(parent_id)
+
+    # THEN all the child terminal categories should be returned
+    assert retrieved_categories == expected
