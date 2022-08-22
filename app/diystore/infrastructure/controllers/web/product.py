@@ -54,7 +54,7 @@ class ProductController:
 
         return wrapper
 
-    def _generate_presentation(self, output_dto: DTO) -> str:
+    def _generate_representation(self, output_dto: DTO) -> str:
         return self._presenter(output_dto)
 
     @_cache
@@ -66,21 +66,31 @@ class ProductController:
         output_dto = get_product_use_case(input_dto, self._repo)
         if output_dto is None:
             raise ProductNotFound(_id=product_id)
-        return self._generate_presentation(output_dto)
+        return self._generate_representation(output_dto)
+
+    _ordering_property_map = {
+        "rating": OrderingProperty.RATING,
+        "price": OrderingProperty.PRICE,
+    }
+
+    _ordering_type_map = {
+        "asc": OrderingType.ASCENDING,
+        "ascending": OrderingType.ASCENDING,
+        "desc": OrderingType.DESCESDING,
+        "descending": OrderingType.DESCESDING,
+    }
 
     def _get_ordering_property(self, order_by: str):
-        if order_by == "rating":
-            return OrderingProperty.RATING
-        if order_by == "price":
-            return OrderingProperty.PRICE
-        raise InvalidQueryArgument(None, "order_by")
+        try:
+            return self._ordering_property_map[order_by]
+        except KeyError:
+            raise InvalidQueryArgument(parameter="order_by")
 
     def _get_ordering_type(self, order_type: str):
-        if order_type in ("asc", "ascending"):
-            return OrderingType.ASCENDING
-        if order_type in ("desc", "descending"):
-            return OrderingType.DESCESDING
-        raise InvalidQueryArgument(None, "order_type")
+        try:
+            return self._ordering_type_map[order_type]
+        except KeyError:
+            raise InvalidQueryArgument(parameter="order_type")
 
     def _get_ordering_criteria(self, order_by, order_type):
         ordering_property = self._get_ordering_property(order_by)
@@ -110,8 +120,8 @@ class ProductController:
                 with_discounts_only=with_discounts_only,
             )
         except ValidationError as e:
-            loc = e.errors()[0].get("loc")[0]
-            raise InvalidQueryArgument(None, loc)
+            parameter = e.errors()[0].get("loc")[0]
+            raise InvalidQueryArgument(parameter=parameter)
 
     @_cache
     def get_many(
@@ -137,7 +147,7 @@ class ProductController:
             with_discounts_only,
         )
         output_dto = get_products_use_case(input_dto, self._repo)
-        return self._generate_presentation(output_dto)
+        return self._generate_representation(output_dto)
 
     @_cache
     def get_top_category(self, *, category_id: str) -> str:
@@ -148,12 +158,12 @@ class ProductController:
         output_dto = get_top_level_category(input_dto, self._repo)
         if output_dto is None:
             raise TopCategoryNotFound(_id=category_id)
-        return self._generate_presentation(output_dto)
+        return self._generate_representation(output_dto)
 
     @_cache
     def get_top_categories(self) -> str:
         output_dto = get_top_level_categories(self._repo)
-        return self._generate_presentation(output_dto)
+        return self._generate_representation(output_dto)
 
     @_cache
     def get_mid_category(self, *, category_id: str) -> str:
@@ -164,7 +174,7 @@ class ProductController:
         output_dto = get_mid_level_category(input_dto, self._repo)
         if output_dto is None:
             raise MidCategoryNotFound(_id=category_id)
-        return self._generate_presentation(output_dto)
+        return self._generate_representation(output_dto)
 
     @_cache
     def get_mid_categories(self, *, parent_id: str) -> str:
@@ -175,7 +185,7 @@ class ProductController:
         output_dto = get_mid_level_categories(input_dto, self._repo)
         if output_dto is None:
             raise TopCategoryNotFound(_id=parent_id)
-        return self._generate_presentation(output_dto)
+        return self._generate_representation(output_dto)
 
     @_cache
     def get_terminal_category(self, *, category_id: str) -> str:
@@ -185,5 +195,5 @@ class ProductController:
             raise InvalidCategoryID(_id=category_id)
         output_dto = get_terminal_level_category(input_dto, self._repo)
         if output_dto is None:
-            raise TerminalCategoryNotFound
-        return self._generate_presentation(output_dto)
+            raise TerminalCategoryNotFound(_id=category_id)
+        return self._generate_representation(output_dto)
