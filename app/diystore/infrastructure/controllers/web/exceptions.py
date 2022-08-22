@@ -1,9 +1,26 @@
+# 400 Bad Request Exceptions
 class BadRequest(Exception):
     default_msg = "bad request"
     code = 400
 
     def __init__(self, msg=None):
         self.msg = msg or self.default_msg
+        super().__init__(self.msg)
+
+
+class InvalidQueryParameter(BadRequest):
+    default_msg = "invalid query parameter {parameter}"
+
+    def __init__(self, msg=None, parameter=None):
+        self.msg = msg or self.default_msg.format(parameter=parameter or "")
+        super().__init__(self.msg)
+
+
+class ParameterMissing(BadRequest):
+    default_msg = "invalid query: missing parameter {parameter}"
+
+    def __init__(self, msg=None, parameter=None):
+        self.msg = msg or self.default_msg.format(parameter=parameter or "")
         super().__init__(self.msg)
 
 
@@ -37,22 +54,6 @@ class InvalidQueryArgument(UnprocessableEntity):
     def __init__(self, msg=None, parameter=None):
         format_text = f"for parameter {parameter}" if parameter else ""
         self.msg = msg or self.default_msg.format(text=format_text)
-        super().__init__(self.msg)
-
-
-class InvalidQueryParameter(UnprocessableEntity):
-    default_msg = "invalid query parameter {parameter}"
-
-    def __init__(self, msg=None, parameter=None):
-        self.msg = msg or self.default_msg.format(parameter=parameter or "")
-        super().__init__(self.msg)
-
-
-class ParameterMissing(UnprocessableEntity):
-    default_msg = "invalid query: missing parameter {parameter}"
-
-    def __init__(self, msg=None, parameter=None):
-        self.msg = msg or self.default_msg.format(parameter=parameter or "")
         super().__init__(self.msg)
 
 

@@ -4,7 +4,7 @@ from flask import escape
 from flask import g
 
 from .common_objs import product
-from ....infrastructure.controllers.web.exceptions import UnprocessableEntity
+from ....infrastructure.controllers.web.exceptions import BadRequest
 from ....infrastructure.controllers.web.exceptions import ParameterMissing
 
 
@@ -41,4 +41,4 @@ def get_products():
     except TypeError as e:
         if "category_id" in e.args[0]:
             raise ParameterMissing(parameter="category_id")
-        raise UnprocessableEntity
+        raise BadRequest
