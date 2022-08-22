@@ -3,9 +3,10 @@ from flask import request
 from flask import escape
 from flask import g
 
-from .common_objs import product
+from ..helpers import request_controller
 from ....infrastructure.controllers.web.exceptions import BadRequest
 from ....infrastructure.controllers.web.exceptions import ParameterMissing
+from ....infrastructure.controllers.web.product import ProductController
 
 
 bp = Blueprint("product", __name__)
@@ -30,14 +31,16 @@ def parse_args():
 
 
 @bp.get("/products/<string:product_id>")
-def get_product(product_id: str):
-    return product.get_one(product_id=escape(product_id))
+@request_controller
+def get_product(product_id: str, controller: ProductController):
+    return controller.get_one(product_id=escape(product_id))
 
 
 @bp.get("/products")
-def get_products():
+@request_controller
+def get_products(controller: ProductController):
     try:
-        return product.get_many(**g.parsed_args)
+        return controller.get_many(**g.parsed_args)
     except TypeError as e:
         if "category_id" in e.args[0]:
             raise ParameterMissing(parameter="category_id")
