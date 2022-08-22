@@ -1,6 +1,7 @@
 from uuid import UUID
 from decimal import Decimal
 from typing import Optional
+from functools import wraps
 
 from sqlalchemy import Column
 from sqlalchemy.orm import joinedload
@@ -64,14 +65,22 @@ class SQLProductRepository(ProductRepository):
         except AttributeError:
             raise TypeError(f"object must be UUID not {type(_uuid).__name__}")
 
+    @staticmethod
+    def _crud_operation(f):
+        @wraps(f)
+        def wrapper(self: "SQLProductRepository", *args, **kwargs):
+            with self._session as s:
+                return f(self, *args, **kwargs, _session=s)
+
+        return wrapper
+
+    @_crud_operation
     def get_product(
-        self, product_id: UUID, with_reviews: bool = False
+        self, product_id: UUID, with_reviews: bool = False, _session: Session = None
     ) -> Optional[Product]:
         encoded_id = self._encode_uuid(product_id)
-        with self._session as s:
-            product: ProductOrmModel = s.get(ProductOrmModel, encoded_id)
-            domain_entity = product.to_domain_entity(with_reviews) if product else None
-        return domain_entity
+        product: ProductOrmModel = _session.get(ProductOrmModel, encoded_id)
+        return product.to_domain_entity(with_reviews) if product else None
 
     def _normalize_ranges(
         self, price_min, price_max, rating_min, rating_max
@@ -89,7 +98,7 @@ class SQLProductRepository(ProductRepository):
     def _generate_get_products_query(
         self,
         category_id: UUID,
-        session: Session,
+        _session: Session,
         price_min: Decimal = min_price,
         price_max: Decimal = max_price,
         rating_min: Decimal = min_rating,
@@ -102,7 +111,7 @@ class SQLProductRepository(ProductRepository):
         p_min, p_max, r_min, r_max = self._normalize_ranges(
             price_min, price_max, rating_min, rating_max
         )
-        query = session.query(ProductOrmModel).filter(
+        query = _session.query(ProductOrmModel).filter(
             ProductOrmModel.category_id == encoded_id,
             ProductOrmModel.base_price >= p_min,
             ProductOrmModel.base_price <= p_max,
@@ -125,23 +134,23 @@ class SQLProductRepository(ProductRepository):
         with_discounts_only: bool = False,
         orderby_attr: Column = None,
         descending: bool = False,
-    ) -> list[Product]:
-        with self._session as s:
-            query = self._generate_get_products_query(
-                category_id,
-                s,
-                price_min,
-                price_max,
-                rating_min,
-                rating_max,
-                with_discounts_only,
-                orderby_attr,
-                descending,
-            )
-            products: list[ProductOrmModel] = query.all()
-            domain_entities = [p.to_domain_entity() for p in products]
-        return domain_entities
+        _session: Session = None,
+    ) -> tuple[Product]:
+        query = self._generate_get_products_query(
+            category_id,
+            _session,
+            price_min,
+            price_max,
+            rating_min,
+            rating_max,
+            with_discounts_only,
+            orderby_attr,
+            descending,
+        )
+        products: list[ProductOrmModel] = query.all()
+        return tuple(p.to_domain_entity() for p in products)
 
+    @_crud_operation
     def get_products(
         self,
         category_id: UUID,
@@ -150,7 +159,8 @@ class SQLProductRepository(ProductRepository):
         rating_min: Decimal = Decimal("0"),
         rating_max: Decimal = Decimal("5"),
         with_discounts_only: bool = False,
-    ) -> list[Product]:
+        _session: Session = None,
+    ) -> tuple[Product]:
         return self._get_products(
             category_id,
             price_min,
@@ -158,8 +168,10 @@ class SQLProductRepository(ProductRepository):
             rating_min,
             rating_max,
             with_discounts_only,
+            _session=_session,
         )
 
+    @_crud_operation
     def get_products_ordering_by_rating(
         self,
         category_id: UUID,
@@ -169,7 +181,8 @@ class SQLProductRepository(ProductRepository):
         rating_max: Decimal = Decimal("5"),
         with_discounts_only: bool = False,
         descending: bool = True,
-    ) -> list[Product]:
+        _session: Session = None,
+    ) -> tuple[Product]:
         orderby_attr = ProductOrmModel.rating
         return self._get_products(
             category_id,
@@ -180,8 +193,10 @@ class SQLProductRepository(ProductRepository):
             with_discounts_only,
             orderby_attr=orderby_attr,
             descending=descending,
+            _session=_session,
         )
 
+    @_crud_operation
     def get_products_ordering_by_price(
         self,
         category_id: UUID,
@@ -191,7 +206,8 @@ class SQLProductRepository(ProductRepository):
         rating_max: Decimal = Decimal("5"),
         with_discounts_only: bool = False,
         descending: bool = False,
-    ) -> list[Product]:
+        _session: Session = None,
+    ) -> tuple[Product]:
         orderby_attr = ProductOrmModel.base_price
         return self._get_products(
             category_id,
@@ -202,57 +218,56 @@ class SQLProductRepository(ProductRepository):
             with_discounts_only,
             orderby_attr=orderby_attr,
             descending=descending,
+            _session=_session,
         )
 
+    @_crud_operation
     def get_top_level_category(
-        self, category_id: UUID
+        self, category_id: UUID, _session: Session = None
     ) -> Optional[TopLevelProductCategory]:
         encoded_id = self._encode_uuid(category_id)
-        with self._session as s:
-            orm_category: TopLevelCategoryOrmModel = s.get(
-                TopLevelCategoryOrmModel, encoded_id
-            )
-            domain_entity = orm_category.to_domain_entity() if orm_category else None
-        return domain_entity
+        orm_category: TopLevelCategoryOrmModel = _session.get(
+            TopLevelCategoryOrmModel, encoded_id
+        )
+        return orm_category.to_domain_entity() if orm_category else None
 
-    def get_top_level_categories(self) -> tuple[TopLevelProductCategory]:
-        with self._session as s:
-            categories = s.query(TopLevelCategoryOrmModel).all()
+    @_crud_operation
+    def get_top_level_categories(
+        self, _session: Session = None
+    ) -> tuple[TopLevelProductCategory]:
+        categories = _session.query(TopLevelCategoryOrmModel).all()
         return tuple(c.to_domain_entity() for c in categories)
 
+    @_crud_operation
     def get_mid_level_category(
-        self, category_id: UUID
+        self, category_id: UUID, _session: Session = None
     ) -> Optional[MidLevelProductCategory]:
         encoded_id = self._encode_uuid(category_id)
-        with self._session as s:
-            orm_category: MidLevelCategoryOrmModel = s.get(
-                MidLevelCategoryOrmModel, encoded_id
-            )
-            domain_entity = orm_category.to_domain_entity() if orm_category else None
-        return domain_entity
+        orm_category: MidLevelCategoryOrmModel = _session.get(
+            MidLevelCategoryOrmModel, encoded_id
+        )
+        return orm_category.to_domain_entity() if orm_category else None
 
+    @_crud_operation
     def get_mid_level_categories(
-        self, parent_id: UUID
+        self, parent_id: UUID, _session: Session = None
     ) -> Optional[tuple[MidLevelProductCategory]]:
         encoded_id = self._encode_uuid(parent_id)
-        with self._session as s:
-            top_category: TopLevelCategoryOrmModel = s.get(
-                TopLevelCategoryOrmModel,
-                encoded_id,
-                options=(joinedload(TopLevelCategoryOrmModel.children),),
-            )
-            if top_category is None:
-                return None
-            categories = tuple(c.to_domain_entity() for c in top_category.children)
-        return categories
+        top_category: TopLevelCategoryOrmModel = _session.get(
+            TopLevelCategoryOrmModel,
+            encoded_id,
+            options=(joinedload(TopLevelCategoryOrmModel.children),),
+        )
+        if top_category is None:
+            return None
+        return tuple(c.to_domain_entity() for c in top_category.children)
 
+    @_crud_operation
     def get_terminal_level_category(
-        self, category_id: UUID
+        self, category_id: UUID, _session: Session = None
     ) -> Optional[TerminalLevelProductCategory]:
         encoded_id = self._encode_uuid(category_id)
-        with self._session as s:
-            orm_category: TerminalCategoryOrmModel = s.get(
-                TerminalCategoryOrmModel, encoded_id
-            )
-            category = orm_category.to_domain_entity() if orm_category else None
-        return category
+        orm_category: TerminalCategoryOrmModel = _session.get(
+            TerminalCategoryOrmModel, encoded_id
+        )
+        return orm_category.to_domain_entity() if orm_category else None
