@@ -271,3 +271,8 @@ class SQLProductRepository(ProductRepository):
             TerminalCategoryOrmModel, encoded_id
         )
         return orm_category.to_domain_entity() if orm_category else None
+
+    def get_terminal_level_categories(
+        self, parent_id: UUID
+    ) -> Optional[tuple[TerminalLevelProductCategory]]:
+        pass

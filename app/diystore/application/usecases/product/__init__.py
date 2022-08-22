@@ -22,3 +22,6 @@ from .getmidlevelcategories import get_mid_level_categories
 from .getterminallevelcategory import GetTerminalLevelCategoryInputDTO
 from .getterminallevelcategory import GetTerminalLevelCategoryOutputDTO
 from .getterminallevelcategory import get_terminal_level_category
+from .getterminallevelcategories import GetTerminalLevelCategoriesInputDTO
+from .getterminallevelcategories import GetTerminalLevelCategoriesOutputDTO
+from .getterminallevelcategories import get_terminal_level_categories

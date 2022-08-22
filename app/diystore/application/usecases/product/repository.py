@@ -82,3 +82,9 @@ class ProductRepository(ABC):
         self, category_id: UUID
     ) -> Optional[TerminalLevelProductCategory]:
         ...
+
+    @abstractmethod
+    def get_terminal_level_categories(
+        self, parent_id: UUID
+    ) -> Optional[tuple[TerminalLevelProductCategory]]:
+        ...
