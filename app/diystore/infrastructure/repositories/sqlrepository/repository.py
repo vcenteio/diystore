@@ -13,6 +13,7 @@ from pydantic import AnyUrl
 
 from .models import Base
 from .models.product import ProductOrmModel
+from .models.product import ProductVendorOrmModel
 from .models.categories import TopLevelCategoryOrmModel
 from .models.categories import MidLevelCategoryOrmModel
 from .models.categories import TerminalCategoryOrmModel
@@ -285,9 +286,12 @@ class SQLProductRepository(ProductRepository):
         )
         if parent is not None:
             return tuple(c.to_domain_entity() for c in parent.children)
+        return None
 
     @_crud_operation
     def get_vendor(
         self, vendor_id: UUID, _session: Session = None
     ) -> Optional[ProductVendor]:
-        pass
+        encoded_id = self._encode_uuid(vendor_id)
+        vendor: ProductVendorOrmModel = _session.get(ProductVendorOrmModel, encoded_id)
+        return vendor.to_domain_entity() if vendor is not None else None

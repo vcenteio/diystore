@@ -7,6 +7,8 @@ import pytest
 from sqlalchemy.orm import Session
 from factory import Factory
 
+from .conftest import ProductVendorOrmModelStub
+from .conftest import ProductVendorStub
 from .conftest import TopLevelCategoryOrmModelStub
 from .conftest import MidLevelCategoryOrmModelStub
 from .conftest import TerminalCategoryOrmModelStub
@@ -20,6 +22,7 @@ from diystore.domain.entities.product import TopLevelProductCategory
 from diystore.domain.entities.product import ProductVendor
 from diystore.domain.entities.product import ProductReview
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
+from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
 
 
 def test_infra_sqlrepo_repository_get_product_wrong_id_type(
@@ -515,3 +518,32 @@ def test_infra_sqlrepo_get_terminal_level_categories_existent_categories(
 
     # THEN all the child terminal categories should be returned
     assert retrieved_categories == expected
+
+
+def test_infra_sqlrepo_get_vendor_non_existing_vendor(sqlrepo: SQLProductRepository):
+    # GIVEN an id not associated with an existing vendor
+    _id = uuid1()
+
+    # WHEN a vendor is queried with such id
+    vendor = sqlrepo.get_vendor(_id)
+
+    # THEN no vendor is returned
+    assert vendor is None
+
+
+def test_infra_sqlrepo_get_vendor_existing_vendor(sqlrepo: SQLProductRepository):
+    # GIVEN an id associated with an existing vendor
+    existing_vendor = ProductVendorStub()
+
+    with sqlrepo._session as s:
+        s.add(ProductVendorOrmModel.from_domain_entity(existing_vendor))
+        s.commit()
+
+    # WHEN a vendor is queried with such id
+    vendor = sqlrepo.get_vendor(existing_vendor.id)
+
+    # THEN a valid vendor object is returned
+    assert vendor.id == existing_vendor.id
+    assert vendor.name == existing_vendor.name
+    assert vendor.description == existing_vendor.description
+    assert vendor.logo_url == existing_vendor.logo_url
