@@ -17,6 +17,7 @@ from .models.categories import TopLevelCategoryOrmModel
 from .models.categories import MidLevelCategoryOrmModel
 from .models.categories import TerminalCategoryOrmModel
 from ....domain.entities.product import Product
+from ....domain.entities.product import ProductVendor
 from ....domain.entities.product import TopLevelProductCategory
 from ....domain.entities.product import MidLevelProductCategory
 from ....domain.entities.product import TerminalLevelProductCategory
@@ -284,3 +285,9 @@ class SQLProductRepository(ProductRepository):
         )
         if parent is not None:
             return tuple(c.to_domain_entity() for c in parent.children)
+
+    @_crud_operation
+    def get_vendor(
+        self, vendor_id: UUID, _session: Session = None
+    ) -> Optional[ProductVendor]:
+        pass

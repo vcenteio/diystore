@@ -5,6 +5,7 @@ from typing import Optional
 from uuid import UUID
 
 from ....domain.entities.product import Product
+from ....domain.entities.product.vendor import ProductVendor
 from ....domain.entities.product import TopLevelProductCategory
 from ....domain.entities.product import MidLevelProductCategory
 from ....domain.entities.product import TerminalLevelProductCategory
@@ -87,4 +88,8 @@ class ProductRepository(ABC):
     def get_terminal_level_categories(
         self, parent_id: UUID
     ) -> Optional[tuple[TerminalLevelProductCategory]]:
+        ...
+
+    @abstractmethod
+    def get_vendor(self, vendor_id: UUID) -> Optional[ProductVendor]:
         ...
