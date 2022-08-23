@@ -7,8 +7,10 @@ from .exceptions import InvalidQueryArgument
 from .exceptions import InvalidVendorID
 from .exceptions import InvalidProductID
 from .exceptions import InvalidCategoryID
+from .exceptions import InvalidReviewID
 from .exceptions import ProductNotFound
 from .exceptions import VendorNotFound
+from .exceptions import ReviewNotFound
 from .exceptions import TopCategoryNotFound
 from .exceptions import MidCategoryNotFound
 from .exceptions import TerminalCategoryNotFound
@@ -36,6 +38,9 @@ from ....application.usecases.product import get_terminal_level_categories
 from ....application.usecases.product import GetProductVendorInputDTO
 from ....application.usecases.product import get_vendor
 from ....application.usecases.product import get_vendors
+from ....application.usecases.product import GetProductReviewInputDTO
+from ....application.usecases.product import get_review
+
 
 
 class ProductController:
@@ -227,4 +232,15 @@ class ProductController:
     @_cache
     def get_vendors(self) -> str:
         output_dto = get_vendors(self._repo)
+        return self._generate_representation(output_dto)
+
+    @_cache
+    def get_review(self, *, review_id: str) -> str:
+        try:
+            input_dto = GetProductReviewInputDTO(review_id=review_id)
+        except ValidationError:
+            raise InvalidReviewID(_id=review_id)
+        output_dto = get_review(input_dto, self._repo)
+        if output_dto is None:
+            raise ReviewNotFound(_id=review_id)
         return self._generate_representation(output_dto)

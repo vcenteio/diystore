@@ -11,7 +11,9 @@ from .conftest import ProductVendorOrmModel
 from .conftest import TopLevelCategoryOrmModelStub
 from .conftest import MidLevelCategoryOrmModelStub
 from .conftest import TerminalCategoryOrmModelStub
+from .conftest import ProductReviewStub
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
+from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
 from diystore.infrastructure.controllers.web import ProductController
 from diystore.infrastructure.controllers.web.exceptions import InvalidProductID
 from diystore.infrastructure.controllers.web.exceptions import InvalidVendorID
@@ -22,6 +24,8 @@ from diystore.infrastructure.controllers.web.exceptions import TopCategoryNotFou
 from diystore.infrastructure.controllers.web.exceptions import MidCategoryNotFound
 from diystore.infrastructure.controllers.web.exceptions import TerminalCategoryNotFound
 from diystore.infrastructure.controllers.web.exceptions import InvalidQueryArgument
+from diystore.infrastructure.controllers.web.exceptions import ReviewNotFound
+from diystore.infrastructure.controllers.web.exceptions import InvalidReviewID
 
 
 def test_infra_product_controller_get_one_invalid_id_value(
@@ -530,3 +534,36 @@ def test_infra_product_controller_get_vendors_existing_vendors(
         assert vendor.name in representation
         assert vendor.description in representation
         assert vendor.logo_url in representation
+
+
+def test_infra_product_controller_get_review_non_existent_review(
+    product_controller: ProductController,
+):
+    # GIVEN an id associated with no review
+    _id = uuid4()
+
+    # WHEN a query for a review is made with such id
+    # THEN an error is raised
+    with pytest.raises(ReviewNotFound):
+        product_controller.get_review(review_id=_id.hex)
+
+
+def test_infra_product_controller_get_review_existent_review(
+    product_controller: ProductController,
+):
+    # GIVEN an existent review
+    review = ProductReviewStub()
+    repo = product_controller._repo
+    with repo._session as s:
+        s.add(ProductReviewOrmModel.from_domain_entity(review))
+        s.commit()
+
+    # WHEN a query for such review is made
+    representation = product_controller.get_review(review_id=review.id.hex)
+
+    # THEN a correct representation is returned
+    assert review.id.hex in representation
+    assert review.product_id.hex in representation
+    assert review.client_id.hex in representation
+    assert review.creation_date.isoformat() in representation
+    assert review.feedback in representation

@@ -56,6 +56,14 @@ class InvalidVendorID(UnprocessableEntity):
         super().__init__(self.msg)
 
 
+class InvalidReviewID(UnprocessableEntity):
+    default_msg = "invalid review id {_id}"
+
+    def __init__(self, msg=None, _id=None):
+        self.msg = msg or self.default_msg.format(_id=_id if _id else "")
+        super().__init__(self.msg)
+
+
 class InvalidQueryArgument(UnprocessableEntity):
     default_msg = "invalid query argument {text}"
 
@@ -107,6 +115,14 @@ class TerminalCategoryNotFound(NotFound):
 
 class VendorNotFound(NotFound):
     default_msg = "no vendor associated with the id {_id}"
+
+    def __init__(self, msg=None, _id=None):
+        self.msg = msg or self.default_msg.format(_id=_id if _id else "")
+        super().__init__(self.msg)
+
+
+class ReviewNotFound(NotFound):
+    default_msg = "no review associated with the id {_id}"
 
     def __init__(self, msg=None, _id=None):
         self.msg = msg or self.default_msg.format(_id=_id if _id else "")
