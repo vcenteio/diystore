@@ -30,3 +30,6 @@ from .getvendor import GetProductVendorOutputDTO
 from .getvendor import get_vendor
 from .getvendors import GetProductVendorsOutputDTO
 from .getvendors import get_vendors
+from .getreview import GetProductReviewInputDTO
+from .getreview import GetProductReviewOutputDTO
+from .getreview import get_review

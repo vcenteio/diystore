@@ -5,7 +5,8 @@ from typing import Optional
 from uuid import UUID
 
 from ....domain.entities.product import Product
-from ....domain.entities.product.vendor import ProductVendor
+from ....domain.entities.product import ProductVendor
+from ....domain.entities.product import ProductReview
 from ....domain.entities.product import TopLevelProductCategory
 from ....domain.entities.product import MidLevelProductCategory
 from ....domain.entities.product import TerminalLevelProductCategory
@@ -96,4 +97,8 @@ class ProductRepository(ABC):
 
     @abstractmethod
     def get_vendors(self) -> tuple[ProductVendor]:
+        ...
+
+    @abstractmethod
+    def get_review(self, review_id: UUID) -> Optional[ProductReview]:
         ...

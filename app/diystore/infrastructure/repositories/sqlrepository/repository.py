@@ -19,6 +19,7 @@ from .models.categories import MidLevelCategoryOrmModel
 from .models.categories import TerminalCategoryOrmModel
 from ....domain.entities.product import Product
 from ....domain.entities.product import ProductVendor
+from ....domain.entities.product import ProductReview
 from ....domain.entities.product import TopLevelProductCategory
 from ....domain.entities.product import MidLevelProductCategory
 from ....domain.entities.product import TerminalLevelProductCategory
@@ -300,3 +301,7 @@ class SQLProductRepository(ProductRepository):
     def get_vendors(self, _session: Session) -> tuple[ProductVendor]:
         orm_vendors = _session.query(ProductVendorOrmModel)
         return tuple(v.to_domain_entity() for v in orm_vendors)
+
+    @_crud_operation
+    def get_review(self, review_id: UUID, _session: Session) -> Optional[ProductReview]:
+        pass
