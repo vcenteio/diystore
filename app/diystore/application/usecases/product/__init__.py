@@ -28,3 +28,5 @@ from .getterminallevelcategories import get_terminal_level_categories
 from .getvendor import GetProductVendorInputDTO
 from .getvendor import GetProductVendorOutputDTO
 from .getvendor import get_vendor
+from .getvendors import GetProductVendorsOutputDTO
+from .getvendors import get_vendors

@@ -93,3 +93,7 @@ class ProductRepository(ABC):
     @abstractmethod
     def get_vendor(self, vendor_id: UUID) -> Optional[ProductVendor]:
         ...
+
+    @abstractmethod
+    def get_vendors(self) -> tuple[ProductVendor]:
+        ...

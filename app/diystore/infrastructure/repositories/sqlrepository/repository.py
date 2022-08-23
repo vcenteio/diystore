@@ -295,3 +295,7 @@ class SQLProductRepository(ProductRepository):
         encoded_id = self._encode_uuid(vendor_id)
         vendor: ProductVendorOrmModel = _session.get(ProductVendorOrmModel, encoded_id)
         return vendor.to_domain_entity() if vendor is not None else None
+
+    @_crud_operation
+    def get_vendors(self, _session: Session) -> tuple[ProductVendor]:
+        pass
