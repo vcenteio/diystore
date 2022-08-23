@@ -35,6 +35,7 @@ from ....application.usecases.product import GetTerminalLevelCategoriesInputDTO
 from ....application.usecases.product import get_terminal_level_categories
 from ....application.usecases.product import GetProductVendorInputDTO
 from ....application.usecases.product import get_vendor
+from ....application.usecases.product import get_vendors
 
 
 class ProductController:
@@ -221,4 +222,9 @@ class ProductController:
         output_dto = get_vendor(input_dto, self._repo)
         if output_dto is None:
             raise VendorNotFound(_id=vendor_id)
+        return self._generate_representation(output_dto)
+
+    @_cache
+    def get_vendors(self) -> str:
+        output_dto = get_vendors(self._repo)
         return self._generate_representation(output_dto)

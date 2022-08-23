@@ -497,3 +497,36 @@ def test_infra_product_controller_get_vendor_existent_vendor(
     assert vendor.name == retrieved_vendor.name
     assert vendor.description == retrieved_vendor.description
     assert vendor.logo_url == retrieved_vendor.logo_url
+
+
+def test_infra_product_controller_get_vendors_no_existing_vendors(
+    product_controller: ProductController,
+):
+    # GIVEN a repository with no existing vendors
+    # WHEN a representation of all vendors are requested
+    representation = product_controller.get_vendors()
+
+    # THEN a representation with no vendor information is returned
+    dict_repr = json.loads(representation)
+    assert len(dict_repr.get("vendors")) == 0
+
+
+def test_infra_product_controller_get_vendors_existing_vendors(
+    product_controller: ProductController,
+):
+    # GIVEN a repository with existing vendors
+    vendors = ProductVendorStub.build_batch(3)
+    repo = product_controller._repo
+    with repo._session as s:
+        s.add_all(ProductVendorOrmModel.from_domain_entity(v) for v in vendors)
+        s.commit()
+
+    # WHEN a representation of all vendors are requested
+    representation = product_controller.get_vendors()
+
+    # THEN a representation containing information of all vendors is returned
+    for vendor in vendors:
+        assert vendor.id.hex in representation
+        assert vendor.name in representation
+        assert vendor.description in representation
+        assert vendor.logo_url in representation
