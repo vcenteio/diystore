@@ -17,6 +17,7 @@ from .models.product import ProductVendorOrmModel
 from .models.categories import TopLevelCategoryOrmModel
 from .models.categories import MidLevelCategoryOrmModel
 from .models.categories import TerminalCategoryOrmModel
+from .models.review import ProductReviewOrmModel
 from ....domain.entities.product import Product
 from ....domain.entities.product import ProductVendor
 from ....domain.entities.product import ProductReview
@@ -304,4 +305,10 @@ class SQLProductRepository(ProductRepository):
 
     @_crud_operation
     def get_review(self, review_id: UUID, _session: Session) -> Optional[ProductReview]:
-        pass
+        encoded_id = self._encode_uuid(review_id)
+        orm_review: ProductReviewOrmModel = _session.get(
+            ProductReviewOrmModel, encoded_id
+        )
+        if orm_review is not None:
+            return orm_review.to_domain_entity()
+        return None

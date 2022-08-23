@@ -14,6 +14,8 @@ from .conftest import MidLevelCategoryOrmModelStub
 from .conftest import TerminalCategoryOrmModelStub
 from .conftest import ProductOrmModelStub
 from .conftest import LoadedProductOrmModelStub
+from .conftest import ProductReviewOrmModelStub
+from .conftest import ProductReviewStub
 from .conftest import persist_new_products_and_return_category_id
 from diystore.domain.entities.product import Product
 from diystore.domain.entities.product import TerminalLevelProductCategory
@@ -23,6 +25,7 @@ from diystore.domain.entities.product import ProductVendor
 from diystore.domain.entities.product import ProductReview
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
 from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
+from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
 
 
 def test_infra_sqlrepo_repository_get_product_wrong_id_type(
@@ -571,3 +574,28 @@ def test_infra_sqlrepo_get_vendors_existing_vendors(sqlrepo: SQLProductRepositor
 
     # THEN all vendors are returned
     assert expected_vendors == retrieved_vendors
+
+
+def test_infra_sqlrepo_get_review_non_existent_review(sqlrepo: SQLProductRepository):
+    # GIVEN an id associated with no review
+    _id = uuid4()
+
+    # WHEN a query for a review is made with such id
+    review = sqlrepo.get_review(_id)
+
+    # THEN no review is returned
+    assert review is None
+
+
+def test_infra_sqlrepo_get_review_existing_review(sqlrepo: SQLProductRepository):
+    # GIVEN an existing review
+    review = ProductReviewStub()
+    with sqlrepo._session as s:
+        s.add(ProductReviewOrmModel.from_domain_entity(review))
+        s.commit()
+
+    # WHEN a query is made for such review
+    retrieved_review = sqlrepo.get_review(review.id)
+
+    # THEN the correct review is returned
+    assert review == retrieved_review
