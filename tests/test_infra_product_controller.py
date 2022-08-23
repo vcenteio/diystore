@@ -6,14 +6,18 @@ from uuid import UUID
 import pytest
 
 from .conftest import LoadedProductOrmModelStub
+from .conftest import ProductVendorStub
+from .conftest import ProductVendorOrmModel
 from .conftest import TopLevelCategoryOrmModelStub
 from .conftest import MidLevelCategoryOrmModelStub
 from .conftest import TerminalCategoryOrmModelStub
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
 from diystore.infrastructure.controllers.web import ProductController
 from diystore.infrastructure.controllers.web.exceptions import InvalidProductID
+from diystore.infrastructure.controllers.web.exceptions import InvalidVendorID
 from diystore.infrastructure.controllers.web.exceptions import InvalidCategoryID
 from diystore.infrastructure.controllers.web.exceptions import ProductNotFound
+from diystore.infrastructure.controllers.web.exceptions import VendorNotFound
 from diystore.infrastructure.controllers.web.exceptions import TopCategoryNotFound
 from diystore.infrastructure.controllers.web.exceptions import MidCategoryNotFound
 from diystore.infrastructure.controllers.web.exceptions import TerminalCategoryNotFound
@@ -447,3 +451,49 @@ def test_infra_product_controller_get_terminal_categories_existing_categories(
         assert category.id.hex in representation
         assert category.name in representation
         assert category.description in representation
+
+
+def test_infra_product_controller_get_vendor_invalid_id(
+    product_controller: ProductController,
+):
+    # GIVEN an invalid id
+    _id = 123
+
+    # WHEN a vendor is queried with such id
+    # THEN an error occurs
+    with pytest.raises(InvalidVendorID):
+        product_controller.get_vendor(vendor_id=_id)
+
+
+def test_infra_product_controller_get_vendor_non_existent_vendor(
+    product_controller: ProductController,
+):
+    # GIVEN a valid id associated with no vendor
+    _id = uuid1()
+
+    # WHEN a vendor is queried with such id
+    # THEN an error occurs
+    with pytest.raises(VendorNotFound):
+        product_controller.get_vendor(vendor_id=_id)
+
+
+def test_infra_product_controller_get_vendor_existent_vendor(
+    product_controller: ProductController,
+):
+    # GIVEN an existing vendor
+    vendor = ProductVendorStub()
+    repo = product_controller._repo
+    with repo._session as s:
+        s.add(ProductVendorOrmModel.from_domain_entity(vendor))
+        s.commit()
+
+    # WHEN such vendor is queried using its id
+    representation = product_controller.get_vendor(vendor_id=vendor.id.hex)
+
+    # THEN a valid representation of the vendor is returned
+    dict_repr = json.loads(representation)
+    retrieved_vendor = ProductVendorStub(**dict_repr)
+    assert vendor.id == retrieved_vendor.id
+    assert vendor.name == retrieved_vendor.name
+    assert vendor.description == retrieved_vendor.description
+    assert vendor.logo_url == retrieved_vendor.logo_url

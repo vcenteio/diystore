@@ -4,9 +4,11 @@ from functools import wraps
 from pydantic import ValidationError
 
 from .exceptions import InvalidQueryArgument
+from .exceptions import InvalidVendorID
 from .exceptions import InvalidProductID
 from .exceptions import InvalidCategoryID
 from .exceptions import ProductNotFound
+from .exceptions import VendorNotFound
 from .exceptions import TopCategoryNotFound
 from .exceptions import MidCategoryNotFound
 from .exceptions import TerminalCategoryNotFound
@@ -22,19 +24,17 @@ from ....application.usecases.product import OrderingProperty
 from ....application.usecases.product import OrderingType
 from ....application.usecases.product import get_top_level_category
 from ....application.usecases.product import GetTopLevelCategoryInputDTO
-from ....application.usecases.product import GetTopLevelCategoryOutputDTO
 from ....application.usecases.product import get_top_level_categories
-from ....application.usecases.product import GetTopLevelCategoriesOutputDTO
 from ....application.usecases.product import GetMidLevelCategoryInputDTO
 from ....application.usecases.product import get_mid_level_category
 from ....application.usecases.product import get_mid_level_categories
 from ....application.usecases.product import GetMidLevelCategoriesInputDTO
-from ....application.usecases.product import GetMidLevelCategoriesOutputDTO
 from ....application.usecases.product import GetTerminalLevelCategoryInputDTO
 from ....application.usecases.product import get_terminal_level_category
 from ....application.usecases.product import GetTerminalLevelCategoriesInputDTO
-from ....application.usecases.product import GetTerminalLevelCategoriesOutputDTO
 from ....application.usecases.product import get_terminal_level_categories
+from ....application.usecases.product import GetProductVendorInputDTO
+from ....application.usecases.product import get_vendor
 
 
 class ProductController:
@@ -210,4 +210,15 @@ class ProductController:
         output_dto = get_terminal_level_categories(input_dto, self._repo)
         if output_dto is None:
             raise MidCategoryNotFound(_id=parent_id)
+        return self._generate_representation(output_dto)
+
+    @_cache
+    def get_vendor(self, *, vendor_id: str) -> str:
+        try:
+            input_dto = GetProductVendorInputDTO(vendor_id=vendor_id)
+        except ValidationError:
+            raise InvalidVendorID(_id=vendor_id)
+        output_dto = get_vendor(input_dto, self._repo)
+        if output_dto is None:
+            raise VendorNotFound(_id=vendor_id)
         return self._generate_representation(output_dto)

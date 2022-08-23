@@ -48,6 +48,14 @@ class InvalidCategoryID(UnprocessableEntity):
         super().__init__(self.msg)
 
 
+class InvalidVendorID(UnprocessableEntity):
+    default_msg = "invalid vendor id {_id}"
+
+    def __init__(self, msg=None, _id=None):
+        self.msg = msg or self.default_msg.format(_id=_id if _id else "")
+        super().__init__(self.msg)
+
+
 class InvalidQueryArgument(UnprocessableEntity):
     default_msg = "invalid query argument {text}"
 
@@ -91,6 +99,14 @@ class MidCategoryNotFound(NotFound):
 
 class TerminalCategoryNotFound(NotFound):
     default_msg = "no terminal category associated with the id {_id}"
+
+    def __init__(self, msg=None, _id=None):
+        self.msg = msg or self.default_msg.format(_id=_id if _id else "")
+        super().__init__(self.msg)
+
+
+class VendorNotFound(NotFound):
+    default_msg = "no vendor associated with the id {_id}"
 
     def __init__(self, msg=None, _id=None):
         self.msg = msg or self.default_msg.format(_id=_id if _id else "")
