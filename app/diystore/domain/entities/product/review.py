@@ -2,12 +2,12 @@ from datetime import datetime
 from uuid import UUID
 from uuid import uuid4
 
+import pendulum
+from pendulum.datetime import DateTime
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic import validator
 from pydantic import Extra
-import pendulum
-from pendulum.datetime import DateTime
 
 from .types import ProductRating
 
@@ -17,7 +17,7 @@ class ProductReview(BaseModel):
     product_id: UUID = Field(...)
     client_id: UUID = Field(...)
     rating: ProductRating = Field(...)
-    creation_date: datetime = Field(...)
+    creation_date: DateTime = Field(...)
     feedback: str = Field(default=None, min_length=1, max_length=3000)
 
     class Config:
