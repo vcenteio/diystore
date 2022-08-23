@@ -298,4 +298,5 @@ class SQLProductRepository(ProductRepository):
 
     @_crud_operation
     def get_vendors(self, _session: Session) -> tuple[ProductVendor]:
-        pass
+        orm_vendors = _session.query(ProductVendorOrmModel)
+        return tuple(v.to_domain_entity() for v in orm_vendors)

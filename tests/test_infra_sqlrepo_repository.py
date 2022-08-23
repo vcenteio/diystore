@@ -547,3 +547,27 @@ def test_infra_sqlrepo_get_vendor_existing_vendor(sqlrepo: SQLProductRepository)
     assert vendor.name == existing_vendor.name
     assert vendor.description == existing_vendor.description
     assert vendor.logo_url == existing_vendor.logo_url
+
+
+def test_infra_sqlrepo_get_vendors_no_existing_vendors(sqlrepo: SQLProductRepository):
+    # GIVEN a repository with no vendors
+    # WHEN a query for all vendors is made
+    vendors = sqlrepo.get_vendors()
+
+    # THEN no vendors are returned
+    assert vendors == ()
+
+
+def test_infra_sqlrepo_get_vendors_existing_vendors(sqlrepo: SQLProductRepository):
+    # GIVEN a repository with vendors
+    vendors = ProductVendorOrmModelStub.build_batch(3)
+    expected_vendors = tuple(v.to_domain_entity() for v in vendors)
+    with sqlrepo._session as s:
+        s.add_all(vendors)
+        s.commit()
+
+    # WHEN a query for all vendors is made
+    retrieved_vendors = sqlrepo.get_vendors()
+
+    # THEN all vendors are returned
+    assert expected_vendors == retrieved_vendors
