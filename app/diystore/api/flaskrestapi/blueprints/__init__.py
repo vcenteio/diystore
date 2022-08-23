@@ -8,6 +8,7 @@ from flask import current_app
 from .category_bp import bp as categorybp
 from .product_bp import bp as productbp
 from .vendor_bp import bp as vendorbp
+from .review_bp import bp as reviewbp
 from ....infrastructure.controllers.web import ProductController
 from ....infrastructure.controllers.web.exceptions import BadRequest
 from ....infrastructure.controllers.web.factories import ProductControllerFactory
@@ -17,6 +18,7 @@ products_bp = Blueprint("products", __name__)
 products_bp.register_blueprint(categorybp)
 products_bp.register_blueprint(productbp)
 products_bp.register_blueprint(vendorbp)
+products_bp.register_blueprint(reviewbp)
 
 product_controller: ProductController = ProductControllerFactory()
 
