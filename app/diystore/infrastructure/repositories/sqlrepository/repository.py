@@ -312,3 +312,7 @@ class SQLProductRepository(ProductRepository):
         if orm_review is not None:
             return orm_review.to_domain_entity()
         return None
+
+    @_crud_operation
+    def get_reviews(self, product_id: UUID) -> Optional[tuple[ProductReview]]:
+        pass

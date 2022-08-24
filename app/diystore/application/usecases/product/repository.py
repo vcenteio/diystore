@@ -102,3 +102,7 @@ class ProductRepository(ABC):
     @abstractmethod
     def get_review(self, review_id: UUID) -> Optional[ProductReview]:
         ...
+
+    @abstractmethod
+    def get_reviews(self, product_id: UUID) -> Optional[tuple[ProductReview]]:
+        ...

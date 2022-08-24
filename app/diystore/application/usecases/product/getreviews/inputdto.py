@@ -6,5 +6,5 @@ from ....dto import DTO
 
 
 @dataclass(frozen=True)
-class GetProductReviewInputDTO(DTO):
-    review_id: UUID
+class GetProductReviewsInputDTO(DTO):
+    product_id: UUID
