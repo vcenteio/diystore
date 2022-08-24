@@ -52,7 +52,7 @@ class SQLProductRepository(ProductRepository):
             path=f"/{dbname}" if dbname is not None else None,
         )
         try:
-            self._engine = create_engine(db_url, future=True)
+            self._engine = create_engine(db_url, future=True, echo=True)
         except ArgumentError:
             raise ValueError(f"invalid url passed as argument: {db_url}")
         base.metadata.create_all(self._engine)
@@ -268,7 +268,7 @@ class SQLProductRepository(ProductRepository):
 
     @_crud_operation
     def get_terminal_level_category(
-        self, category_id: UUID, _session: Session = None
+        self, category_id: UUID, _session: Session
     ) -> Optional[TerminalLevelProductCategory]:
         encoded_id = self._encode_uuid(category_id)
         orm_category: TerminalCategoryOrmModel = _session.get(
@@ -278,7 +278,7 @@ class SQLProductRepository(ProductRepository):
 
     @_crud_operation
     def get_terminal_level_categories(
-        self, parent_id: UUID, _session: Session = None
+        self, parent_id: UUID, _session: Session
     ) -> Optional[tuple[TerminalLevelProductCategory]]:
         encoded_id = self._encode_uuid(parent_id)
         parent: MidLevelCategoryOrmModel = _session.get(
@@ -291,9 +291,7 @@ class SQLProductRepository(ProductRepository):
         return None
 
     @_crud_operation
-    def get_vendor(
-        self, vendor_id: UUID, _session: Session = None
-    ) -> Optional[ProductVendor]:
+    def get_vendor(self, vendor_id: UUID, _session: Session) -> Optional[ProductVendor]:
         encoded_id = self._encode_uuid(vendor_id)
         vendor: ProductVendorOrmModel = _session.get(ProductVendorOrmModel, encoded_id)
         return vendor.to_domain_entity() if vendor is not None else None
@@ -314,5 +312,17 @@ class SQLProductRepository(ProductRepository):
         return None
 
     @_crud_operation
-    def get_reviews(self, product_id: UUID) -> Optional[tuple[ProductReview]]:
-        pass
+    def get_reviews(
+        self, product_id: UUID, _session: Session
+    ) -> Optional[tuple[ProductReview]]:
+        encoded_id = self._encode_uuid(product_id)
+        product = (
+            _session.get(
+                ProductOrmModel,
+                encoded_id,
+                options=(joinedload(ProductOrmModel.reviews),),
+            )
+        )
+        if product is not None:
+            return tuple(r.to_domain_entity() for r in product.reviews)
+        return None

@@ -7,7 +7,7 @@ import pytest
 from sqlalchemy.orm import Session
 from factory import Factory
 
-from .conftest import ProductVendorOrmModelStub
+from .conftest import ProductStub, ProductVendorOrmModelStub
 from .conftest import ProductVendorStub
 from .conftest import TopLevelCategoryOrmModelStub
 from .conftest import MidLevelCategoryOrmModelStub
@@ -26,6 +26,7 @@ from diystore.domain.entities.product import ProductReview
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
 from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
+from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel
 
 
 def test_infra_sqlrepo_repository_get_product_wrong_id_type(
@@ -599,3 +600,48 @@ def test_infra_sqlrepo_get_review_existing_review(sqlrepo: SQLProductRepository)
 
     # THEN the correct review is returned
     assert review == retrieved_review
+
+
+def test_infra_sqlrepo_get_reviews_non_existing_product(sqlrepo: SQLProductRepository):
+    # GIVEN an id not associated with any product
+    _id = uuid4()
+
+    # WHEN reviews associated with such id are queried
+    result = sqlrepo.get_reviews(_id)
+
+    # THEN no DTO is returned
+    assert result is None
+
+
+def test_infra_sqlrepo_get_reviews_existing_product_with_no_reviews(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN an existing product with no reviews
+    product = ProductStub()
+    with sqlrepo._session as s:
+        s.add(ProductOrmModel.from_domain_entity(product))
+        s.commit()
+
+    # WHEN reviews associated with such id are queried
+    reviews = sqlrepo.get_reviews(product.id)
+
+    # THEN no reviews are returned
+    assert reviews == ()
+
+
+def test_infra_sqlrepo_get_reviews_existing_product_with_reviews(
+    sqlrepo: SQLProductRepository,
+):
+    # GIVEN an existing product_with_reviews
+    product = ProductStub()
+    reviews = ProductReviewStub.build_batch(3, product_id=product.id)
+    with sqlrepo._session as s:
+        s.add(ProductOrmModel.from_domain_entity(product))
+        s.add_all((ProductReviewOrmModel.from_domain_entity(r) for r in reviews))
+        s.commit()
+
+    # WHEN all of its reviews are queried
+    retrieved_reviews = sqlrepo.get_reviews(product.id)
+
+    # THEN all of its reviews are returned
+    assert retrieved_reviews == tuple(reviews)
