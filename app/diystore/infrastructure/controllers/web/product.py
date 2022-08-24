@@ -40,7 +40,8 @@ from ....application.usecases.product import get_vendor
 from ....application.usecases.product import get_vendors
 from ....application.usecases.product import GetProductReviewInputDTO
 from ....application.usecases.product import get_review
-
+from ....application.usecases.product import GetProductReviewsInputDTO
+from ....application.usecases.product import get_reviews
 
 
 class ProductController:
@@ -243,4 +244,15 @@ class ProductController:
         output_dto = get_review(input_dto, self._repo)
         if output_dto is None:
             raise ReviewNotFound(_id=review_id)
+        return self._generate_representation(output_dto)
+
+    @_cache
+    def get_reviews(self, *, product_id: str) -> str:
+        try:
+            input_dto = GetProductReviewsInputDTO(product_id=product_id)
+        except ValidationError:
+            raise InvalidProductID(_id=product_id)
+        output_dto = get_reviews(input_dto, self._repo)
+        if output_dto is None:
+            raise ProductNotFound(_id=product_id)
         return self._generate_representation(output_dto)

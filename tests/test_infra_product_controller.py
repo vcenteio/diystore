@@ -5,6 +5,8 @@ from uuid import UUID
 
 import pytest
 
+from .conftest import ProductStub
+
 from .conftest import LoadedProductOrmModelStub
 from .conftest import ProductVendorStub
 from .conftest import ProductVendorOrmModel
@@ -13,6 +15,8 @@ from .conftest import MidLevelCategoryOrmModelStub
 from .conftest import TerminalCategoryOrmModelStub
 from .conftest import ProductReviewStub
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
+from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
+from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
 from diystore.infrastructure.controllers.web import ProductController
 from diystore.infrastructure.controllers.web.exceptions import InvalidProductID
@@ -567,3 +571,40 @@ def test_infra_product_controller_get_review_existent_review(
     assert review.client_id.hex in representation
     assert review.creation_date.isoformat() in representation
     assert review.feedback in representation
+
+
+def test_infra_product_controller_get_reviews_non_existent_product(
+    product_controller: ProductController,
+):
+    # GIVEN an id associated with no product
+    _id = uuid4().hex
+
+    # WHEN reviews associated with such product id are queried
+    # THEN an error is raised
+    with pytest.raises(ProductNotFound):
+        product_controller.get_reviews(product_id=_id)
+
+def test_infra_product_controller_get_reviews_product_with_reviews(
+    product_controller: ProductController,
+):
+    # GIVEN an existing product with reviews
+    product = ProductStub()
+    reviews = ProductReviewStub.build_batch(3, product_id=product.id)
+
+    repo = product_controller._repo
+    with repo._session as s:
+        s.add(ProductOrmModel.from_domain_entity(product))
+        s.add_all(ProductReviewOrmModel.from_domain_entity(r) for r in reviews)
+        s.commit()
+    
+    # WHEN reviews associated with such product id are queried
+    representation = product_controller.get_reviews(product_id=product.id.hex)
+
+    # THEN a representation containing all product reviews is returned
+    for review in reviews:
+        assert review.id.hex in representation
+        assert review.product_id.hex in representation
+        assert review.client_id.hex in representation
+        assert review.creation_date.isoformat() in representation
+        assert review.feedback in representation
+    assert len(reviews) == len(json.loads(representation).get("reviews"))
