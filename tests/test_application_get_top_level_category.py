@@ -1,6 +1,6 @@
 import pytest
 
-from .conftest import TopLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import TopLevelProductCategoryStub
 from diystore.application.usecases.product import ProductRepository
 from diystore.application.usecases.product import get_top_level_category
 from diystore.application.usecases.product import GetTopLevelCategoryInputDTO

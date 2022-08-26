@@ -7,16 +7,10 @@ import pytest
 from sqlalchemy.orm import Session
 from factory import Factory
 
-from .conftest import ProductStub, ProductVendorOrmModelStub
-from .conftest import ProductVendorStub
-from .conftest import TopLevelCategoryOrmModelStub
-from .conftest import MidLevelCategoryOrmModelStub
-from .conftest import TerminalCategoryOrmModelStub
-from .conftest import ProductOrmModelStub
-from .conftest import LoadedProductOrmModelStub
-from .conftest import ProductReviewOrmModelStub
-from .conftest import ProductReviewStub
 from .conftest import persist_new_products_and_return_category_id
+from diystore.domain.entities.product.stubs import ProductStub
+from diystore.domain.entities.product.stubs import ProductVendorStub
+from diystore.domain.entities.product.stubs import ProductReviewStub
 from diystore.domain.entities.product import Product
 from diystore.domain.entities.product import TerminalLevelProductCategory
 from diystore.domain.entities.product import MidLevelProductCategory
@@ -27,6 +21,15 @@ from diystore.infrastructure.repositories.sqlrepository import SQLProductReposit
 from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import ProductReviewOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import ProductVendorOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import VatOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import DiscountOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import TerminalCategoryOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import MidLevelCategoryOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import TopLevelCategoryOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import ProductOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import LoadedProductOrmModelStub
 
 
 def test_infra_sqlrepo_repository_get_product_wrong_id_type(

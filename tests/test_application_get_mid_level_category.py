@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 from uuid import uuid4
 
-from .conftest import MidLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import MidLevelProductCategoryStub
 from diystore.domain.entities.product import MidLevelProductCategory
 from diystore.application.usecases.product import ProductRepository
 from diystore.application.usecases.product import get_mid_level_category

@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from .conftest import TopLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import TopLevelProductCategoryStub
 from diystore.application.usecases.product import get_top_level_categories
 from diystore.application.usecases.product import GetTopLevelCategoriesOutputDTO
 from diystore.application.usecases.product import GetTopLevelCategoryOutputDTO

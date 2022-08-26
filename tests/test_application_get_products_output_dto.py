@@ -2,9 +2,9 @@ from uuid import uuid4
 
 from diystore.application.usecases.product import GetProductOutputDTO
 from diystore.application.usecases.product import GetProductsOutputDTO
-from .conftest import Product
-from .conftest import ProductStub
-from .conftest import GetProductOutputDTOStub
+from diystore.domain.entities.product.stubs import Product
+from diystore.domain.entities.product.stubs import ProductStub
+from diystore.application.usecases.product.stubs import GetProductOutputDTOStub
 
 
 def test_application_get_products_product_output_dto_id_is_hex():

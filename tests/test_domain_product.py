@@ -6,6 +6,7 @@ import pendulum
 from pendulum.datetime import DateTime
 from pydantic.error_wrappers import ValidationError
 
+from diystore.domain.helpers import round_decimal
 from diystore.domain.entities.product import ProductPrice
 from diystore.domain.entities.product import ProductDimensions
 from diystore.domain.entities.product import TerminalLevelProductCategory
@@ -13,16 +14,15 @@ from diystore.domain.entities.product import ProductPhotoUrl
 from diystore.domain.entities.product import ProductVendor
 from diystore.domain.entities.product import Product
 from diystore.domain.entities.product import ProductRating
-from .conftest import DiscountStub, ProductReviewStub, tz
-from .conftest import round_decimal
-from .conftest import ProductPhotoUrlStub
-from .conftest import ProductStub
-from .conftest import ProductDimensionsStub
-from .conftest import ProductPriceStub
-from .conftest import TopLevelProductCategoryStub
-from .conftest import MidLevelProductCategoryStub
-from .conftest import TerminalLevelProductCategoryStub
-from .conftest import ProductVendorStub
+from diystore.domain.entities.product.stubs import DiscountStub, ProductReviewStub, tz
+from diystore.domain.entities.product.stubs import ProductPhotoUrlStub
+from diystore.domain.entities.product.stubs import ProductStub
+from diystore.domain.entities.product.stubs import ProductDimensionsStub
+from diystore.domain.entities.product.stubs import ProductPriceStub
+from diystore.domain.entities.product.stubs import TopLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import MidLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import TerminalLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import ProductVendorStub
 
 
 @pytest.mark.parametrize("wrong_ean", (b"1234567891234", [], dict(), (), {}, type))

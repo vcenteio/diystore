@@ -3,11 +3,11 @@ from typing import Union
 
 import pytest
 
-from .conftest import GetProductInputDTOStub
-from .conftest import ProductStub
+from diystore.domain.entities.product.stubs import ProductStub
 from diystore.application.usecases.product import ProductRepository
 from diystore.application.usecases.product import get_product_use_case
 from diystore.application.usecases.product import GetProductOutputDTO
+from diystore.application.usecases.product.stubs import GetProductInputDTOStub
 
 
 def test_application_get_product_use_case_wrong_input_dto_type(

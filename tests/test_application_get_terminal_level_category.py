@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 from uuid import uuid4
 
-from .conftest import TerminalLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import TerminalLevelProductCategoryStub
 from diystore.domain.entities.product import TerminalLevelProductCategory
 from diystore.application.usecases.product import ProductRepository
 from diystore.application.usecases.product import get_terminal_level_category

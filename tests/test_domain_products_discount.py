@@ -7,7 +7,7 @@ import pytest
 from pendulum import now
 from pydantic.error_wrappers import ValidationError
 
-from .conftest import DiscountStub
+from diystore.domain.entities.product.stubs import DiscountStub
 
 
 @pytest.mark.parametrize("rate", ("abc", {1, 2}, dict(), [1, 2], b"123"))

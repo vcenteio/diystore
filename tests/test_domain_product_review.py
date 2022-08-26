@@ -5,8 +5,8 @@ import pytest
 from pydantic.error_wrappers import ValidationError
 import pendulum
 
-from .conftest import ProductReviewStub
-from .conftest import round_decimal
+from diystore.domain.helpers import round_decimal
+from diystore.domain.entities.product.stubs import ProductReviewStub
 
 
 @pytest.mark.parametrize("invalid_rating", (-1, -0.01, 5.1, 50))

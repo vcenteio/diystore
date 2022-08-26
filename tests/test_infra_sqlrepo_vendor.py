@@ -3,10 +3,10 @@ from uuid import UUID
 import pytest
 from sqlalchemy.orm import Session
 
-from .conftest import ProductVendorStub
-from .conftest import ProductVendorOrmModelStub
-from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
 from diystore.domain.entities.product import ProductVendor
+from diystore.domain.entities.product.stubs import ProductVendorStub
+from diystore.infrastructure.repositories.sqlrepository import ProductVendorOrmModel
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import ProductVendorOrmModelStub
 
 
 def test_infra_sqlrepo_vendor_to_domain_entity(orm_session: Session):

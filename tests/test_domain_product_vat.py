@@ -5,7 +5,7 @@ import pytest
 from pydantic.error_wrappers import ValidationError
 
 from diystore.domain.entities.product import VAT
-from .conftest import VATStub
+from diystore.domain.entities.product.stubs import VATStub
 
 
 @pytest.mark.parametrize("wrong_rate", ("abc", {1, 2}, dict(), [1, 2], b"123"))

@@ -8,8 +8,7 @@ from diystore.application.usecases.product import get_products_use_case
 from diystore.application.usecases.product import OrderingProperty
 from diystore.application.usecases.product import OrderingType
 from diystore.application.usecases.product import GetProductsOutputDTO
-from diystore.domain.entities.product import Product
-from .conftest import GetProductsInputDTOStub
+from diystore.application.usecases.product.stubs import GetProductsInputDTOStub
 
 
 def test_application_get_products_use_case_input_dto_wrong_type():

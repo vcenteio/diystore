@@ -1,7 +1,7 @@
 from uuid import uuid4
 
-from .conftest import TerminalLevelProductCategoryStub
-from .conftest import MidLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import TerminalLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import MidLevelProductCategoryStub
 from diystore.application.usecases.product import ProductRepository
 from diystore.application.usecases.product import get_terminal_level_categories
 from diystore.application.usecases.product import GetTerminalLevelCategoriesOutputDTO

@@ -3,7 +3,7 @@ from pydantic import ValidationError
 
 from diystore.application.usecases.product import OrderingProperty
 from diystore.application.usecases.product import OrderingType
-from .conftest import GetProductsInputDTOStub
+from diystore.application.usecases.product.stubs import GetProductsInputDTOStub
 
 
 def test_application_get_products_input_dto_category_id_is_necessary(

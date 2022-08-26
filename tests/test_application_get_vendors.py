@@ -1,4 +1,4 @@
-from .conftest import ProductVendorStub
+from diystore.domain.entities.product.stubs import ProductVendorStub
 from diystore.application.usecases.product import GetProductVendorsOutputDTO
 from diystore.application.usecases.product import GetProductVendorOutputDTO
 from diystore.application.usecases.product import get_vendors

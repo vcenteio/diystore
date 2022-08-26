@@ -4,12 +4,14 @@ from uuid import UUID
 import pytest
 from sqlalchemy.orm import Session
 
-from .conftest import TopLevelCategoryOrmModelStub
-from .conftest import MidLevelCategoryOrmModelStub
-from .conftest import TerminalCategoryOrmModelStub
-from .conftest import TopLevelProductCategoryStub
-from .conftest import MidLevelProductCategoryStub
-from .conftest import TerminalLevelProductCategoryStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import LoadedProductOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import ProductVendorOrmModel
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import TopLevelCategoryOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import MidLevelCategoryOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import TerminalCategoryOrmModelStub
+from diystore.domain.entities.product.stubs import TopLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import MidLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import TerminalLevelProductCategoryStub
 from diystore.infrastructure.repositories.sqlrepository import TopLevelCategoryOrmModel
 from diystore.infrastructure.repositories.sqlrepository import MidLevelCategoryOrmModel
 from diystore.infrastructure.repositories.sqlrepository import TerminalCategoryOrmModel

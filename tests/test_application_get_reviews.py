@@ -1,7 +1,7 @@
 from uuid import uuid4
 
-from .conftest import ProductStub
-from .conftest import ProductReviewStub
+from diystore.domain.entities.product.stubs import ProductStub
+from diystore.domain.entities.product.stubs import ProductReviewStub
 from diystore.application.usecases.product import ProductRepository
 from diystore.application.usecases.product import GetProductReviewsInputDTO
 from diystore.application.usecases.product import GetProductReviewsOutputDTO

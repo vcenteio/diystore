@@ -5,15 +5,14 @@ from uuid import UUID
 
 import pytest
 
-from .conftest import ProductStub
-
-from .conftest import LoadedProductOrmModelStub
-from .conftest import ProductVendorStub
-from .conftest import ProductVendorOrmModel
-from .conftest import TopLevelCategoryOrmModelStub
-from .conftest import MidLevelCategoryOrmModelStub
-from .conftest import TerminalCategoryOrmModelStub
-from .conftest import ProductReviewStub
+from diystore.domain.entities.product.stubs import ProductStub
+from diystore.domain.entities.product.stubs import ProductVendorStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import LoadedProductOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import ProductVendorOrmModel
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import TopLevelCategoryOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import MidLevelCategoryOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import TerminalCategoryOrmModelStub
+from diystore.domain.entities.product.stubs import ProductReviewStub
 from diystore.infrastructure.repositories.sqlrepository import SQLProductRepository
 from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
 from diystore.infrastructure.repositories.sqlrepository import ProductOrmModel

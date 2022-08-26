@@ -1,8 +1,7 @@
 from uuid import UUID
 from uuid import uuid4
 
-from .conftest import ProductVendorOrmModelStub
-from .conftest import ProductVendorStub
+from diystore.domain.entities.product.stubs import ProductVendorStub
 from diystore.application.usecases.product import GetProductVendorInputDTO
 from diystore.application.usecases.product import GetProductVendorOutputDTO
 from diystore.application.usecases.product import get_vendor

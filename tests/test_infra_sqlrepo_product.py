@@ -4,16 +4,8 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.orm import Session
 
-from .conftest import ProductReviewStub, ProductReviewOrmModelStub
-from .conftest import ProductVendorOrmModelStub
-from .conftest import VatOrmModelStub
-from .conftest import ProductStub
-from .conftest import DiscountOrmModelStub
-from .conftest import TerminalCategoryOrmModelStub
-from .conftest import MidLevelCategoryOrmModelStub
-from .conftest import TopLevelCategoryOrmModelStub
-from .conftest import ProductOrmModelStub
-from .conftest import LoadedProductOrmModelStub
+from diystore.domain.entities.product.stubs import ProductStub
+from diystore.domain.entities.product.stubs import ProductReviewStub
 from diystore.domain.entities.product import Product
 from diystore.domain.entities.product import VAT
 from diystore.domain.entities.product import Discount
@@ -34,6 +26,15 @@ from diystore.infrastructure.repositories.sqlrepository import VatOrmModel
 from diystore.infrastructure.repositories.sqlrepository.exceptions import (
     OrmEntityNotFullyLoaded,
 )
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import ProductReviewOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import ProductVendorOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import VatOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import DiscountOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import TerminalCategoryOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import MidLevelCategoryOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import TopLevelCategoryOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import ProductOrmModelStub
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import LoadedProductOrmModelStub
 
 
 def test_infra_sqlrepo_product_vat_relationship_non_existing_vat(orm_session: Session):

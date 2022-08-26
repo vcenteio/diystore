@@ -2,7 +2,7 @@ import pytest
 from pydantic.error_wrappers import ValidationError
 
 from diystore.domain.entities.product import ProductVendor
-from .conftest import ProductVendorStub
+from diystore.domain.entities.product.stubs import ProductVendorStub
 
 
 def test_domain_product_vendor_no_description():

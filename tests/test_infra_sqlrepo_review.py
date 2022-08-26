@@ -3,11 +3,11 @@ from uuid import UUID
 import pytest
 from sqlalchemy.orm import Session
 
-from .conftest import tz
-from .conftest import ProductReviewStub
-from .conftest import ProductReviewOrmModelStub
+from diystore.domain.entities.product.stubs import tz
+from diystore.domain.entities.product.stubs import ProductReviewStub
 from diystore.domain.entities.product import ProductReview
 from diystore.infrastructure.repositories.sqlrepository import ProductReviewOrmModel
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import ProductReviewOrmModelStub
 
 
 def test_infra_sqlrepo_to_domain_entity(orm_session: Session):

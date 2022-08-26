@@ -4,11 +4,11 @@ from decimal import Decimal
 import pytest
 from sqlalchemy.orm import Session
 
-from .conftest import tz
-from .conftest import DiscountOrmModel
-from .conftest import DiscountOrmModelStub
-from .conftest import DiscountStub
+from diystore.domain.entities.product.stubs import tz
+from diystore.domain.entities.product.stubs import DiscountStub
 from diystore.domain.entities.product import Discount
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import DiscountOrmModel
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import DiscountOrmModelStub
 
 
 def test_infra_sqlrepo_discount_to_domain_entity(orm_session: Session):

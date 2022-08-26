@@ -5,9 +5,9 @@ from pydantic.error_wrappers import ValidationError
 
 from diystore.domain.entities.product import TerminalLevelProductCategory
 
-from .conftest import TopLevelProductCategoryStub
-from .conftest import MidLevelProductCategoryStub
-from .conftest import TerminalLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import TopLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import MidLevelProductCategoryStub
+from diystore.domain.entities.product.stubs import TerminalLevelProductCategoryStub
 
 
 def test_domain_product_categories_id_wrong_type(non_str_type):

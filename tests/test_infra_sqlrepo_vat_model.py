@@ -3,11 +3,11 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.orm import Session
 
-from .conftest import VATStub
-from .conftest import VatOrmModelStub
+from diystore.domain.entities.product.stubs import VATStub
 from diystore.infrastructure.repositories.sqlrepository import VatOrmModel
 from diystore.infrastructure.repositories.sqlrepository.helpers import validate_id
 from diystore.domain.entities.product import VAT
+from diystore.infrastructure.repositories.sqlrepository.models.stubs import VatOrmModelStub
 
 
 def test_infra_sqlrepo_vat_id_is_necessary():

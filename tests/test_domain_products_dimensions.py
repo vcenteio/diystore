@@ -4,7 +4,7 @@ import pytest
 from pydantic.error_wrappers import ValidationError
 
 from diystore.domain.entities.product import ProductDimensions
-from .conftest import ProductDimensionsStub
+from diystore.domain.entities.product.stubs import ProductDimensionsStub
 
 
 @pytest.mark.parametrize("wrong_dimension", ("a", b"a", [], (), {}, dict()))

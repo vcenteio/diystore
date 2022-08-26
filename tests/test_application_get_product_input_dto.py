@@ -3,7 +3,7 @@ from uuid import UUID
 import pytest
 from pydantic import ValidationError
 
-from .conftest import GetProductInputDTOStub
+from diystore.application.usecases.product.stubs import GetProductInputDTOStub
 
 
 def test_application_get_product_input_dto_invalid_uuid(invalid_uuid_str):

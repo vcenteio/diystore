@@ -6,9 +6,9 @@ from faker import Faker
 
 from diystore.domain.entities.product import ProductPrice
 
-from .conftest import DiscountStub
-from .conftest import ProductPriceStub
-from .conftest import VATStub
+from diystore.domain.entities.product.stubs import DiscountStub
+from diystore.domain.entities.product.stubs import ProductPriceStub
+from diystore.domain.entities.product.stubs import VATStub
 
 
 Faker.seed(0)
