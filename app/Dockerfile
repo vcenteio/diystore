@@ -8,4 +8,4 @@ COPY . /app/
 
 RUN /bin/bash -c "pip install poetry && poetry export > requirements.txt && pip install -r requirements.txt;"
 
-CMD gunicorn 'diystore.api.flaskrestapi:create_app()'
+CMD gunicorn $API_APP

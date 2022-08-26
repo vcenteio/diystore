@@ -5,7 +5,7 @@ from ..api_settings import WebAPISettings
 
 
 def _configure_app(app: Flask, settings: WebAPISettings):
-    if settings.env == "development":
+    if settings.ENV == "development":
         app.add_url_rule("/ping", view_func=lambda: "pong")
     
     app.config.update(settings.dict())

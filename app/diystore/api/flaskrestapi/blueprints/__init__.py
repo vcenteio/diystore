@@ -37,15 +37,15 @@ def configure_globals():
 
 @products_bp.after_request
 def set_mimetype(response: Response):
-    response.mimetype = current_app.config.get("mimetype")
+    response.mimetype = current_app.config.get("MIMETYPE")
     return response
 
 
 @products_bp.after_request
 def set_client_side_caching(response: Response):
-    add_etag: bool = current_app.config.get("add_etag")
-    cache_control: dict = current_app.config.get("cache_control")
-    response.cache_control.max_age = cache_control.get("max_age")
+    add_etag: bool = current_app.config.get("ADD_ETAG")
+    cache_control: dict = current_app.config.get("CACHE_CONTROL")
+    response.cache_control.max_age = cache_control.get("MAX_AGE")
     response.cache_control.public = True
     if add_etag:
         response.add_etag()
