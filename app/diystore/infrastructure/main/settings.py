@@ -11,6 +11,7 @@ class Settings(BaseSettings):
 
 class RepositorySettings(Settings):
     url: AnyUrl = Field(env="database_url")
+    echo: bool = Field(env="database_log_queries", default=False)
 
 
 class CacheSettings(Settings):

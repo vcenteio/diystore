@@ -41,6 +41,7 @@ class SQLProductRepository(ProductRepository):
         user: str = None,
         password: str = None,
         dbname: str = None,
+        echo: bool = False,
         base=Base,
     ):
         db_url = AnyUrl.build(
@@ -52,7 +53,7 @@ class SQLProductRepository(ProductRepository):
             path=f"/{dbname}" if dbname is not None else None,
         )
         try:
-            self._engine = create_engine(db_url, future=True, echo=True)
+            self._engine = create_engine(db_url, future=True, echo=echo)
         except ArgumentError:
             raise ValueError(f"invalid url passed as argument: {db_url}")
         base.metadata.create_all(self._engine)

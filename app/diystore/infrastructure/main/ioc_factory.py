@@ -35,6 +35,7 @@ def _setup_repos(ioc: IoCContainer, settings: InfraSettings):
             user=db_url.user,
             password=db_url.password,
             dbname=db_url.path.strip("/"),
+            echo=settings.repo.echo
         )
         return
     raise ValueError(f"unknown url scheme {db_url.scheme}")
