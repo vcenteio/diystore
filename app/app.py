@@ -1,0 +1,1 @@
+from diystore.api.flaskrestapi import create_app
