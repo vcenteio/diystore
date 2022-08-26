@@ -325,9 +325,7 @@ class LoadedProductOrmModelStub(ProductOrmModelStub):
         if o.discount_id is not None
         else None
     )
-    category = LazyAttribute(
-        lambda o: TerminalCategoryOrmModelStub(id=o.category_id)
-    )
+    category = LazyAttribute(lambda o: TerminalCategoryOrmModelStub(id=o.category_id))
     vendor = LazyAttribute(lambda o: ProductVendorOrmModelStub(id=o.vendor_id))
     reviews = LazyAttribute(
         lambda o: ProductReviewOrmModelStub.build_batch(3, product_id=o.id)
@@ -355,7 +353,7 @@ class GetProductsInputDTOStub(Factory):
     with_discounts_only = Faker("pybool")
 
 
-class ProductOutputDTOStub(Factory):
+class GetProductOutputDTOStub(Factory):
     class Meta:
         model = GetProductOutputDTO
 
@@ -368,6 +366,9 @@ class ProductOutputDTOStub(Factory):
         "pyfloat", right_digits=2, min_value=0.1, max_value=1, positive=True
     )
     price_without_discount: Decimal = Faker(
+        "pyfloat", right_digits=2, min_value=0.01, max_value=999.99
+    )
+    base_price: Decimal = Faker(
         "pyfloat", right_digits=2, min_value=0.01, max_value=999.99
     )
     vat: Decimal = Faker("pyfloat", right_digits=2, min_value=0, max_value=1)

@@ -4,18 +4,18 @@ from diystore.application.usecases.product import GetProductOutputDTO
 from diystore.application.usecases.product import GetProductsOutputDTO
 from .conftest import Product
 from .conftest import ProductStub
-from .conftest import ProductOutputDTOStub
+from .conftest import GetProductOutputDTOStub
 
 
 def test_application_get_products_product_output_dto_id_is_hex():
     _id = uuid4()
-    odto = ProductOutputDTOStub(id=_id)
+    odto = GetProductOutputDTOStub(id=_id)
     assert odto.id == _id.hex
 
 
 def test_application_get_products_product_output_dto_warranty_is_int(faker):
     warranty = faker.pyint(min_value=1, max_value=5)
-    odto = ProductOutputDTOStub(warranty=warranty)
+    odto = GetProductOutputDTOStub(warranty=warranty)
     assert isinstance(odto.warranty, int)
     assert odto.warranty == warranty
 

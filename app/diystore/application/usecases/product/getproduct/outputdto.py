@@ -16,6 +16,7 @@ class GetProductOutputDTO(BaseModel, DTO):
     description: Optional[str]
     price: float
     price_without_discount: float
+    base_price: float
     discount: Optional[float]
     vat: float
     in_stock: bool
@@ -53,6 +54,7 @@ class GetProductOutputDTO(BaseModel, DTO):
             description=product.description,
             price=product.get_final_price(),
             price_without_discount=product.get_final_price_without_discount(),
+            base_price=product.get_base_price(),
             discount=product.get_discount_rate(),
             vat=product.get_vat_rate(),
             in_stock=product.quantity > 0,
