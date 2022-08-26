@@ -1,12 +1,13 @@
 from flask import Flask
 
 from .blueprints import products_bp
+from .blueprints.dev_bp import bp as dev_bp
 from ..api_settings import WebAPISettings
 
 
 def _configure_app(app: Flask, settings: WebAPISettings):
     if settings.ENV == "development":
-        app.add_url_rule("/ping", view_func=lambda: "pong")
+        app.register_blueprint(dev_bp)
     
     app.config.update(settings.dict())
     app.register_blueprint(products_bp)
